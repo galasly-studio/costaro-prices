@@ -1,0 +1,138 @@
+name: COSTARO Price Catalog Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * *'
+  push:
+    paths:
+      - 'prices.json'
+      - '.github/workflows/price-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-prices:
+    name: Validate Moldova Price Catalog
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v6
+
+      - name: Validate prices.json
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import math
+          from pathlib import Path
+
+          path = Path("prices.json")
+
+          if not path.is_file():
+              raise SystemExit("ERROR: prices.json not found")
+
+          def reject_duplicates(pairs):
+              result = {}
+              for key, value in pairs:
+                  if key in result:
+                      raise ValueError(f"Duplicate JSON key: {key}")
+                  result[key] = value
+              return result
+
+          with path.open("r", encoding="utf-8") as file:
+              catalog = json.load(
+                  file,
+                  object_pairs_hook=reject_duplicates,
+                  parse_constant=lambda value: (
+                      (_ for _ in ()).throw(
+                          ValueError(f"Invalid JSON number: {value}")
+                      )
+                  ),
+              )
+
+          if not isinstance(catalog, dict):
+              raise SystemExit("ERROR: catalog must be a JSON object")
+
+          expected = {
+              "schemaVersion": 1,
+              "country": "MD",
+              "currency": "MDL",
+          }
+
+          for key, value in expected.items():
+              if catalog.get(key) != value:
+                  raise SystemExit(
+                      f"ERROR: invalid {key}, expected {value}"
+                  )
+
+          version = catalog.get("catalogVersion")
+
+          if not isinstance(version, str) or not version.strip():
+              raise SystemExit("ERROR: catalogVersion is missing")
+
+          if catalog.get("status") != "draft":
+              raise SystemExit(
+                  "ERROR: expected draft status during setup"
+              )
+
+          if catalog.get("automaticUpdatesEnabled") is not False:
+              raise SystemExit(
+                  "ERROR: automatic updates must remain disabled"
+              )
+
+          groups = {
+              "laborPrices": 37,
+              "materialPrices": 41,
+          }
+
+          for group_name, expected_count in groups.items():
+              group = catalog.get(group_name)
+
+              if not isinstance(group, dict):
+                  raise SystemExit(
+                      f"ERROR: {group_name} must be an object"
+                  )
+
+              if len(group) != expected_count:
+                  raise SystemExit(
+                      f"ERROR: {group_name}: expected "
+                      f"{expected_count} entries, got {len(group)}"
+                  )
+
+          def inspect_numbers(value, location="catalog"):
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      inspect_numbers(item, f"{location}.{key}")
+
+              elif isinstance(value, list):
+                  for index, item in enumerate(value):
+                      inspect_numbers(item, f"{location}[{index}]")
+
+              elif isinstance(value, float):
+                  if not math.isfinite(value):
+                      raise ValueError(
+                          f"Invalid number at {location}"
+                      )
+
+              elif isinstance(value, (int, float)) and not isinstance(
+                  value, bool
+              ):
+                  if value < 0:
+                      raise ValueError(
+                          f"Negative number at {location}"
+                      )
+
+          inspect_numbers(catalog)
+
+          print("COSTARO PRICE CATALOG: VALID")
+          print(f"Version: {version}")
+          print("Country: MD")
+          print("Currency: MDL")
+          print("Labor entries: 37")
+          print("Material entries: 41")
+          print("Automatic price changes: DISABLED")
+          PY
