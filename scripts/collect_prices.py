@@ -1,3 +1,5 @@
+"""COSTARO: read-only monitoring of Moldova material prices."""
+
 import json
 import re
 import statistics
@@ -9,28 +11,71 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-SOURCE_FILE = Path("price_sources.json")
-REPORT_FILE = Path("price_observations.json")
-
-ALLOWED_DOMAINS = {
-    "macons.md",
-    "www.macons.md",
-    "gebhardt.md",
-    "www.gebhardt.md",
-    "teremok.md",
-    "www.teremok.md",
-}
+SOURCES = Path("price_sources.json")
+OUTPUT = Path("price_observations.json")
 
 
-class ProductPageParser(HTMLParser):
+def normalize(value):
+    value = str(value).casefold()
+    value = value.replace("naș", "nas").replace("naş", "nas")
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def parse_price(value):
+    if isinstance(value, bool):
+        return None
+
+    raw = (
+        str(value)
+        .strip()
+        .replace("\u00a0", "")
+        .replace(" ", "")
+        .replace(",", ".")
+    )
+
+    if not re.fullmatch(r"\d+(?:\.\d{1,2})?", raw):
+        return None
+
+    price = float(raw)
+
+    if 1 <= price <= 100000:
+        return round(price, 2)
+
+    return None
+
+
+def find_products(node):
+    found = []
+
+    if isinstance(node, list):
+        for item in node:
+            found.extend(find_products(item))
+
+    elif isinstance(node, dict):
+        types = node.get("@type", [])
+
+        if isinstance(types, str):
+            types = [types]
+
+        if "Product" in types:
+            found.append(node)
+
+        for value in node.values():
+            if isinstance(value, (dict, list)):
+                found.extend(find_products(value))
+
+    return found
+
+
+class ProductHTML(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
+
         self.text_parts = []
-        self.json_ld = []
-        self.meta_prices = []
+        self.products = []
         self.inside_script = False
         self.inside_style = False
-        self.script_is_json_ld = False
+        self.is_json_ld = False
         self.script_parts = []
 
     def handle_starttag(self, tag, attrs):
@@ -41,127 +86,90 @@ class ProductPageParser(HTMLParser):
 
         if tag == "script":
             self.inside_script = True
-            script_type = attributes.get("type", "").lower()
-            self.script_is_json_ld = (
-                script_type == "application/ld+json"
+            self.is_json_ld = (
+                attributes.get("type", "").lower()
+                == "application/ld+json"
             )
             self.script_parts = []
-
-        if tag == "meta":
-            key = (
-                attributes.get("property")
-                or attributes.get("name")
-                or ""
-            ).lower()
-
-            if key in {
-                "product:price:amount",
-                "og:price:amount",
-            }:
-                value = attributes.get("content", "")
-                if value:
-                    self.meta_prices.append(value)
 
     def handle_endtag(self, tag):
         if tag == "style":
             self.inside_style = False
 
         if tag == "script":
-            if self.script_is_json_ld:
-                content = "".join(self.script_parts).strip()
-
-                if content:
-                    try:
-                        self.json_ld.append(json.loads(content))
-                    except json.JSONDecodeError:
-                        pass
+            if self.is_json_ld:
+                try:
+                    data = json.loads(
+                        "".join(self.script_parts)
+                    )
+                    self.products.extend(
+                        find_products(data)
+                    )
+                except json.JSONDecodeError:
+                    pass
 
             self.inside_script = False
-            self.script_is_json_ld = False
+            self.is_json_ld = False
             self.script_parts = []
 
     def handle_data(self, data):
         if self.inside_script:
-            if self.script_is_json_ld:
+            if self.is_json_ld:
                 self.script_parts.append(data)
             return
 
         if self.inside_style:
             return
 
-        value = " ".join(data.split())
+        text = " ".join(data.split())
 
-        if value:
-            self.text_parts.append(value)
-
-
-def normalize(value):
-    value = str(value).lower()
-    value = value.replace("naș", "nas")
-    value = value.replace("naş", "nas")
-    value = re.sub(r"\s+", " ", value)
-    return value.strip()
+        if text:
+            self.text_parts.append(text)
 
 
-def valid_product_name(value):
-    name = normalize(value)
+def matches(name, required_terms):
+    text = normalize(name)
 
-    return (
-        "class nas" in name
-        and re.search(r"25\s*kg\b", name) is not None
+    return all(
+        normalize(term) in text
+        for term in required_terms
     )
-
-
-def parse_price(value):
-    if isinstance(value, bool):
-        return None
-
-    if isinstance(value, (int, float)):
-        number = float(value)
-
-    elif isinstance(value, str):
-        cleaned = value.strip().replace(" ", "")
-        cleaned = cleaned.replace("\u00a0", "")
-        cleaned = cleaned.replace(",", ".")
-
-        if not re.fullmatch(r"\d+(?:\.\d{1,2})?", cleaned):
-            return None
-
-        number = float(cleaned)
-
-    else:
-        return None
-
-    if 10 <= number <= 2000:
-        return round(number, 2)
-
-    return None
 
 
 def download_page(url):
     parsed = urlparse(url)
 
-    if parsed.scheme != "https":
-        raise ValueError("Only HTTPS sources are allowed")
+    host = parsed.hostname or ""
 
-    if parsed.hostname not in ALLOWED_DOMAINS:
-        raise ValueError("Unapproved source domain")
+    if (
+        parsed.scheme != "https"
+        or not host.endswith(".md")
+        or parsed.username
+        or parsed.password
+    ):
+        raise ValueError(
+            "Only approved Moldova HTTPS sources are allowed"
+        )
 
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": (
-                "Mozilla/5.0 "
-                "(compatible; COSTARO-PriceResearch/0.2)"
-            ),
+            "User-Agent": "COSTARO-PriceResearch/0.3",
             "Accept": "text/html",
         },
     )
 
-    with urllib.request.urlopen(request, timeout=20) as response:
-        final_url = response.geturl()
+    with urllib.request.urlopen(
+        request,
+        timeout=20,
+    ) as response:
 
-        if urlparse(final_url).hostname not in ALLOWED_DOMAINS:
+        final_url = urlparse(response.geturl())
+
+        if (
+            final_url.scheme != "https"
+            or not (final_url.hostname or "").endswith(".md")
+        ):
             raise ValueError("Unexpected redirect")
 
         content_type = response.headers.get(
@@ -169,161 +177,117 @@ def download_page(url):
         ).lower()
 
         if "text/html" not in content_type:
-            raise ValueError("Response is not HTML")
+            raise ValueError("Unexpected content type")
 
         raw = response.read(2_000_001)
 
         if len(raw) > 2_000_000:
-            raise ValueError("Page exceeds size limit")
+            raise ValueError("Page too large")
 
-        return raw.decode("utf-8", errors="replace")
-
-
-def find_product_objects(value):
-    results = []
-
-    if isinstance(value, list):
-        for item in value:
-            results.extend(find_product_objects(item))
-
-    elif isinstance(value, dict):
-        object_type = value.get("@type", "")
-        types = (
-            object_type
-            if isinstance(object_type, list)
-            else [object_type]
+        return raw.decode(
+            "utf-8",
+            errors="replace",
         )
 
-        if "Product" in types:
-            results.append(value)
 
-        for nested in value.values():
-            if isinstance(nested, (list, dict)):
-                results.extend(find_product_objects(nested))
+def extract_price(html, required_terms, product_code):
+    parser = ProductHTML()
+    parser.feed(html)
 
-    return results
+    structured_prices = []
 
+    for product in parser.products:
+        if not matches(
+            product.get("name", ""),
+            required_terms,
+        ):
+            continue
 
-def structured_prices(parser, expected_code):
-    prices = []
+        sku = str(product.get("sku", "")).strip()
 
-    for block in parser.json_ld:
-        for product in find_product_objects(block):
-            if not valid_product_name(
-                product.get("name", "")
-            ):
+        if sku and product_code and sku != product_code:
+            continue
+
+        offers = product.get("offers", [])
+
+        if isinstance(offers, dict):
+            offers = [offers]
+
+        if not isinstance(offers, list):
+            continue
+
+        for offer in offers:
+            if not isinstance(offer, dict):
                 continue
 
-            sku = str(product.get("sku", "")).strip()
+            currency = offer.get(
+                "priceCurrency",
+                "MDL",
+            )
 
-            if sku and sku != expected_code:
+            if currency != "MDL":
                 continue
 
-            offers = product.get("offers", [])
+            price = parse_price(
+                offer.get("price", "")
+            )
 
-            if isinstance(offers, dict):
-                offers = [offers]
+            if price is not None:
+                structured_prices.append(price)
 
-            if not isinstance(offers, list):
-                continue
+    unique = sorted(set(structured_prices))
 
-            for offer in offers:
-                if not isinstance(offer, dict):
-                    continue
+    if len(unique) == 1:
+        return unique[0], "candidate", "structured_data"
 
-                currency = offer.get("priceCurrency")
+    if len(unique) > 1:
+        return None, "ambiguous", "structured_data"
 
-                if currency and currency != "MDL":
-                    continue
-
-                price = parse_price(offer.get("price"))
-
-                if price is not None:
-                    prices.append(price)
-
-    return sorted(set(prices))
-
-
-def visible_prices(parser):
-    parts = parser.text_parts
-
-    # Требуем название товара на странице.
-    if not any(valid_product_name(part) for part in parts):
-        return []
-
-    prices = []
     price_pattern = re.compile(
-        r"(?<!\d)(\d{1,5}(?:[.,]\d{1,2})?)"
+        r"(?<!\d)(\d{1,6}(?:[.,]\d{1,2})?)"
         r"\s*(?:MDL|lei)\b",
         re.IGNORECASE,
     )
 
-    for index, part in enumerate(parts):
-        if not valid_product_name(part):
+    visible_prices = []
+    parts = parser.text_parts
+
+    for index, text in enumerate(parts):
+        if not matches(text, required_terms):
             continue
 
-        # Ищем только в небольшом фрагменте
-        # после названия конкретного товара.
-        fragment_parts = parts[index + 1:index + 16]
+        nearby = parts[index + 1:index + 16]
 
-        for text in fragment_parts:
-            if valid_product_name(text):
-                break
-
-            for match in price_pattern.findall(text):
-                price = parse_price(match)
+        for fragment in nearby:
+            for value in price_pattern.findall(fragment):
+                price = parse_price(value)
 
                 if price is not None:
-                    prices.append(price)
+                    visible_prices.append(price)
 
-    return sorted(set(prices))
+    unique = sorted(set(visible_prices))
 
+    if len(unique) == 1:
+        return unique[0], "candidate", "visible_text"
 
-def inspect_page(html, expected_code):
-    parser = ProductPageParser()
-    parser.feed(html)
-
-    full_text = normalize(" ".join(parser.text_parts))
-
-    if not valid_product_name(full_text):
-        return None, "product_not_found", "none"
-
-    structured = structured_prices(
-        parser,
-        expected_code,
-    )
-
-    if len(structured) == 1:
-        return structured[0], "candidate", "structured_data"
-
-    if len(structured) > 1:
-        return None, "ambiguous", "structured_data"
-
-    visible = visible_prices(parser)
-
-    if len(visible) == 1:
-        return visible[0], "candidate", "visible_text"
-
-    if len(visible) > 1:
+    if len(unique) > 1:
         return None, "ambiguous", "visible_text"
 
-    # Мета-теги проверяем только как дополнительный
-    # источник, без автоматического подтверждения цены.
     return None, "unavailable", "none"
 
 
 def main():
-    with SOURCE_FILE.open("r", encoding="utf-8") as file:
+    with SOURCES.open("r", encoding="utf-8") as file:
         config = json.load(file)
 
     if config.get("schemaVersion") != 1:
-        raise ValueError("Unsupported source schema")
+        raise ValueError("Invalid schema version")
 
     if config.get("country") != "MD":
-        raise ValueError("Unexpected country")
+        raise ValueError("Invalid country")
 
     if config.get("currency") != "MDL":
-        raise ValueError("Unexpected currency")
+        raise ValueError("Invalid currency")
 
     if config.get("automaticPublicationEnabled") is not False:
         raise ValueError(
@@ -333,7 +297,7 @@ def main():
     materials = config.get("materials")
 
     if not isinstance(materials, list) or not materials:
-        raise ValueError("Materials list is missing")
+        raise ValueError("Material sources are missing")
 
     report = {
         "generatedAt": datetime.now(
@@ -352,18 +316,41 @@ def main():
             observation = {
                 "store": source["store"],
                 "url": source["url"],
-                "productCode": source["productCode"],
+                "productCode": source.get(
+                    "productCode", ""
+                ),
                 "price": None,
                 "status": "unavailable",
                 "extractionMethod": "none",
             }
 
+            terms = source.get(
+                "matchTerms",
+                material.get("matchTerms"),
+            )
+
+            if terms is None:
+                terms = [material["name"]]
+
+            if (
+                not isinstance(terms, list)
+                or not terms
+                or not all(
+                    isinstance(term, str) and term.strip()
+                    for term in terms
+                )
+            ):
+                raise ValueError(
+                    "Invalid matchTerms configuration"
+                )
+
             try:
                 html = download_page(source["url"])
 
-                price, status, method = inspect_page(
+                price, status, method = extract_price(
                     html,
-                    str(source["productCode"]),
+                    terms,
+                    str(source.get("productCode", "")),
                 )
 
                 observation["price"] = price
@@ -384,26 +371,25 @@ def main():
             print(
                 f"{source['store']}: "
                 f"{observation['status']} | "
-                f"{observation['price']} MDL | "
-                f"{observation['extractionMethod']}"
+                f"{observation['price']} MDL"
             )
 
         candidates = [
             item["price"]
             for item in observations
-            if item["status"] == "candidate"
-            and item["price"] is not None
+            if (
+                item["status"] == "candidate"
+                and item["price"] is not None
+            )
         ]
 
         median = None
 
         if len(candidates) >= 2:
-            low = min(candidates)
-            high = max(candidates)
+            minimum = min(candidates)
+            maximum = max(candidates)
 
-            # При слишком большом расхождении
-            # предварительную медиану не рассчитываем.
-            if high <= low * 1.20:
+            if maximum <= minimum * 1.20:
                 median = statistics.median(candidates)
 
         report["materials"].append(
@@ -416,7 +402,7 @@ def main():
             }
         )
 
-    with REPORT_FILE.open("w", encoding="utf-8") as file:
+    with OUTPUT.open("w", encoding="utf-8") as file:
         json.dump(
             report,
             file,
@@ -424,7 +410,7 @@ def main():
             indent=2,
         )
 
-    print(f"Report saved: {REPORT_FILE}")
+    print(f"Report saved: {OUTPUT}")
     print("Published prices were NOT changed.")
 
 
