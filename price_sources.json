@@ -132,11 +132,30 @@
       "sources": []
     },
     {
-      "id": "finishPutty",
-      "name": "Финишная шпаклёвка",
-      "catalogMaterialKey": "finishPutty",
-      "sources": []
+  "id": "finito_sv_plus_20kg",
+  "name": "Glet Finito SV+ 20kg",
+  "catalogMaterialKey": "finishPutty",
+  "priceTier": null,
+  "unit": "bag",
+  "packageWeightKg": 20,
+  "matchTerms": [
+    "Finito",
+    "SV+",
+    "20kg"
+  ],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/glet-finito-sv-20kg",
+      "productCode": "1190"
     },
+    {
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/glet-finito-sv-20kg.html",
+      "productCode": "6000557"
+    }
+  ]
+}
     {
       "id": "gypsumBoardCeiling",
       "name": "Потолочный гипсокартон",
