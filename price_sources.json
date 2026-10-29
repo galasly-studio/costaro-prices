@@ -6,8 +6,208 @@
   "automaticPublicationEnabled": false,
   "materials": [
     {
+      "id": "ceilingDirectHangerPerPiece",
+      "name": "Прямой подвес потолочного профиля",
+      "catalogMaterialKey": "ceilingDirectHangerPerPiece",
+      "sources": []
+    },
+    {
+      "id": "ceilingCrossConnectorPerPiece",
+      "name": "Крестообразный соединитель профиля",
+      "catalogMaterialKey": "ceilingCrossConnectorPerPiece",
+      "sources": []
+    },
+    {
+      "id": "ceilingExtensionConnectorPerPiece",
+      "name": "Удлинитель потолочного профиля",
+      "catalogMaterialKey": "ceilingExtensionConnectorPerPiece",
+      "sources": []
+    },
+    {
+      "id": "ceilingBaseAnchorPerPiece",
+      "name": "Анкер потолочной конструкции",
+      "catalogMaterialKey": "ceilingBaseAnchorPerPiece",
+      "sources": []
+    },
+    {
+      "id": "ceilingUdFastenerPerPiece",
+      "name": "Крепёж направляющего профиля",
+      "catalogMaterialKey": "ceilingUdFastenerPerPiece",
+      "sources": []
+    },
+    {
+      "id": "tilePerM2",
+      "name": "Напольная плитка",
+      "catalogMaterialKey": "tilePerM2",
+      "sources": []
+    },
+    {
+      "id": "laminatePerM2",
+      "name": "Ламинат",
+      "catalogMaterialKey": "laminatePerM2",
+      "sources": []
+    },
+    {
+      "id": "vinylPerM2",
+      "name": "Виниловое напольное покрытие",
+      "catalogMaterialKey": "vinylPerM2",
+      "sources": []
+    },
+    {
+      "id": "linoleumPerM2",
+      "name": "Линолеум",
+      "catalogMaterialKey": "linoleumPerM2",
+      "sources": []
+    },
+    {
+      "id": "laminateUnderlayPerM2",
+      "name": "Подложка под ламинат",
+      "catalogMaterialKey": "laminateUnderlayPerM2",
+      "sources": []
+    },
+    {
+      "id": "skirtingAccessoryPerPiece",
+      "name": "Комплектующие плинтуса",
+      "catalogMaterialKey": "skirtingAccessoryPerPiece",
+      "sources": []
+    },
+    {
+      "id": "electricalSocketPerPiece",
+      "name": "Электрическая розетка",
+      "catalogMaterialKey": "electricalSocketPerPiece",
+      "sources": []
+    },
+    {
+      "id": "electricalSwitchPerPiece",
+      "name": "Электрический выключатель",
+      "catalogMaterialKey": "electricalSwitchPerPiece",
+      "sources": []
+    },
+    {
+      "id": "electricalSubboxPerPiece",
+      "name": "Подрозетник",
+      "catalogMaterialKey": "electricalSubboxPerPiece",
+      "sources": []
+    },
+    {
+      "id": "electricalLightingConnectorPerPoint",
+      "name": "Соединитель освещения",
+      "catalogMaterialKey": "electricalLightingConnectorPerPoint",
+      "sources": []
+    },
+    {
+      "id": "electricalSocketCablePerM",
+      "name": "Кабель для розеток",
+      "catalogMaterialKey": "electricalSocketCablePerM",
+      "sources": []
+    },
+    {
+      "id": "electricalLightingCablePerM",
+      "name": "Кабель освещения",
+      "catalogMaterialKey": "electricalLightingCablePerM",
+      "sources": []
+    },
+    {
+      "id": "ceilingFrameFastenersPerM2",
+      "name": "Крепёж потолочного каркаса",
+      "catalogMaterialKey": "ceilingFrameFastenersPerM2",
+      "sources": []
+    },
+    {
+      "id": "gypsumPlaster",
+      "name": "Гипсовая штукатурка",
+      "catalogMaterialKey": "gypsumPlaster",
+      "sources": []
+    },
+    {
+      "id": "cementPlaster",
+      "name": "Цементная штукатурка",
+      "catalogMaterialKey": "cementPlaster",
+      "sources": []
+    },
+    {
+      "id": "startPutty",
+      "name": "Стартовая шпаклёвка",
+      "catalogMaterialKey": "startPutty",
+      "sources": []
+    },
+    {
+      "id": "finishPutty",
+      "name": "Финишная шпаклёвка",
+      "catalogMaterialKey": "finishPutty",
+      "sources": []
+    },
+    {
+      "id": "gypsumBoardCeiling",
+      "name": "Потолочный гипсокартон",
+      "catalogMaterialKey": "gypsumBoardCeiling",
+      "sources": []
+    },
+    {
+      "id": "ceilingCdProfile",
+      "name": "Потолочный CD-профиль",
+      "catalogMaterialKey": "ceilingCdProfile",
+      "sources": []
+    },
+    {
+      "id": "ceilingUdProfile",
+      "name": "Направляющий UD-профиль",
+      "catalogMaterialKey": "ceilingUdProfile",
+      "sources": []
+    },
+    {
+      "id": "ceilingMetalScrews",
+      "name": "Саморезы по металлу",
+      "catalogMaterialKey": "ceilingMetalScrews",
+      "sources": []
+    },
+    {
+      "id": "ceilingDrywallScrews",
+      "name": "Саморезы для гипсокартона",
+      "catalogMaterialKey": "ceilingDrywallScrews",
+      "sources": []
+    },
+    {
+      "id": "ceilingJointTape",
+      "name": "Армирующая лента для швов",
+      "catalogMaterialKey": "ceilingJointTape",
+      "sources": []
+    },
+    {
+      "id": "primer",
+      "name": "Грунтовка",
+      "catalogMaterialKey": "primer",
+      "sources": []
+    },
+    {
+      "id": "interiorPaint",
+      "name": "Интерьерная краска",
+      "catalogMaterialKey": "interiorPaint",
+      "sources": []
+    },
+    {
+      "id": "wallpaper",
+      "name": "Обои",
+      "catalogMaterialKey": "wallpaper",
+      "sources": []
+    },
+    {
+      "id": "wallpaperGlue",
+      "name": "Клей для обоев",
+      "catalogMaterialKey": "wallpaperGlue",
+      "sources": []
+    },
+    {
+      "id": "decorativePlaster",
+      "name": "Декоративная штукатурка",
+      "catalogMaterialKey": "decorativePlaster",
+      "sources": []
+    },
+    {
       "id": "tile_adhesive_class_nas_25kg",
       "name": "Adeziv Class Nas 25kg",
+      "catalogMaterialKey": "tileAdhesive",
+      "priceTier": null,
       "unit": "bag",
       "packageWeightKg": 25,
       "sources": [
@@ -27,6 +227,48 @@
           "productCode": "510014"
         }
       ]
+    },
+    {
+      "id": "grout",
+      "name": "Затирка для плитки",
+      "catalogMaterialKey": "grout",
+      "sources": []
+    },
+    {
+      "id": "floorScreedMix",
+      "name": "Смесь для стяжки пола",
+      "catalogMaterialKey": "floorScreedMix",
+      "sources": []
+    },
+    {
+      "id": "selfLevelingFloorMix",
+      "name": "Самовыравнивающаяся смесь",
+      "catalogMaterialKey": "selfLevelingFloorMix",
+      "sources": []
+    },
+    {
+      "id": "floorWaterproofing",
+      "name": "Гидроизоляция пола",
+      "catalogMaterialKey": "floorWaterproofing",
+      "sources": []
+    },
+    {
+      "id": "pvcSkirtingPiece",
+      "name": "ПВХ-плинтус",
+      "catalogMaterialKey": "pvcSkirtingPiece",
+      "sources": []
+    },
+    {
+      "id": "mdfSkirtingPiece",
+      "name": "МДФ-плинтус",
+      "catalogMaterialKey": "mdfSkirtingPiece",
+      "sources": []
+    },
+    {
+      "id": "woodSkirtingPiece",
+      "name": "Деревянный плинтус",
+      "catalogMaterialKey": "woodSkirtingPiece",
+      "sources": []
     }
   ]
 }
