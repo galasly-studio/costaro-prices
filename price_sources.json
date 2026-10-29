@@ -12,18 +12,18 @@
       "packageWeightKg": 25,
       "sources": [
         {
-          "store": "StroiMarket",
-          "url": "https://stroimarket.md/adezivi",
-          "productCode": "368"
+          "store": "Macons",
+          "url": "https://macons.md/adeziv-class-nas-25kg",
+          "productCode": "495"
         },
         {
-          "store": "ObraMag",
-          "url": "https://www.obramag.md/category/pentru-gresie-%C8%99i-faian%C8%9B%C4%83",
+          "store": "Gebhardt",
+          "url": "https://gebhardt.md/adezivi/adeziv-class-nas-25kg.html",
           "productCode": "510014"
         },
         {
           "store": "Teremok",
-          "url": "https://teremok.md/product-category/totul-pentru-reparatii-si-constructii/materiale-de-finisare/",
+          "url": "https://teremok.md/product/adeziv-class-nas-25kg/",
           "productCode": "510014"
         }
       ]
