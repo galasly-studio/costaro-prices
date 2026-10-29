@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "country": "MD",
+  "currency": "MDL",
+  "status": "pilot",
+  "automaticPublicationEnabled": false,
+  "materials": [
+    {
+      "id": "tile_adhesive_class_nas_25kg",
+      "name": "Adeziv Class Nas 25kg",
+      "unit": "bag",
+      "packageWeightKg": 25,
+      "sources": [
+        {
+          "store": "StroiMarket",
+          "url": "https://stroimarket.md/adezivi",
+          "productCode": "368"
+        },
+        {
+          "store": "ObraMag",
+          "url": "https://www.obramag.md/category/pentru-gresie-%C8%99i-faian%C8%9B%C4%83",
+          "productCode": "510014"
+        },
+        {
+          "store": "Teremok",
+          "url": "https://teremok.md/product-category/totul-pentru-reparatii-si-constructii/materiale-de-finisare/",
+          "productCode": "510014"
+        }
+      ]
+    }
+  ]
+}
