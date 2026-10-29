@@ -49,7 +49,7 @@
     },
     {
       "id": "vinylPerM2",
-      "name": "Виниловое напольное покрытие",
+      "name": "Виниловое покрытие",
       "catalogMaterialKey": "vinylPerM2",
       "sources": []
     },
@@ -97,7 +97,7 @@
     },
     {
       "id": "electricalSocketCablePerM",
-      "name": "Кабель для розеток",
+      "name": "Кабель розеток",
       "catalogMaterialKey": "electricalSocketCablePerM",
       "sources": []
     },
@@ -114,48 +114,74 @@
       "sources": []
     },
     {
-      "id": "gypsumPlaster",
-      "name": "Гипсовая штукатурка",
+      "id": "knauf_mp75_25kg",
+      "name": "Tencuiala pe baza de ipsos Knauf MP-75 25kg",
       "catalogMaterialKey": "gypsumPlaster",
-      "sources": []
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 25,
+      "matchTerms": ["Knauf", "MP-75", "25kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/tencuiala-pe-baza-de-ipsos-knauf-mp-75-25kg",
+          "productCode": "2668"
+        }
+      ]
     },
     {
-      "id": "cementPlaster",
-      "name": "Цементная штукатурка",
+      "id": "optim_cement_plaster_25kg",
+      "name": "Tencuiala pe baza de ciment Optim 25kg",
       "catalogMaterialKey": "cementPlaster",
-      "sources": []
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 25,
+      "matchTerms": ["Optim", "25kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/tencuiala-pe-baza-de-ciment-optim-25kg",
+          "productCode": "537"
+        }
+      ]
     },
     {
-      "id": "startPutty",
-      "name": "Стартовая шпаклёвка",
+      "id": "acryl_putz_st10_start_20kg",
+      "name": "Chit Acryl-Putz ST10 START 20kg",
       "catalogMaterialKey": "startPutty",
-      "sources": []
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 20,
+      "matchTerms": ["Acryl-Putz", "ST10", "20kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/chit-acryl-putz-st10-start-20kg",
+          "productCode": "1162"
+        }
+      ]
     },
     {
-  "id": "finito_sv_plus_20kg",
-  "name": "Glet Finito SV+ 20kg",
-  "catalogMaterialKey": "finishPutty",
-  "priceTier": null,
-  "unit": "bag",
-  "packageWeightKg": 20,
-  "matchTerms": [
-    "Finito",
-    "SV+",
-    "20kg"
-  ],
-  "sources": [
-    {
-      "store": "Macons",
-      "url": "https://macons.md/glet-finito-sv-20kg",
-      "productCode": "1190"
+      "id": "finito_sv_plus_20kg",
+      "name": "Glet Finito SV+ 20kg",
+      "catalogMaterialKey": "finishPutty",
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 20,
+      "matchTerms": ["Finito", "SV+", "20kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/glet-finito-sv-20kg",
+          "productCode": "1190"
+        },
+        {
+          "store": "Gebhardt",
+          "url": "https://gebhardt.md/glet-finito-sv-20kg.html",
+          "productCode": "6000557"
+        }
+      ]
     },
-    {
-      "store": "Gebhardt",
-      "url": "https://gebhardt.md/glet-finito-sv-20kg.html",
-      "productCode": "6000557"
-    }
-  ]
-},
     {
       "id": "gypsumBoardCeiling",
       "name": "Потолочный гипсокартон",
@@ -164,13 +190,13 @@
     },
     {
       "id": "ceilingCdProfile",
-      "name": "Потолочный CD-профиль",
+      "name": "Профиль CD",
       "catalogMaterialKey": "ceilingCdProfile",
       "sources": []
     },
     {
       "id": "ceilingUdProfile",
-      "name": "Направляющий UD-профиль",
+      "name": "Профиль UD",
       "catalogMaterialKey": "ceilingUdProfile",
       "sources": []
     },
@@ -182,27 +208,47 @@
     },
     {
       "id": "ceilingDrywallScrews",
-      "name": "Саморезы для гипсокартона",
+      "name": "Саморезы по гипсокартону",
       "catalogMaterialKey": "ceilingDrywallScrews",
       "sources": []
     },
     {
       "id": "ceilingJointTape",
-      "name": "Армирующая лента для швов",
+      "name": "Лента для швов",
       "catalogMaterialKey": "ceilingJointTape",
       "sources": []
     },
     {
-      "id": "primer",
-      "name": "Грунтовка",
+      "id": "supraton_extra_15kg",
+      "name": "Grund Supraton Extra 15kg",
       "catalogMaterialKey": "primer",
-      "sources": []
+      "priceTier": null,
+      "unit": "bucket",
+      "packageWeightKg": 15,
+      "matchTerms": ["Supraton", "Extra", "15kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/grund-supraton-extra-15kg",
+          "productCode": "552"
+        }
+      ]
     },
     {
-      "id": "interiorPaint",
-      "name": "Интерьерная краска",
+      "id": "sansiro_14kg",
+      "name": "Vopsea Sansiro 14kg",
       "catalogMaterialKey": "interiorPaint",
-      "sources": []
+      "priceTier": null,
+      "unit": "bucket",
+      "packageWeightKg": 14,
+      "matchTerms": ["Sansiro", "14kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/vopsea-sansiro-14kg",
+          "productCode": "590"
+        }
+      ]
     },
     {
       "id": "wallpaper",
@@ -260,10 +306,20 @@
       "sources": []
     },
     {
-      "id": "selfLevelingFloorMix",
-      "name": "Самовыравнивающаяся смесь",
+      "id": "nivelir_universal_25kg",
+      "name": "Sapa autonivelanta Nivelir Universal 25kg",
       "catalogMaterialKey": "selfLevelingFloorMix",
-      "sources": []
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 25,
+      "matchTerms": ["Nivelir", "Universal", "25kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/sapa-autonivelanta-nivelir-universal-25kg",
+          "productCode": "640"
+        }
+      ]
     },
     {
       "id": "floorWaterproofing",
