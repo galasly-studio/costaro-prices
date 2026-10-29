@@ -137,7 +137,7 @@ jobs:
           print("Automatic price changes: DISABLED")
           PY
 
-            collect-observations:
+ collect-observations:
     name: Collect Moldova Material Prices
     runs-on: ubuntu-latest
     timeout-minutes: 10
