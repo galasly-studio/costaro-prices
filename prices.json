@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "0.0.1",
+  "country": "MD",
+  "currency": "MDL",
+  "status": "draft",
+  "automaticUpdatesEnabled": false,
+  "laborPrices": {},
+  "materialPrices": {}
+}
