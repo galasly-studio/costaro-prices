@@ -136,26 +136,3 @@ jobs:
           print("Material entries: 41")
           print("Automatic price changes: DISABLED")
           PY
-
- collect-observations:
-    name: Collect Moldova Material Prices
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Download repository
-        uses: actions/checkout@v6
-
-      - name: Check Python script
-        run: python3 -m py_compile scripts/collect_prices.py
-
-      - name: Collect price observations
-        run: python3 scripts/collect_prices.py
-
-      - name: Upload observation report
-        uses: actions/upload-artifact@v4
-        with:
-          name: costaro-price-observations
-          path: price_observations.json
-          if-no-files-found: error
-          retention-days: 30
