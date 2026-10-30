@@ -21,11 +21,20 @@
   ]
 },
     {
-      "id": "ceilingCrossConnectorPerPiece",
-      "name": "Крестообразный соединитель профиля",
-      "catalogMaterialKey": "ceilingCrossConnectorPerPiece",
-      "sources": []
-    },
+  "id": "ceilingCrossConnectorPerPiece",
+  "name": "Соединитель профилей CD 60×27 NIDA",
+  "catalogMaterialKey": "ceilingCrossConnectorPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": ["Conector", "CD 60x27", "NIDA"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/conector-de-fixare-a-profilelor-cd-60x27-nida",
+      "productCode": "1129"
+    }
+  ]
+},
     {
   "id": "ceilingExtensionConnectorPerPiece",
   "name": "Удлинитель профиля CD 60×27",
@@ -298,11 +307,21 @@
   ]
 },
     {
-      "id": "ceilingMetalScrews",
-      "name": "Саморезы по металлу",
-      "catalogMaterialKey": "ceilingMetalScrews",
-      "sources": []
-    },
+  "id": "ceilingMetalScrews",
+  "name": "Саморезы металл-металл 3,5×9,5 мм, 1000 шт.",
+  "catalogMaterialKey": "ceilingMetalScrews",
+  "priceTier": null,
+  "unit": "pack",
+  "packageQuantity": 1000,
+  "matchTerms": ["metal-metal", "3.5x9.5mm", "1000buc"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/surub-autofiletant-pentru-metal-metal-35x95mm-1000buc",
+      "productCode": "1730"
+    }
+  ]
+},
    {
   "id": "ceilingDrywallScrews",
   "name": "Саморезы для гипсокартона по металлу 3,5×25 мм, 1000 шт.",
