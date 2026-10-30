@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: costaro-price-observations
-        path: |
+          path: |
             price_observations.json
             price_audit_report.json
           if-no-files-found: error
