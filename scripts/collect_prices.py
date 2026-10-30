@@ -255,7 +255,7 @@ def download_page(url):
 
 
 def extract_price(html, required_terms, product_code):
-        primary_price = extract_primary_microdata_price(
+    primary_price = extract_primary_microdata_price(
         html,
         required_terms,
         product_code,
