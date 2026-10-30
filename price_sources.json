@@ -188,23 +188,47 @@
       ]
     },
     {
-      "id": "gypsumBoardCeiling",
-      "name": "Потолочный гипсокартон",
-      "catalogMaterialKey": "gypsumBoardCeiling",
-      "sources": []
-    },
+  "id": "gypsumBoardCeiling",
+  "name": "Гипсокартон Technogips 2500×1200×12,5 мм",
+  "catalogMaterialKey": "gypsumBoardCeiling",
+  "priceTier": null,
+  "unit": "sheet",
+  "sources": [
     {
-      "id": "ceilingCdProfile",
-      "name": "Профиль CD",
-      "catalogMaterialKey": "ceilingCdProfile",
-      "sources": []
-    },
+      "store": "Macons",
+      "url": "https://macons.md/gips-carton-technogips-2500x1200x125mm",
+      "productCode": ""
+    }
+  ]
+},
     {
-      "id": "ceilingUdProfile",
-      "name": "Профиль UD",
-      "catalogMaterialKey": "ceilingUdProfile",
-      "sources": []
-    },
+  "id": "ceilingCdProfile",
+  "name": "Профиль CD 60/27, 0,6 мм, 3 м",
+  "catalogMaterialKey": "ceilingCdProfile",
+  "priceTier": null,
+  "unit": "piece",
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/profil-cd-60-27-06mm-3m",
+      "productCode": ""
+    }
+  ]
+},
+   {
+  "id": "ceilingUdProfile",
+  "name": "Профиль UD 27/28, 0,6 мм, 3 м",
+  "catalogMaterialKey": "ceilingUdProfile",
+  "priceTier": null,
+  "unit": "piece",
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/profil-ud-27-28-06mm-3m",
+      "productCode": ""
+    }
+  ]
+},
     {
       "id": "ceilingMetalScrews",
       "name": "Саморезы по металлу",
@@ -212,17 +236,35 @@
       "sources": []
     },
     {
-      "id": "ceilingDrywallScrews",
-      "name": "Саморезы по гипсокартону",
-      "catalogMaterialKey": "ceilingDrywallScrews",
-      "sources": []
-    },
+  "id": "ceilingDrywallScrews",
+  "name": "Саморезы для гипсокартона по металлу 3,5×25 мм, 1000 шт.",
+  "catalogMaterialKey": "ceilingDrywallScrews",
+  "priceTier": null,
+  "unit": "pack",
+  "packageQuantity": 1000,
+  "sources": [
     {
-      "id": "ceilingJointTape",
-      "name": "Лента для швов",
-      "catalogMaterialKey": "ceilingJointTape",
-      "sources": []
-    },
+      "store": "Macons",
+      "url": "https://macons.md/surub-autofiletant-pentru-gips-metal-35x25mm-1000buc",
+      "productCode": ""
+    }
+  ]
+},
+    {
+  "id": "ceilingJointTape",
+  "name": "Лента для швов гипсокартона 50 мм × 90 м",
+  "catalogMaterialKey": "ceilingJointTape",
+  "priceTier": null,
+  "unit": "roll",
+  "packageLengthM": 90,
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/banda-pentru-rosturi-gips-carton-50mm-x-90m",
+      "productCode": ""
+    }
+  ]
+},
     {
   "id": "supraton_extra_15kg",
   "name": "Grund Supraton Extra 15kg",
@@ -309,11 +351,20 @@
       ]
     },
     {
-      "id": "grout",
-      "name": "Затирка для плитки",
-      "catalogMaterialKey": "grout",
-      "sources": []
-    },
+  "id": "grout",
+  "name": "Затирка Ceresit CE 40, 2 кг",
+  "catalogMaterialKey": "grout",
+  "priceTier": null,
+  "unit": "pack",
+  "packageWeightKg": 2,
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/chit-de-rosturi-ceresit-ce-40-2kg",
+      "productCode": ""
+    }
+  ]
+},
     {
       "id": "floorScreedMix",
       "name": "Смесь для стяжки пола",
