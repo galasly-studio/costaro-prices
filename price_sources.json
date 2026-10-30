@@ -83,17 +83,43 @@
   ]
 },
     {
-      "id": "tilePerM2",
-      "name": "Напольная плитка",
-      "catalogMaterialKey": "tilePerM2",
-      "sources": []
-    },
+  "id": "tilePerM2",
+  "name": "Напольная плитка Cersanit Milton Grey 298x598 PEI 4",
+  "catalogMaterialKey": "tilePerM2",
+  "priceTier": null,
+  "unit": "m2",
+  "matchTerms": [
+    "CERSANIT",
+    "MILTON",
+    "298X598"
+  ],
+  "sources": [
     {
-      "id": "laminatePerM2",
-      "name": "Ламинат",
-      "catalogMaterialKey": "laminatePerM2",
-      "sources": []
-    },
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/gresie-cersanit-milton-grey-298x598-gri-pei-4.html",
+      "productCode": "40582"
+    }
+  ]
+},
+    {
+  "id": "laminatePerM2",
+  "name": "Ламинат Floorpan Classic Datca Timb, 8 мм, класс 32",
+  "catalogMaterialKey": "laminatePerM2",
+  "priceTier": null,
+  "unit": "m2",
+  "matchTerms": [
+    "FLOORPAN",
+    "DATCA",
+    "1205X197X8"
+  ],
+  "sources": [
+    {
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/floorpan-ro-ro/laminat-kastamonu-floorpan-classic-datca-timb-1205x197x8-bej-cl-32.html",
+      "productCode": "107760"
+    }
+  ]
+},
     {
       "id": "vinylPerM2",
       "name": "Виниловое покрытие",
@@ -113,11 +139,23 @@
       "sources": []
     },
     {
-      "id": "skirtingAccessoryPerPiece",
-      "name": "Комплектующие плинтуса",
-      "catalogMaterialKey": "skirtingAccessoryPerPiece",
-      "sources": []
-    },
+  "id": "skirtingAccessoryPerPiece",
+  "name": "Окончание плинтуса PROFI 55 мм",
+  "catalogMaterialKey": "skirtingAccessoryPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": [
+    "Sfirsit",
+    "PROFI"
+  ],
+  "sources": [
+    {
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/564-sfirsit-profi.html",
+      "productCode": "9210508"
+    }
+  ]
+},
     {
   "id": "electricalSocketPerPiece",
   "name": "Розетка Schneider Asfora EPH2900221, 16 А, белая",
@@ -544,18 +582,44 @@
     }
   ]
 },
+   {
+  "id": "pvcSkirtingPiece",
+  "name": "ПВХ-плинтус INDO 03 Stejar Loft",
+  "catalogMaterialKey": "pvcSkirtingPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": [
+    "INDO",
+    "03",
+    "Stejar Loft"
+  ],
+  "sources": [
     {
-      "id": "pvcSkirtingPiece",
-      "name": "ПВХ-плинтус",
-      "catalogMaterialKey": "pvcSkirtingPiece",
-      "sources": []
-    },
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/plinta-indo-03-stejar-loft.html",
+      "productCode": "5580"
+    }
+  ]
+},
     {
-      "id": "mdfSkirtingPiece",
-      "name": "МДФ-плинтус",
-      "catalogMaterialKey": "mdfSkirtingPiece",
-      "sources": []
-    },
+  "id": "mdfSkirtingPiece",
+  "name": "МДФ-плинтус Arbiton MP1101 Paint It",
+  "catalogMaterialKey": "mdfSkirtingPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": [
+    "MDF",
+    "Arbiton",
+    "MP1101"
+  ],
+  "sources": [
+    {
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/plinte-si-accesorii/plinta-mdf-arbiton-mp1101-paint-it.html",
+      "productCode": "9211095"
+    }
+  ]
+},
     {
       "id": "woodSkirtingPiece",
       "name": "Деревянный плинтус",
