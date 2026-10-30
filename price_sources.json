@@ -193,11 +193,12 @@
   "catalogMaterialKey": "gypsumBoardCeiling",
   "priceTier": null,
   "unit": "sheet",
+  "matchTerms": ["Technogips", "2500x1200", "12.5mm"],
   "sources": [
     {
       "store": "Macons",
       "url": "https://macons.md/gips-carton-technogips-2500x1200x125mm",
-      "productCode": ""
+      "productCode": "2643"
     }
   ]
 },
@@ -207,11 +208,12 @@
   "catalogMaterialKey": "ceilingCdProfile",
   "priceTier": null,
   "unit": "piece",
+  "matchTerms": ["Profil CD", "60/27", "0.6mm", "3m"],
   "sources": [
     {
       "store": "Macons",
       "url": "https://macons.md/profil-cd-60-27-06mm-3m",
-      "productCode": ""
+      "productCode": "1812"
     }
   ]
 },
@@ -221,11 +223,12 @@
   "catalogMaterialKey": "ceilingUdProfile",
   "priceTier": null,
   "unit": "piece",
+  "matchTerms": ["Profil UD", "27/28", "0.6mm", "3m"],
   "sources": [
     {
       "store": "Macons",
       "url": "https://macons.md/profil-ud-27-28-06mm-3m",
-      "productCode": ""
+      "productCode": "1739"
     }
   ]
 },
@@ -235,18 +238,19 @@
       "catalogMaterialKey": "ceilingMetalScrews",
       "sources": []
     },
-    {
+   {
   "id": "ceilingDrywallScrews",
   "name": "Саморезы для гипсокартона по металлу 3,5×25 мм, 1000 шт.",
   "catalogMaterialKey": "ceilingDrywallScrews",
   "priceTier": null,
   "unit": "pack",
   "packageQuantity": 1000,
+  "matchTerms": ["gips-metal", "3.5x25mm", "1000buc"],
   "sources": [
     {
       "store": "Macons",
       "url": "https://macons.md/surub-autofiletant-pentru-gips-metal-35x25mm-1000buc",
-      "productCode": ""
+      "productCode": "1524"
     }
   ]
 },
@@ -257,11 +261,12 @@
   "priceTier": null,
   "unit": "roll",
   "packageLengthM": 90,
+  "matchTerms": ["Banda", "50mm", "90m"],
   "sources": [
     {
       "store": "Macons",
       "url": "https://macons.md/banda-pentru-rosturi-gips-carton-50mm-x-90m",
-      "productCode": ""
+      "productCode": "1087"
     }
   ]
 },
@@ -357,11 +362,12 @@
   "priceTier": null,
   "unit": "pack",
   "packageWeightKg": 2,
+  "matchTerms": ["Ceresit", "CE 40", "2kg"],
   "sources": [
     {
       "store": "Macons",
       "url": "https://macons.md/chit-de-rosturi-ceresit-ce-40-2kg",
-      "productCode": ""
+      "productCode": "2076"
     }
   ]
 },
