@@ -119,17 +119,43 @@
       "sources": []
     },
     {
-      "id": "electricalSocketPerPiece",
-      "name": "Электрическая розетка",
-      "catalogMaterialKey": "electricalSocketPerPiece",
-      "sources": []
-    },
+  "id": "electricalSocketPerPiece",
+  "name": "Розетка Schneider Asfora EPH2900221, 16 А, белая",
+  "catalogMaterialKey": "electricalSocketPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": [
+    "Schneider",
+    "EPH2900221",
+    "16 A"
+  ],
+  "sources": [
     {
-      "id": "electricalSwitchPerPiece",
-      "name": "Электрический выключатель",
-      "catalogMaterialKey": "electricalSwitchPerPiece",
-      "sources": []
-    },
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/prize/priza-unitara-cu-obturator-schneider-eph2900221-asfora-16-a-250-v-alb.html",
+      "productCode": "EPH2900221"
+    }
+  ]
+},
+    {
+  "id": "electricalSwitchPerPiece",
+  "name": "Выключатель Elmos 8001-01, 10 А, белый",
+  "catalogMaterialKey": "electricalSwitchPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": [
+    "Elmos",
+    "8001-01",
+    "10 A"
+  ],
+  "sources": [
+    {
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/intrerupatoare/intrerupator-unitar-elmos-8001-01-10-a-230-v-alb.html",
+      "productCode": "8001-01"
+    }
+  ]
+},
     {
   "id": "electricalSubboxPerPiece",
   "name": "Подрозетник D65×H40 с винтом",
