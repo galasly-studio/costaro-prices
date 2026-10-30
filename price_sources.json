@@ -5,12 +5,21 @@
   "status": "pilot",
   "automaticPublicationEnabled": false,
   "materials": [
+   {
+  "id": "ceilingDirectHangerPerPiece",
+  "name": "Прямой подвес 0,65 мм, 60×125 мм",
+  "catalogMaterialKey": "ceilingDirectHangerPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": ["Element suspensie", "0.65mm", "60x125mm"],
+  "sources": [
     {
-      "id": "ceilingDirectHangerPerPiece",
-      "name": "Прямой подвес потолочного профиля",
-      "catalogMaterialKey": "ceilingDirectHangerPerPiece",
-      "sources": []
-    },
+      "store": "Macons",
+      "url": "https://macons.md/element-suspensie-065mm-60x125mm",
+      "productCode": "1982"
+    }
+  ]
+},
     {
       "id": "ceilingCrossConnectorPerPiece",
       "name": "Крестообразный соединитель профиля",
@@ -18,23 +27,52 @@
       "sources": []
     },
     {
-      "id": "ceilingExtensionConnectorPerPiece",
-      "name": "Удлинитель потолочного профиля",
-      "catalogMaterialKey": "ceilingExtensionConnectorPerPiece",
-      "sources": []
-    },
+  "id": "ceilingExtensionConnectorPerPiece",
+  "name": "Удлинитель профиля CD 60×27",
+  "catalogMaterialKey": "ceilingExtensionConnectorPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": ["Conector imbinare", "CD", "60x27"],
+  "sources": [
     {
-      "id": "ceilingBaseAnchorPerPiece",
-      "name": "Анкер потолочной конструкции",
-      "catalogMaterialKey": "ceilingBaseAnchorPerPiece",
-      "sources": []
-    },
+      "store": "Macons",
+      "url": "https://macons.md/conector-imbinare-profiluri-cd-60x27",
+      "productCode": "894"
+    }
+  ]
+},
     {
-      "id": "ceilingUdFastenerPerPiece",
-      "name": "Крепёж направляющего профиля",
-      "catalogMaterialKey": "ceilingUdFastenerPerPiece",
-      "sources": []
-    },
+  "id": "ceilingBaseAnchorPerPiece",
+  "name": "Клиновой анкер 6×40 мм, упаковка 20 шт.",
+  "catalogMaterialKey": "ceilingBaseAnchorPerPiece",
+  "priceTier": null,
+  "unit": "pack",
+  "packageQuantity": 20,
+  "matchTerms": ["6x40mm", "20buc"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/ancora-cu-pana-6x40mm-20buc",
+      "productCode": "2651"
+    }
+  ]
+},
+    {
+  "id": "ceilingUdFastenerPerPiece",
+  "name": "Дюбель-гвоздь 6×40 мм, упаковка 20 шт.",
+  "catalogMaterialKey": "ceilingUdFastenerPerPiece",
+  "priceTier": null,
+  "unit": "pack",
+  "packageQuantity": 20,
+  "matchTerms": ["Diblu", "6x40mm", "20buc"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/diblu-cu-guler-cu-surub-cui-6x40mm-20buc",
+      "productCode": "1090"
+    }
+  ]
+},
     {
       "id": "tilePerM2",
       "name": "Напольная плитка",
@@ -84,11 +122,20 @@
       "sources": []
     },
     {
-      "id": "electricalSubboxPerPiece",
-      "name": "Подрозетник",
-      "catalogMaterialKey": "electricalSubboxPerPiece",
-      "sources": []
-    },
+  "id": "electricalSubboxPerPiece",
+  "name": "Подрозетник D65×H40 с винтом",
+  "catalogMaterialKey": "electricalSubboxPerPiece",
+  "priceTier": null,
+  "unit": "piece",
+  "matchTerms": ["Cutie pentru priza", "D65", "H40"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/cutie-pentru-priza-d65-x-h40-cu-surub",
+      "productCode": "1962"
+    }
+  ]
+},
     {
       "id": "electricalLightingConnectorPerPoint",
       "name": "Соединитель освещения",
