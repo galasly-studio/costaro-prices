@@ -121,23 +121,63 @@
   ]
 },
     {
-      "id": "vinylPerM2",
-      "name": "Виниловое покрытие",
-      "catalogMaterialKey": "vinylPerM2",
-      "sources": []
-    },
+  "id": "vinylPerM2",
+  "name": "Виниловое SPC-покрытие Ametista Spanish Cedar, 4 мм",
+  "catalogMaterialKey": "vinylPerM2",
+  "priceTier": null,
+  "unit": "m2",
+  "matchTerms": [
+    "SPC",
+    "Ametista",
+    "Spanish Cedar"
+  ],
+  "sources": [
     {
-      "id": "linoleumPerM2",
-      "name": "Линолеум",
-      "catalogMaterialKey": "linoleumPerM2",
-      "sources": []
-    },
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/parchet-spc-ametista-classa-33-4mm-spanish-cedar-4v-1220-180-cafeniu.html",
+      "productCode": "529163"
+    }
+  ]
+},
     {
-      "id": "laminateUnderlayPerM2",
-      "name": "Подложка под ламинат",
-      "catalogMaterialKey": "laminateUnderlayPerM2",
-      "sources": []
-    },
+  "id": "linoleumPerM2",
+  "name": "Линолеум PVC Kortes-1, 2,5 мм, ширина 1,5 м",
+  "catalogMaterialKey": "linoleumPerM2",
+  "priceTier": null,
+  "unit": "m2",
+  "matchTerms": [
+    "Linoleum",
+    "Kortes-1",
+    "2.5mm"
+  ],
+  "sources": [
+    {
+      "store": "Supraten",
+      "url": "https://supraten.md/linoleum-1044957-ro",
+      "productCode": "1044957"
+    }
+  ]
+},
+    {
+  "id": "laminateUnderlayPerM2",
+  "name": "Подложка Premium Sound, 1,8 мм, рулон 8,5 м²",
+  "catalogMaterialKey": "laminateUnderlayPerM2",
+  "priceTier": null,
+  "unit": "roll",
+  "packageAreaM2": 8.5,
+  "matchTerms": [
+    "PREMIUM SOUND",
+    "8.50x1m",
+    "1.8mm"
+  ],
+  "sources": [
+    {
+      "store": "Supraten",
+      "url": "https://supraten.md/folie-0012076-ro",
+      "productCode": "0012076"
+    }
+  ]
+},
     {
   "id": "skirtingAccessoryPerPiece",
   "name": "Окончание плинтуса PROFI 55 мм",
@@ -461,17 +501,45 @@
   ]
 },
     {
-      "id": "wallpaper",
-      "name": "Обои",
-      "catalogMaterialKey": "wallpaper",
-      "sources": []
-    },
+  "id": "wallpaper",
+  "name": "Виниловые обои на флизелине 10x1,06 м, DXC 1588/1",
+  "catalogMaterialKey": "wallpaper",
+  "priceTier": null,
+  "unit": "roll",
+  "packageLengthM": 10,
+  "packageWidthM": 1.06,
+  "matchTerms": [
+    "Tapet vinil/vlies",
+    "1588/1"
+  ],
+  "sources": [
     {
-      "id": "wallpaperGlue",
-      "name": "Клей для обоев",
-      "catalogMaterialKey": "wallpaperGlue",
-      "sources": []
-    },
+      "store": "Supraten",
+      "url": "https://supraten.md/tapet-1085752-ro",
+      "productCode": "1085752"
+    }
+  ]
+},
+    {
+  "id": "wallpaperGlue",
+  "name": "Клей для обоев Supra-T, 200 г",
+  "catalogMaterialKey": "wallpaperGlue",
+  "priceTier": null,
+  "unit": "pack",
+  "packageWeightKg": 0.2,
+  "matchTerms": [
+    "Adeziv",
+    "Supra-T",
+    "200g"
+  ],
+  "sources": [
+    {
+      "store": "Supraten",
+      "url": "https://supraten.md/adeziv-supra-t-200g-54841-ro",
+      "productCode": "510023"
+    }
+  ]
+},
     {
   "id": "decorativePlaster",
   "name": "Декоративная штукатурка Vinarom F15, 25 кг",
