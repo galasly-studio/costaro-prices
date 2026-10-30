@@ -50,7 +50,9 @@ def main():
         configured_sources = material.get("sources", [])
         total_sources += len(configured_sources)
 
-        if catalog_key in catalog_keys:
+        # Считаем материал охваченным мониторингом,
+        # только если для него настроен хотя бы один источник.
+        if catalog_key in catalog_keys and configured_sources:
             covered_catalog_keys.add(catalog_key)
 
         observation = observations_by_id.get(material_id, {})
