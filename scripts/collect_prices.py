@@ -126,7 +126,71 @@ class ProductHTML(HTMLParser):
         if text:
             self.text_parts.append(text)
 
+class PrimaryProductMicrodata(HTMLParser):
+    """Read the main product's heading, SKU and price."""
 
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.inside_h1 = False
+        self.heading_parts = []
+        self.skus = []
+        self.prices = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+
+        if tag == "h1":
+            self.inside_h1 = True
+
+        if tag != "meta":
+            return
+
+        itemprop = attributes.get("itemprop", "").lower()
+        content = attributes.get("content", "").strip()
+
+        if itemprop == "sku" and content:
+            self.skus.append(content)
+
+        elif itemprop == "price" and content:
+            price = parse_price(content)
+
+            if price is not None:
+                self.prices.append(price)
+
+    def handle_endtag(self, tag):
+        if tag == "h1":
+            self.inside_h1 = False
+
+    def handle_data(self, data):
+        if self.inside_h1:
+            self.heading_parts.append(data)
+
+
+def extract_primary_microdata_price(html, required_terms, product_code):
+    """
+    Accept a price only when the main product heading
+    and exact SKU match the configured source.
+    """
+    parser = PrimaryProductMicrodata()
+    parser.feed(html)
+
+    heading = " ".join(parser.heading_parts).strip()
+
+    if not matches(heading, required_terms):
+        return None
+
+    if not product_code:
+        return None
+
+    if product_code not in parser.skus:
+        return None
+
+    unique_prices = sorted(set(parser.prices))
+
+    if len(unique_prices) != 1:
+        return None
+
+    return unique_prices[0]
 def matches(name, required_terms):
     text = normalize(name)
 
@@ -191,6 +255,19 @@ def download_page(url):
 
 
 def extract_price(html, required_terms, product_code):
+        primary_price = extract_primary_microdata_price(
+        html,
+        required_terms,
+        product_code,
+    )
+
+    if primary_price is not None:
+        return (
+            primary_price,
+            "candidate",
+            "product_microdata",
+        )
+
     parser = ProductHTML()
     parser.feed(html)
 
