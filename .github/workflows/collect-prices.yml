@@ -24,10 +24,17 @@ jobs:
       - name: Collect price observations
         run: python3 scripts/collect_prices.py
 
+      - name: Audit all COSTARO prices
+        run: |
+          python3 -m py_compile scripts/audit_prices.py
+          python3 scripts/audit_prices.py
+
       - name: Upload observation report
         uses: actions/upload-artifact@v4
         with:
           name: costaro-price-observations
-          path: price_observations.json
+        path: |
+            price_observations.json
+            price_audit_report.json
           if-no-files-found: error
           retention-days: 30
