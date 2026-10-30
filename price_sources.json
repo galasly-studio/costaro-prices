@@ -96,17 +96,35 @@
       "sources": []
     },
     {
-      "id": "electricalSocketCablePerM",
-      "name": "Кабель розеток",
-      "catalogMaterialKey": "electricalSocketCablePerM",
-      "sources": []
-    },
+  "id": "electricalSocketCablePerM",
+  "name": "Кабель ВВГнг 3×2,5 мм²",
+  "catalogMaterialKey": "electricalSocketCablePerM",
+  "priceTier": null,
+  "unit": "m",
+  "matchTerms": ["VVG", "3x2.5mm2"],
+  "sources": [
     {
-      "id": "electricalLightingCablePerM",
-      "name": "Кабель освещения",
-      "catalogMaterialKey": "electricalLightingCablePerM",
-      "sources": []
-    },
+      "store": "Macons",
+      "url": "https://macons.md/cablu-electric-vvg-ng-3x25mm2",
+      "productCode": "1959"
+    }
+  ]
+},
+    {
+  "id": "electricalLightingCablePerM",
+  "name": "Кабель ВВГнг 3×1,5 мм²",
+  "catalogMaterialKey": "electricalLightingCablePerM",
+  "priceTier": null,
+  "unit": "m",
+  "matchTerms": ["VVG", "3x1.5mm2"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/cablu-electric-vvg-ng-3x15mm2",
+      "productCode": "1960"
+    }
+  ]
+},
     {
       "id": "ceilingFrameFastenersPerM2",
       "name": "Крепёж потолочного каркаса",
@@ -325,11 +343,21 @@
       "sources": []
     },
     {
-      "id": "decorativePlaster",
-      "name": "Декоративная штукатурка",
-      "catalogMaterialKey": "decorativePlaster",
-      "sources": []
-    },
+  "id": "decorativePlaster",
+  "name": "Декоративная штукатурка Vinarom F15, 25 кг",
+  "catalogMaterialKey": "decorativePlaster",
+  "priceTier": null,
+  "unit": "bucket",
+  "packageWeightKg": 25,
+  "matchTerms": ["VINAROM", "F15", "25kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/tencuiala-decorativa-vinarom-f15-bob-de-orez-alb-25kg",
+      "productCode": "2532"
+    }
+  ]
+},
     {
       "id": "tile_adhesive_class_nas_25kg",
       "name": "Adeziv Class Nas 25kg",
@@ -372,11 +400,21 @@
   ]
 },
     {
-      "id": "floorScreedMix",
-      "name": "Смесь для стяжки пола",
-      "catalogMaterialKey": "floorScreedMix",
-      "sources": []
-    },
+  "id": "floorScreedMix",
+  "name": "Смесь для стяжки Baumit Solido E225, 40 кг",
+  "catalogMaterialKey": "floorScreedMix",
+  "priceTier": null,
+  "unit": "bag",
+  "packageWeightKg": 40,
+  "matchTerms": ["Baumit", "Solido E225", "40kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/sapa-egalizare-baumit-solido-e225-interior-exterior-40kg",
+      "productCode": "1880"
+    }
+  ]
+},
     {
   "id": "nivelir_universal_25kg",
   "name": "Sapa autonivelanta Nivelir Universal 25kg",
@@ -399,11 +437,21 @@
   ]
 },
     {
-      "id": "floorWaterproofing",
-      "name": "Гидроизоляция пола",
-      "catalogMaterialKey": "floorWaterproofing",
-      "sources": []
-    },
+  "id": "floorWaterproofing",
+  "name": "Гидроизоляция Ceresit CL 51 Express, 5 кг",
+  "catalogMaterialKey": "floorWaterproofing",
+  "priceTier": null,
+  "unit": "pack",
+  "packageWeightKg": 5,
+  "matchTerms": ["Ceresit", "CL 51", "5kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/hidroizolatie-ceresit-cl-51-express-5kg",
+      "productCode": "2038"
+    }
+  ]
+},
     {
       "id": "pvcSkirtingPiece",
       "name": "ПВХ-плинтус",
