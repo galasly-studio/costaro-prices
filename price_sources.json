@@ -114,21 +114,26 @@
       "sources": []
     },
     {
-      "id": "knauf_mp75_25kg",
-      "name": "Tencuiala pe baza de ipsos Knauf MP-75 25kg",
-      "catalogMaterialKey": "gypsumPlaster",
-      "priceTier": null,
-      "unit": "bag",
-      "packageWeightKg": 25,
-      "matchTerms": ["Knauf", "MP-75", "25kg"],
-      "sources": [
-        {
-          "store": "Macons",
-          "url": "https://macons.md/tencuiala-pe-baza-de-ipsos-knauf-mp-75-25kg",
-          "productCode": "2668"
-        }
-      ]
+  "id": "knauf_mp75_25kg",
+  "name": "Tencuiala pe baza de ipsos Knauf MP-75 25kg",
+  "catalogMaterialKey": "gypsumPlaster",
+  "priceTier": null,
+  "unit": "bag",
+  "packageWeightKg": 25,
+  "matchTerms": ["Knauf", "MP-75", "25kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/tencuiala-pe-baza-de-ipsos-knauf-mp-75-25kg",
+      "productCode": "2668"
     },
+    {
+      "store": "ObraMag",
+      "url": "https://obramag.md/product/knauf-mp-75-25kg-tencuiala-50-sacpal",
+      "productCode": "109710"
+    }
+  ]
+},
     {
       "id": "optim_cement_plaster_25kg",
       "name": "Tencuiala pe baza de ciment Optim 25kg",
@@ -219,37 +224,47 @@
       "sources": []
     },
     {
-      "id": "supraton_extra_15kg",
-      "name": "Grund Supraton Extra 15kg",
-      "catalogMaterialKey": "primer",
-      "priceTier": null,
-      "unit": "bucket",
-      "packageWeightKg": 15,
-      "matchTerms": ["Supraton", "Extra", "15kg"],
-      "sources": [
-        {
-          "store": "Macons",
-          "url": "https://macons.md/grund-supraton-extra-15kg",
-          "productCode": "552"
-        }
-      ]
+  "id": "supraton_extra_15kg",
+  "name": "Grund Supraton Extra 15kg",
+  "catalogMaterialKey": "primer",
+  "priceTier": null,
+  "unit": "bucket",
+  "packageWeightKg": 15,
+  "matchTerms": ["Supraton", "Extra", "15kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/grund-supraton-extra-15kg",
+      "productCode": "552"
     },
     {
-      "id": "sansiro_14kg",
-      "name": "Vopsea Sansiro 14kg",
-      "catalogMaterialKey": "interiorPaint",
-      "priceTier": null,
-      "unit": "bucket",
-      "packageWeightKg": 14,
-      "matchTerms": ["Sansiro", "14kg"],
-      "sources": [
-        {
-          "store": "Macons",
-          "url": "https://macons.md/vopsea-sansiro-14kg",
-          "productCode": "590"
-        }
-      ]
+      "store": "Teremok",
+      "url": "https://teremok.md/product/grund-supraton-extra-15kg/",
+      "productCode": "3000113"
+    }
+  ]
+},
+    {
+  "id": "sansiro_14kg",
+  "name": "Vopsea Sansiro 14kg",
+  "catalogMaterialKey": "interiorPaint",
+  "priceTier": null,
+  "unit": "bucket",
+  "packageWeightKg": 14,
+  "matchTerms": ["Sansiro", "14kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/vopsea-sansiro-14kg",
+      "productCode": "590"
     },
+    {
+      "store": "ObraMag",
+      "url": "https://obramag.md/product/vopsea-universala-supraten-sansiro-14kg",
+      "productCode": "6000232"
+    }
+  ]
+},
     {
       "id": "wallpaper",
       "name": "Обои",
@@ -306,21 +321,26 @@
       "sources": []
     },
     {
-      "id": "nivelir_universal_25kg",
-      "name": "Sapa autonivelanta Nivelir Universal 25kg",
-      "catalogMaterialKey": "selfLevelingFloorMix",
-      "priceTier": null,
-      "unit": "bag",
-      "packageWeightKg": 25,
-      "matchTerms": ["Nivelir", "Universal", "25kg"],
-      "sources": [
-        {
-          "store": "Macons",
-          "url": "https://macons.md/sapa-autonivelanta-nivelir-universal-25kg",
-          "productCode": "640"
-        }
-      ]
+  "id": "nivelir_universal_25kg",
+  "name": "Sapa autonivelanta Nivelir Universal 25kg",
+  "catalogMaterialKey": "selfLevelingFloorMix",
+  "priceTier": null,
+  "unit": "bag",
+  "packageWeightKg": 25,
+  "matchTerms": ["Nivelir", "Universal", "25kg"],
+  "sources": [
+    {
+      "store": "Macons",
+      "url": "https://macons.md/sapa-autonivelanta-nivelir-universal-25kg",
+      "productCode": "640"
     },
+    {
+      "store": "Gebhardt",
+      "url": "https://gebhardt.md/sapa-autonivelanta-nivelir-universal-25kg-479231754.html",
+      "productCode": "6020068"
+    }
+  ]
+},
     {
       "id": "floorWaterproofing",
       "name": "Гидроизоляция пола",
