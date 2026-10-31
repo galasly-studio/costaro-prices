@@ -1,0 +1,34 @@
+name: COSTARO Labor Price Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-labor:
+    name: Check 37 labor rates without publishing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Check Python script
+        run: python3 -m py_compile scripts/audit_labor_prices.py
+
+      - name: Run audit unit tests
+        run: python3 -m unittest discover -s tests -p test_audit_labor_prices.py -v
+
+      - name: Audit all 37 rates
+        run: python3 scripts/audit_labor_prices.py
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: costaro-labor-audit-report
+          path: |
+            labor_audit_report.json
+            labor_audit_summary.txt
+          if-no-files-found: warn
