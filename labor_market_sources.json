@@ -1,0 +1,65 @@
+{
+  "description": "Documented public Moldova labor-price benchmarks. Not an auto-publishing feed. Quote ranges may describe slightly different scopes; review before changing rates.",
+  "sources": {
+    "plasterWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/facing/", "checkedOn": "2026-10-31", "scope": "plasterWork", "unit": "m2", "min": 65, "max": 160},
+      {"url": "https://construct.md/ru/pages/price/", "checkedOn": "2026-10-31", "scope": "plasterWork", "unit": "m2", "min": 120, "max": 120}
+    ],
+    "puttyWork": [
+      {"url": "https://construct.md/ru/pages/price/", "checkedOn": "2026-10-31", "scope": "puttyWork", "unit": "m2", "min": 50, "max": 50},
+      {"url": "https://remontexpert.md/service/tencuitor-zugrav/", "checkedOn": "2026-10-31", "scope": "puttyWork", "unit": "m2", "min": 75, "max": 75},
+      {"url": "https://clickwork.md/otdelochnye-raboty/shtukaturnye-raboty/shpaklevka-sten/", "checkedOn": "2026-10-31", "scope": "puttyWork", "unit": "m2", "min": 35, "max": 35}
+    ],
+    "wallpaperWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/facing/", "checkedOn": "2026-10-31", "scope": "wallpaperWork", "unit": "m2", "min": 30, "max": 80},
+      {"url": "https://construct.md/ru/pages/price/", "checkedOn": "2026-10-31", "scope": "wallpaperWork", "unit": "m2", "min": 45, "max": 45}
+    ],
+    "wallPaintWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/facing/", "checkedOn": "2026-10-31", "scope": "wallPaintWork", "unit": "m2", "min": 22, "max": 70},
+      {"url": "https://construct.md/ru/pages/price/", "checkedOn": "2026-10-31", "scope": "wallPaintWork", "unit": "m2", "min": 45, "max": 45}
+    ],
+    "drywallCeilingWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/facing/", "checkedOn": "2026-10-31", "scope": "drywallCeilingWork", "unit": "m2", "min": 80, "max": 200},
+      {"url": "https://construct.md/ru/pages/price/", "checkedOn": "2026-10-31", "scope": "drywallCeilingWork", "unit": "m2", "min": 170, "max": 170}
+    ],
+    "primerWork": [
+      {"url": "https://construct.md/ru/pages/price/", "checkedOn": "2026-10-31", "scope": "primerWork", "unit": "m2", "min": 10, "max": 10}
+    ],
+    "laminateWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/floor/montare-laminat-m2/", "checkedOn": "2026-10-31", "scope": "laminateWork", "unit": "m2", "min": 40, "max": 130}
+    ],
+    "floorScreedWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/building_installation_work/", "checkedOn": "2026-10-31", "scope": "floorScreedWork", "unit": "m2", "min": 70, "max": 165}
+    ],
+    "selfLevelingFloorWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/building_installation_work/", "checkedOn": "2026-10-31", "scope": "selfLevelingFloorWork", "unit": "m2", "min": 25, "max": 120}
+    ],
+    "floorTileWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/building_installation_work/", "checkedOn": "2026-10-31", "scope": "floorTileWork", "unit": "m2", "min": 90, "max": 300}
+    ],
+    "skirtingWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/building_installation_work/", "checkedOn": "2026-10-31", "scope": "skirtingWork", "unit": "m", "min": 25, "max": 140}
+    ],
+    "electricalDeviceInstallWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/building_installation_work/", "checkedOn": "2026-10-31", "scope": "electricalDeviceInstallWork", "unit": "piece", "min": 25, "max": 160}
+    ],
+    "electricalCableLayWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/building_installation_work/", "checkedOn": "2026-10-31", "scope": "electricalCableLayWork", "unit": "m", "min": 10, "max": 50}
+    ],
+    "electricalDeviceRemovalWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/repair_electric/", "checkedOn": "2026-10-31", "scope": "electricalDeviceRemovalWork", "unit": "piece", "min": 30, "max": 80}
+    ],
+    "electricalLightRemovalWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/repair_electric/", "checkedOn": "2026-10-31", "scope": "electricalLightRemovalWork", "unit": "piece", "min": 50, "max": 200}
+    ],
+    "plumbingWaterPipeWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/heating_water_supply_sewerage/", "checkedOn": "2026-10-31", "scope": "plumbingWaterPipeWork", "unit": "m", "min": 60, "max": 150}
+    ],
+    "plumbingSewerPipeWork": [
+      {"url": "https://remont.md/ru/preturi/clerical/heating_water_supply_sewerage/", "checkedOn": "2026-10-31", "scope": "plumbingSewerPipeWork", "unit": "m", "min": 100, "max": 320}
+    ],
+    "startPuttyWork": [
+      {"url": "https://remontexpert.md/service/tencuitor-zugrav/", "checkedOn": "2026-10-31", "scope": "startPuttyWork", "unit": "m2", "min": 65, "max": 65}
+    ]
+  }
+}
