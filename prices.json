@@ -7,6 +7,13 @@
   "automaticUpdatesEnabled": false,
   "source": "Existing COSTARO MoldovaPrices constants; not live market prices",
   "sourceAuditDate": "2026-08-30",
+  "laborStagePrices": {
+    "startPuttyWork": {
+      "budget": 40,
+      "standard": 55,
+      "premium": 80
+    }
+  },
   "laborPrices": {
     "removeWallpaperWork": {
       "budget": 25,
