@@ -2,8 +2,6 @@ name: COSTARO Material Price Collection
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '30 6 * * *'
 
 permissions:
   contents: read

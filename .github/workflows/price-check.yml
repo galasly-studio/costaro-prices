@@ -2,11 +2,12 @@ name: COSTARO Price Catalog Check
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 6 * * *'
   push:
     paths:
       - 'prices.json'
+      - 'app_embedded_baseline.json'
+      - 'scripts/validate_app_catalog.py'
+      - 'tests/test_validate_app_catalog.py'
       - '.github/workflows/price-check.yml'
 
 permissions:
@@ -21,6 +22,11 @@ jobs:
     steps:
       - name: Download repository
         uses: actions/checkout@v6
+
+      - name: Validate app compatibility and 30 percent price limits
+        run: |
+          python3 -m unittest discover -s tests -p 'test_validate_app_catalog.py' -v
+          python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
 
       - name: Validate prices.json
         shell: bash
@@ -74,14 +80,12 @@ jobs:
           if not isinstance(version, str) or not version.strip():
               raise SystemExit("ERROR: catalogVersion is missing")
 
-          if catalog.get("status") != "draft":
+          status = catalog.get("status")
+          auto = catalog.get("automaticUpdatesEnabled")
+          if not ((status == "draft" and auto is False)
+                  or (status == "published" and auto is True)):
               raise SystemExit(
-                  "ERROR: expected draft status during setup"
-              )
-
-          if catalog.get("automaticUpdatesEnabled") is not False:
-              raise SystemExit(
-                  "ERROR: automatic updates must remain disabled"
+                  "ERROR: incompatible publication status/flag combination"
               )
 
           groups = {
@@ -134,5 +138,5 @@ jobs:
           print("Currency: MDL")
           print("Labor entries: 37")
           print("Material entries: 41")
-          print("Automatic price changes: DISABLED")
+          print(f"Publication status: {status}")
           PY

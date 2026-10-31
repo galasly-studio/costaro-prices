@@ -114,10 +114,15 @@ class LaborAuditTests(unittest.TestCase):
         data["laborStagePrices"]["startPuttyWork"]["standard"] = 99
         self.assertTrue(catalog_errors(data))
 
-    def test_published_catalog_rejected_for_draft_audit(self):
+    def test_published_catalog_can_be_audited_without_modification(self):
         data = catalog()
         data["status"] = "published"
         data["automaticUpdatesEnabled"] = True
+        self.assertEqual(catalog_errors(data), [])
+
+    def test_inconsistent_publication_flags_are_rejected(self):
+        data = catalog()
+        data["status"] = "published"
         self.assertTrue(catalog_errors(data))
 
     def test_audit_does_not_modify_prices(self):

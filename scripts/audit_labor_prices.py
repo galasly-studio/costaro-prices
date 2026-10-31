@@ -102,8 +102,11 @@ def catalog_errors(catalog: dict) -> list[str]:
             errors.append("laborStagePrices may contain only startPuttyWork")
         else:
             errors.extend(tier_errors(stage["startPuttyWork"], "startPuttyWork"))
-    if catalog.get("status") != "draft" or catalog.get("automaticUpdatesEnabled") is not False:
-        errors.append("Safety stop: catalog must remain draft with automatic updates off")
+    status = catalog.get("status")
+    auto = catalog.get("automaticUpdatesEnabled")
+    if not ((status == "draft" and auto is False) or
+            (status == "published" and auto is True)):
+        errors.append("Safety stop: incompatible publication status and automatic updates flag")
     return errors
 
 

@@ -1,0 +1,105 @@
+name: COSTARO Monthly Market Check
+
+# Safe scheduled research. It deliberately NEVER updates prices.json.
+# Add a separate, fully tested publication workflow after Flutter client
+# compatibility and live-source coverage are verified.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37 5 2 * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: costaro-monthly-price-check
+  cancel-in-progress: false
+
+jobs:
+  monthly-check:
+    name: Inspect material and labor price evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v6
+
+      - name: Validate Python scripts
+        run: |
+          python3 -m py_compile scripts/collect_prices.py
+          python3 -m py_compile scripts/audit_prices.py
+          python3 -m py_compile scripts/audit_labor_prices.py
+
+      - name: Run labor audit tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Check Flutter application catalog compatibility
+        run: python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
+
+      - name: Collect live material observations
+        run: python3 scripts/collect_prices.py
+
+      - name: Audit material observations
+        run: python3 scripts/audit_prices.py
+
+      - name: Audit labor sources and 37 work rates
+        run: python3 scripts/audit_labor_prices.py
+
+      - name: Summarize without changing published catalog
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          catalog = json.loads(Path('prices.json').read_text(encoding='utf-8'))
+          materials = json.loads(Path('price_audit_report.json').read_text(encoding='utf-8'))
+          labor = json.loads(Path('labor_audit_report.json').read_text(encoding='utf-8'))
+
+          assert catalog['schemaVersion'] == 1
+          assert catalog['country'] == 'MD' and catalog['currency'] == 'MDL'
+          assert len(catalog['laborPrices']) == 37
+          assert len(catalog['materialPrices']) == 41
+          status = catalog['status']
+          enabled = catalog['automaticUpdatesEnabled']
+          assert ((status == 'draft' and enabled is False)
+                  or (status == 'published' and enabled is True))
+          assert labor['ok'] is True
+
+          material_summary = materials['summary']
+          output = [
+              '=== COSTARO MONTHLY MARKET CHECK ===',
+              'Market: Moldova, MDL',
+              f"Material catalog positions: {material_summary['catalogMaterials']}",
+              f"Materials monitored: {material_summary['materialsWithMonitoring']}",
+              f"Materials ready for comparison: {material_summary['materialsReadyForComparison']}",
+              f"Work rates: {labor['laborCount']}",
+              f"Work rates ready for comparison: {labor['readyCount']}",
+              f"Work rates requiring review: {labor['needsReviewCount']}",
+              f"Start putty: {labor['startPuttyMarketStatus']}",
+              f"Catalog publication status: {status}",
+              'This monthly check does not publish price changes.',
+              'Current prices were preserved.',
+              '',
+              'NOTE: comparison-ready does not mean verified for publication.',
+              'Live material observations and stored labor benchmarks are different evidence classes.',
+              'Never derive new tier prices from missing or stale evidence.',
+          ]
+          print('\n'.join(output))
+          Path('monthly_price_summary.txt').write_text('\n'.join(output) + '\n', encoding='utf-8')
+          PY
+
+      - name: Upload monthly audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: costaro-monthly-market-check
+          path: |
+            price_observations.json
+            price_audit_report.json
+            labor_audit_report.json
+            labor_audit_summary.txt
+            monthly_price_summary.txt
+          if-no-files-found: warn
+          retention-days: 90
