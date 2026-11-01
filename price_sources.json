@@ -530,9 +530,9 @@
       "productCode": "552"
     },
     {
-      "store": "Teremok",
-      "url": "https://teremok.md/product/grund-supraton-extra-15kg/",
-      "productCode": "3000113"
+      "store": "DocConstruct",
+      "url": "https://docconstruct.md/ro/grund-supraton-extra-15kg/100",
+      "productCode": "dc100"
     }
   ]
 },
@@ -665,6 +665,7 @@
       "priceTier": null,
       "unit": "bag",
       "packageWeightKg": 25,
+      "matchTerms": ["Class Nas", "25kg"],
       "sources": [
         {
           "store": "Macons",
@@ -677,8 +678,8 @@
           "productCode": "510014"
         },
         {
-          "store": "Teremok",
-          "url": "https://teremok.md/product/adeziv-class-nas-25kg/",
+          "store": "ObraMag",
+          "url": "https://obramag.md/product/adeziv-gresiefaianta-class-nas-gri-25kg",
           "productCode": "510014"
         }
       ]

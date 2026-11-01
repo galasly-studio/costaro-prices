@@ -281,8 +281,12 @@ def extract_price(html, required_terms, product_code):
             continue
 
         sku = str(product.get("sku", "")).strip()
+        mpn = str(product.get("mpn", "")).strip()
 
-        if sku and product_code and sku != product_code:
+        # Some shops expose the URL's internal ID as schema.org sku,
+        # but display their retail product code as schema.org mpn.
+        # Accept that exact code without accepting an unrelated SKU/MPN.
+        if product_code and (sku or mpn) and product_code not in (sku, mpn):
             continue
 
         offers = product.get("offers", [])
@@ -297,10 +301,7 @@ def extract_price(html, required_terms, product_code):
             if not isinstance(offer, dict):
                 continue
 
-            currency = offer.get(
-                "priceCurrency",
-                "MDL",
-            )
+            currency = str(offer.get("priceCurrency", "MDL")).strip().upper()
 
             if currency != "MDL":
                 continue
