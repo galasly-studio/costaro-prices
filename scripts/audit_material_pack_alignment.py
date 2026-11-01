@@ -87,7 +87,7 @@ def _check_tier(key, tier_data, source):
     return "different_unit", "retail_unit_differs_from_catalog", unit, 1, None
 
 
-def audit(catalog, baseline, sources):
+def audit(catalog, baseline, sources, market_audit=None):
     errors = validate(catalog, baseline)
     if errors:
         raise ValueError("Catalog incompatible with app baseline: " + "; ".join(errors))
@@ -97,6 +97,24 @@ def audit(catalog, baseline, sources):
     source_rows = sources.get("materials")
     if not isinstance(source_rows, list):
         raise ValueError("Sources must have a materials list")
+
+    market_rows = None
+    if market_audit is not None:
+        if (market_audit.get("country") != "MD"
+                or market_audit.get("currency") != "MDL"
+                or market_audit.get("status") != "audit_only"
+                or market_audit.get("automaticPublicationEnabled") is not False
+                or market_audit.get("publishedPricesChanged") is not False):
+            raise ValueError("Unsafe market report for pack comparison")
+        entries = market_audit.get("materials")
+        if not isinstance(entries, list) or any(
+                not isinstance(r, dict) or not isinstance(r.get("id"), str)
+                or not isinstance(r.get("comparisonReady"), bool)
+                for r in entries):
+            raise ValueError("Invalid market comparison rows")
+        market_rows = {r["id"]: r for r in entries}
+        if len(market_rows) != len(entries):
+            raise ValueError("Duplicate market comparison product ID")
 
     catalog_prices = catalog["materialPrices"]
     by_material = {key: [] for key in catalog_prices}
@@ -148,12 +166,26 @@ def audit(catalog, baseline, sources):
             "twoShopMetadataPresent": len(configured) >= 2,
             "retailSkuMissing": any(
                 not str(store.get("productCode", "")).strip() for store in configured),
+            "marketComparisonReady": None if market_rows is None
+                else (market_rows[product_id]["comparisonReady"]
+                      if product_id in market_rows else False),
+            "marketProblems": None if market_rows is None else (
+                market_rows[product_id].get("problems", [])
+                if product_id in market_rows else ["missing_market_product"]),
             "tierChecks": checks,
             "reviewedTier": False,
             "approvedForPublication": False,
         }
         product_rows.append(row)
         by_material[key].append(row)
+
+    if market_rows is not None:
+        if set(market_rows) != product_ids:
+            raise ValueError("Market audit does not match configured product IDs")
+        for product in product_rows:
+            observed = market_rows[product["id"]]
+            if observed.get("catalogMaterialKey") != product["catalogMaterialKey"]:
+                raise ValueError("Market audit material key mismatch")
 
     catalog_rows = []
     for key, products in by_material.items():
@@ -165,8 +197,26 @@ def audit(catalog, baseline, sources):
                            and p["twoShopMetadataPresent"]]
             tiers[tier] = {"unitCompatibleProducts": matched,
                            "unitCompatibleWithTwoStores": with_stores,
+                           "marketComparableExactProducts": None if market_rows is None
+                           else [p["id"] for p in products
+                                 if p["tierChecks"][tier]["status"] == "exact"
+                                 and p["twoShopMetadataPresent"]
+                                 and p["marketComparisonReady"]],
                            "qualityTierReviewed": False}
         catalog_rows.append({"catalogMaterialKey": key, "tiers": tiers})
+
+    covered_slots = sum(
+        bool(row["tiers"][tier]["unitCompatibleWithTwoStores"])
+        for row in catalog_rows for tier in TIERS
+    )
+    fully_covered_materials = sum(
+        all(row["tiers"][tier]["unitCompatibleWithTwoStores"] for tier in TIERS)
+        for row in catalog_rows
+    )
+    market_covered_slots = None if market_rows is None else sum(
+        bool(row["tiers"][tier]["marketComparableExactProducts"])
+        for row in catalog_rows for tier in TIERS
+    )
 
     total = {state: 0 for state in ("exact", "different_unit", "different_pack",
                                     "missing_size", "conversion_review", "unverified")}
@@ -182,6 +232,9 @@ def audit(catalog, baseline, sources):
             "catalogMaterials": len(catalog_rows),
             "productGroups": len(product_rows),
             "catalogTierSlots": len(catalog_rows) * len(TIERS),
+            "catalogTierSlotsWithExactTwoShopMetadata": covered_slots,
+            "catalogTierSlotsWithLiveComparableExactPacks": market_covered_slots,
+            "catalogMaterialsWithExactPacksForAllTiers": fully_covered_materials,
             "productTierChecks": len(product_rows) * len(TIERS),
             "checksByStatus": total,
             "productsWithTwoConfiguredShops": sum(
@@ -199,6 +252,14 @@ def print_summary(report):
     print("Catalog materials:", counts["catalogMaterials"])
     print("Retail product groups:", counts["productGroups"])
     print("Catalog tier slots:", counts["catalogTierSlots"])
+    print("Tier slots with exact packs listed at two shops:",
+          counts["catalogTierSlotsWithExactTwoShopMetadata"], "/", counts["catalogTierSlots"])
+    if counts["catalogTierSlotsWithLiveComparableExactPacks"] is not None:
+        print("Tier slots with exact packs AND two comparable live shop prices:",
+              counts["catalogTierSlotsWithLiveComparableExactPacks"],
+              "/", counts["catalogTierSlots"])
+    print("Materials with exact pack candidates for all tiers:",
+          counts["catalogMaterialsWithExactPacksForAllTiers"], "/", counts["catalogMaterials"])
     print("Product-tier pack checks:", counts["productTierChecks"])
     print("Physical alignment:", ", ".join(
         f"{state}={count}" for state, count in counts["checksByStatus"].items()))
@@ -213,7 +274,15 @@ def print_summary(report):
             print(item["catalogMaterialKey"], "| REVIEW | insufficient_shops")
         if item["retailSkuMissing"]:
             print(item["catalogMaterialKey"], "| REVIEW | retailer_sku_missing")
+    if counts["catalogTierSlotsWithLiveComparableExactPacks"] is not None:
+        print("=== EXACT PACKS WAITING FOR COMPARABLE LIVE PRICES ===")
+        for item in report["products"]:
+            if (item["twoShopMetadataPresent"] and not item["marketComparisonReady"]
+                    and any(c["status"] == "exact" for c in item["tierChecks"].values())):
+                print(item["catalogMaterialKey"], "[" + item["id"] + "]",
+                      "| REVIEW |", ",".join(item["marketProblems"] or ["not_comparison_ready"]))
     print("Physical pack compatibility is NOT an approved budget/standard/premium tier.")
+    print("Two configured shops are metadata, NOT proof of two successful price observations.")
     print("Published prices were NOT changed.")
 
 
@@ -222,9 +291,12 @@ def main(argv=None):
     parser.add_argument("--catalog", type=Path, default=Path("prices.json"))
     parser.add_argument("--baseline", type=Path, default=Path("app_embedded_baseline.json"))
     parser.add_argument("--sources", type=Path, default=Path("price_sources.json"))
+    parser.add_argument("--market-audit", type=Path, default=None,
+                        help="Optional read-only price_audit_report.json for live comparison counts")
     parser.add_argument("--report", type=Path, default=Path("material_pack_alignment_report.json"))
     args = parser.parse_args(argv)
-    report = audit(load(args.catalog), load(args.baseline), load(args.sources))
+    report = audit(load(args.catalog), load(args.baseline), load(args.sources),
+                   load(args.market_audit) if args.market_audit else None)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print_summary(report)
     print("Report saved:", args.report)

@@ -47,7 +47,7 @@ jobs:
         run: python3 scripts/audit_prices.py
 
       - name: Audit catalog pack and unit alignment (read-only)
-        run: python3 scripts/audit_material_pack_alignment.py
+        run: python3 scripts/audit_material_pack_alignment.py --market-audit price_audit_report.json
 
       - name: Audit labor sources and 37 work rates
         run: python3 scripts/audit_labor_prices.py
@@ -91,6 +91,8 @@ jobs:
               f"Materials ready for comparison: {material_summary['materialsReadyForComparison']}",
               f"Physical pack checks: {packs['summary']['productTierChecks']}",
               f"Exactly aligned retail packs: {packs['summary']['checksByStatus']['exact']}",
+              f"Catalog tier slots with exact retail pack options: {packs['summary']['catalogTierSlotsWithExactTwoShopMetadata']} / 123",
+              f"Catalog tier slots with exact packs and comparable live prices: {packs['summary']['catalogTierSlotsWithLiveComparableExactPacks']} / 123",
               f"Wrong retail pack sizes: {packs['summary']['checksByStatus']['different_pack']}",
               f"Pack-to-unit conversions requiring review: {packs['summary']['checksByStatus']['conversion_review']}",
               f"Work rates: {labor['laborCount']}",

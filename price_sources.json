@@ -951,6 +951,84 @@
           "productCode": "9053460"
         }
       ]
+    },
+    {
+      "id": "orizont_gypsum_plaster_30kg",
+      "name": "Tencuiala pe baza de ipsos Orizont 30kg",
+      "catalogMaterialKey": "gypsumPlaster",
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 30,
+      "matchTerms": ["Orizont", "30kg"],
+      "sources": [
+        {"store": "Macons", "url": "https://macons.md/tencuiala-pe-baza-de-ipsos-orizont-30kg", "productCode": "493"},
+        {"store": "Domic", "url": "https://domic.md/ro/tencuiala-pe-baza-de-ipsos-orizont-30kg/40", "productCode": "190"}
+      ]
+    },
+    {
+      "id": "supraton_extra_3kg",
+      "name": "Grund Supraton Extra 3kg",
+      "catalogMaterialKey": "primer",
+      "priceTier": null,
+      "unit": "bucket",
+      "packageWeightKg": 3,
+      "matchTerms": ["Supraton", "Extra", "3kg"],
+      "sources": [
+        {"store": "Macons", "url": "https://macons.md/grund-supraton-extra-3kg", "productCode": "550"},
+        {"store": "Domic", "url": "https://domic.md/ro/grund-supraton-extra-3kg/98", "productCode": "247"}
+      ]
+    },
+    {
+      "id": "kreisel_441_screed_25kg",
+      "name": "Sapa Kreisel 441 M-15 (10-60mm), 25kg",
+      "catalogMaterialKey": "floorScreedMix",
+      "priceTier": null,
+      "unit": "bag",
+      "packageWeightKg": 25,
+      "matchTerms": ["Kreisel", "441", "25kg"],
+      "sources": [
+        {"store": "Macons", "url": "https://macons.md/sapa-kreisel-441-m-15-10-60mm-25kg", "productCode": "1352"},
+        {"store": "Domic", "url": "https://domic.md/ro/sapa-kreisel-441-m-15-10-60mm-25kg/907", "productCode": "1049"}
+      ]
+    },
+    {
+      "id": "ceiling_metal_screws_100pcs",
+      "name": "Surub autofiletant pentru metal-metal 3.5x9.5mm, 100buc",
+      "catalogMaterialKey": "ceilingMetalScrews",
+      "priceTier": null,
+      "unit": "pack",
+      "packageQuantity": 100,
+      "matchTerms": ["metal-metal", "3.5x9.5mm", "100buc"],
+      "sources": [
+        {"store": "Macons", "url": "https://macons.md/surub-autofiletant-pentru-metal-metal-35x95mm-100buc", "productCode": "1731"},
+        {"store": "Domic", "url": "https://domic.md/ro/surub-autofiletant-pentru-metal-metal-3-5x9-5mm-100buc/1292", "productCode": "1428"}
+      ]
+    },
+    {
+      "id": "ceiling_drywall_screws_200pcs",
+      "name": "Surub autofiletant pentru gips-metal 3.5x25mm 200buc",
+      "catalogMaterialKey": "ceilingDrywallScrews",
+      "priceTier": null,
+      "unit": "pack",
+      "packageQuantity": 200,
+      "matchTerms": ["gips-metal", "3.5x25mm", "200buc"],
+      "sources": [
+        {"store": "Macons", "url": "https://macons.md/surub-autofiletant-pentru-gips-metal-35x25mm-200buc", "productCode": "1523"},
+        {"store": "Domic", "url": "https://domic.md/ro/surub-autofiletant-pentru-gips-metal-3-5x25mm-200buc/1084", "productCode": "1220"}
+      ]
+    },
+    {
+      "id": "ceiling_joint_tape_45m",
+      "name": "Banda pentru rosturi gips carton 50mm x 45m",
+      "catalogMaterialKey": "ceilingJointTape",
+      "priceTier": null,
+      "unit": "roll",
+      "packageLengthM": 45,
+      "matchTerms": ["Banda", "50mm", "45m"],
+      "sources": [
+        {"store": "Macons", "url": "https://macons.md/banda-pentru-rosturi-gips-carton-50mm-x-45m", "productCode": "1082"},
+        {"store": "Domic", "url": "https://domic.md/ro/banda-pentru-rosturi-gips-carton-50mm-x-45m/637", "productCode": "779"}
+      ]
     }
   ]
 }

@@ -28,18 +28,20 @@ class PackAlignmentTests(unittest.TestCase):
         report = self.report()
         return next(p for p in report["products"] if p["id"] == key)
 
-    def test_all_41_materials_45_products_and_123_tiers_audited(self):
+    def test_all_41_materials_51_products_and_123_tiers_audited(self):
         report = self.report()
         summary = report["summary"]
         self.assertEqual(summary["catalogMaterials"], 41)
-        self.assertEqual(summary["productGroups"], 45)
+        self.assertEqual(summary["productGroups"], 51)
         self.assertEqual(summary["catalogTierSlots"], 123)
-        self.assertEqual(summary["productTierChecks"], 135)
+        self.assertEqual(summary["productTierChecks"], 153)
+        self.assertEqual(summary["catalogTierSlotsWithExactTwoShopMetadata"], 80)
+        self.assertEqual(summary["catalogMaterialsWithExactPacksForAllTiers"], 26)
         self.assertEqual(summary["checksByStatus"], {
-            "exact": 97, "different_unit": 0, "different_pack": 17,
+            "exact": 113, "different_unit": 0, "different_pack": 19,
             "missing_size": 3, "conversion_review": 12, "unverified": 6,
         })
-        self.assertEqual(summary["productsWithTwoConfiguredShops"], 34)
+        self.assertEqual(summary["productsWithTwoConfiguredShops"], 40)
         self.assertEqual(summary["productsMissingSku"], 1)
         self.assertFalse(report["automaticPublicationEnabled"])
         self.assertFalse(report["pricesChanged"])
@@ -76,6 +78,72 @@ class PackAlignmentTests(unittest.TestCase):
                 self.assertEqual(check["status"], "different_pack")
                 self.assertEqual(check["retailPackageAmount"], retail)
                 self.assertEqual(check["catalogPackageAmount"], catalog)
+
+    def test_six_additional_shop_packs_match_catalog_without_approving_tiers(self):
+        expected = {
+            "orizont_gypsum_plaster_30kg": ("gypsumPlaster", ("exact", "different_pack", "different_pack")),
+            "supraton_extra_3kg": ("primer", ("exact", "exact", "exact")),
+            "kreisel_441_screed_25kg": ("floorScreedMix", ("exact", "exact", "exact")),
+            "ceiling_metal_screws_100pcs": ("ceilingMetalScrews", ("exact", "exact", "exact")),
+            "ceiling_drywall_screws_200pcs": ("ceilingDrywallScrews", ("exact", "exact", "exact")),
+            "ceiling_joint_tape_45m": ("ceilingJointTape", ("exact", "exact", "exact")),
+        }
+        for product, (catalog_key, statuses) in expected.items():
+            with self.subTest(product=product):
+                item = self.item(product)
+                self.assertEqual(item["catalogMaterialKey"], catalog_key)
+                self.assertEqual(item["configuredStores"], 2)
+                self.assertTrue(item["twoShopMetadataPresent"])
+                self.assertFalse(item["retailSkuMissing"])
+                self.assertEqual(tuple(item["tierChecks"][tier]["status"]
+                                       for tier in ("budget", "standard", "premium")), statuses)
+                self.assertFalse(item["reviewedTier"])
+                self.assertFalse(item["approvedForPublication"])
+
+    def test_new_shops_do_not_grant_retail_pack_quality_or_publication(self):
+        rows = {r["catalogMaterialKey"]: r for r in self.report()["materials"]}
+        for key in ("primer", "ceilingJointTape", "floorScreedMix"):
+            for tier in ("budget", "standard", "premium"):
+                self.assertTrue(rows[key]["tiers"][tier]["unitCompatibleWithTwoStores"])
+                self.assertFalse(rows[key]["tiers"][tier]["qualityTierReviewed"])
+
+    def test_live_market_confirmation_requires_comparison_ready_prices(self):
+        market = {
+            "country": "MD", "currency": "MDL", "status": "audit_only",
+            "automaticPublicationEnabled": False, "publishedPricesChanged": False,
+            "materials": [
+                {"id": p["id"], "catalogMaterialKey": p["catalogMaterialKey"],
+                 "comparisonReady": p["id"] != "ceiling_drywall_screws_200pcs"}
+                for p in self.sources["materials"]
+            ],
+        }
+        report = audit(self.catalog, self.baseline, self.sources, market)
+        self.assertEqual(report["summary"]["catalogTierSlotsWithLiveComparableExactPacks"], 77)
+        by_key = {row["catalogMaterialKey"]: row for row in report["materials"]}
+        self.assertTrue(by_key["ceilingJointTape"]["tiers"]["standard"]["marketComparableExactProducts"])
+        self.assertEqual(by_key["ceilingDrywallScrews"]["tiers"]["standard"]["marketComparableExactProducts"], [])
+        self.assertFalse(report["pricesChanged"])
+
+    def test_missing_or_untrusted_market_audit_is_rejected(self):
+        market = {
+            "country": "MD", "currency": "MDL", "status": "audit_only",
+            "automaticPublicationEnabled": False, "publishedPricesChanged": False,
+            "materials": [{"id": p["id"], "catalogMaterialKey": p["catalogMaterialKey"],
+                           "comparisonReady": True} for p in self.sources["materials"]],
+        }
+        for corruption in ("missing", "duplicate", "country", "catalog_key"):
+            bad = deepcopy(market)
+            if corruption == "missing":
+                bad["materials"].pop()
+            elif corruption == "duplicate":
+                bad["materials"].append(deepcopy(bad["materials"][0]))
+            elif corruption == "country":
+                bad["country"] = "ZZ"
+            else:
+                bad["materials"][0]["catalogMaterialKey"] = "different"
+            with self.subTest(corruption=corruption):
+                with self.assertRaises((ValueError, KeyError)):
+                    audit(self.catalog, self.baseline, self.sources, bad)
 
     def test_kilogram_pack_must_match_each_tier_not_just_material(self):
         for product, expected in (("knauf_mp75_25kg", ("different_pack", "exact", "exact")),

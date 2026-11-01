@@ -47,16 +47,16 @@ class HumanTierReviewTests(unittest.TestCase):
     def evaluate(self, f):
         return build(*f, now=NOW)
 
-    def test_45_groups_but_only_six_human_tier_candidates(self):
+    def test_51_groups_but_only_six_human_tier_candidates(self):
         f = fixture()
         catalog_before = json.dumps(f[0], ensure_ascii=False, sort_keys=True)
         output = self.evaluate(f)
         self.assertEqual(output["summary"], {
             "catalogMaterialCount": 41,
-            "productGroupCount": 45,
+            "productGroupCount": 51,
             "reviewCandidates": 6,
             "materialsWithCompleteThreeTierCandidateSet": 2,
-            "heldProductGroups": 39,
+            "heldProductGroups": 45,
         })
         self.assertEqual(output["status"], "human_review_only")
         self.assertEqual(output["approvedTierMappings"], 0)

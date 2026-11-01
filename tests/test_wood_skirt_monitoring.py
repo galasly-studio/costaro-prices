@@ -91,9 +91,9 @@ class NanuSkirtingTests(unittest.TestCase):
         sources = json.loads((ROOT / "price_sources.json").read_text(encoding="utf-8"))
         by_id = {item["id"]: item for item in sources["materials"]}
         self.assertEqual(by_id["ceilingFrameFastenersPerM2"]["sources"], [])
-        self.assertEqual(len(sources["materials"]), 45)
-        self.assertEqual(sum(bool(item["sources"]) for item in sources["materials"]), 44)
-        self.assertEqual(sum(len(item["sources"]) for item in sources["materials"]), 79)
+        self.assertEqual(len(sources["materials"]), 51)
+        self.assertEqual(sum(bool(item["sources"]) for item in sources["materials"]), 50)
+        self.assertEqual(sum(len(item["sources"]) for item in sources["materials"]), 91)
         self.assertFalse(sources["automaticPublicationEnabled"])
         for item in sources["materials"]:
             self.assertIsNone(item.get("priceTier"))

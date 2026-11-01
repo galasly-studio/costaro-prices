@@ -108,13 +108,13 @@ class BulkCoverageTests(unittest.TestCase):
 
     def test_coverage_counts_and_catalog_publication_guard(self):
         materials = list(self.materials.values())
-        self.assertEqual(len(materials), 45)
-        self.assertEqual(sum(len(m["sources"]) for m in materials), 79)
-        self.assertEqual(sum(bool(m["sources"]) for m in materials), 44)
+        self.assertEqual(len(materials), 51)
+        self.assertEqual(sum(len(m["sources"]) for m in materials), 91)
+        self.assertEqual(sum(bool(m["sources"]) for m in materials), 50)
         rows = [{"catalogMaterialKey": m["catalogMaterialKey"],
                  "comparisonReady": len(m["sources"]) > 1}
                 for m in materials]
-        self.assertEqual(comparison_counts(rows), (30, 34))
+        self.assertEqual(comparison_counts(rows), (30, 40))
         self.assertFalse(self.config["automaticPublicationEnabled"])
         self.assertTrue(all(m.get("priceTier") is None for m in materials))
         catalog = json.loads((ROOT / "prices.json").read_text(encoding="utf-8"))

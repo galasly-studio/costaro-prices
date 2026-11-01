@@ -31,11 +31,11 @@ class MatchedPackagingSourcesTests(unittest.TestCase):
             cls.by_key[item["catalogMaterialKey"]].append(item)
             cls.by_id[item["id"]] = item
 
-    def test_45_product_groups_remain_associated_with_41_catalog_keys(self):
+    def test_51_product_groups_remain_associated_with_41_catalog_keys(self):
         source_materials = self.config["materials"]
-        self.assertEqual(len(source_materials), 45)
+        self.assertEqual(len(source_materials), 51)
         self.assertEqual(len(self.by_key), 41)
-        self.assertEqual(len(self.by_id), 45)
+        self.assertEqual(len(self.by_id), 51)
         self.assertEqual(set(self.by_key), set(self.catalog["materialPrices"]))
 
     def test_six_finish_putty_and_paint_candidates_match_existing_catalog_packs(self):

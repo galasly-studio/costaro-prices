@@ -84,16 +84,16 @@ class SecondShopMaterialTests(unittest.TestCase):
 
     def test_audit_has_six_more_comparable_product_groups(self):
         products = self.config["materials"]
-        self.assertEqual(len(products), 45)
+        self.assertEqual(len(products), 51)
         # The November bulk pass added 18 matching alternative listings.
-        self.assertEqual(sum(len(p["sources"]) for p in products), 79)
-        self.assertEqual(len([p for p in products if p["sources"]]), 44)
+        self.assertEqual(sum(len(p["sources"]) for p in products), 91)
+        self.assertEqual(len([p for p in products if p["sources"]]), 50)
         report_like_rows = [
             {"catalogMaterialKey": p["catalogMaterialKey"],
              "comparisonReady": len(p["sources"]) >= 2}
             for p in products
         ]
-        self.assertEqual(comparison_counts(report_like_rows), (30, 34))
+        self.assertEqual(comparison_counts(report_like_rows), (30, 40))
 
     def test_no_prices_or_policy_automatically_updated(self):
         catalog = json.loads((ROOT / "prices.json").read_text(encoding="utf-8"))
