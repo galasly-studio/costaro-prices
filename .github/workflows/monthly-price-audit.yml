@@ -31,6 +31,7 @@ jobs:
           python3 -m py_compile scripts/audit_prices.py
           python3 -m py_compile scripts/audit_labor_prices.py
           python3 -m py_compile scripts/plan_verified_material_updates.py
+          python3 -m py_compile scripts/build_material_tier_review.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -50,6 +51,9 @@ jobs:
       - name: Plan only strongly verified material changes (read-only)
         run: python3 scripts/plan_verified_material_updates.py
 
+      - name: Prepare budget standard premium manual review (read-only)
+        run: python3 scripts/build_material_tier_review.py
+
       - name: Summarize without changing published catalog
         shell: bash
         run: |
@@ -61,6 +65,7 @@ jobs:
           materials = json.loads(Path('price_audit_report.json').read_text(encoding='utf-8'))
           labor = json.loads(Path('labor_audit_report.json').read_text(encoding='utf-8'))
           planned = json.loads(Path('material_update_proposals.json').read_text(encoding='utf-8'))
+          tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
 
           assert catalog['schemaVersion'] == 1
           assert catalog['country'] == 'MD' and catalog['currency'] == 'MDL'
@@ -85,6 +90,8 @@ jobs:
               f"Start putty: {labor['startPuttyMarketStatus']}",
               f"Catalog publication status: {status}",
               f"Strict material update proposals (not published): {planned['proposedCount']}",
+              f"Tier product candidates for human review: {tier_review['summary']['reviewCandidates']}",
+              f"Complete three-tier sets needing human review: {tier_review['summary']['materialsWithCompleteThreeTierCandidateSet']}",
               f"Automatic proposal policy enabled: {planned['policyEnabled']}",
               'This monthly check does not publish price changes.',
               'Current prices were preserved.',
@@ -108,6 +115,8 @@ jobs:
             labor_audit_report.json
             labor_audit_summary.txt
             material_update_proposals.json
+            material_tier_review.json
+            material_tier_review_RU.md
             monthly_price_summary.txt
           if-no-files-found: warn
           retention-days: 90
