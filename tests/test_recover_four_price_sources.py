@@ -95,9 +95,8 @@ class RecoveredSourceTests(unittest.TestCase):
 
     def test_monitoring_counts_and_catalog_remain_draft(self):
         self.assertEqual(len(self.config["materials"]), 45)
-        # Four recovered sources remain; six additional independent shop
-        # listings and one wood-skirt listing raise the total to 61.
-        self.assertEqual(sum(len(row["sources"]) for row in self.config["materials"]), 61)
+        # The November bulk coverage pass adds 18 product-level candidates.
+        self.assertEqual(sum(len(row["sources"]) for row in self.config["materials"]), 79)
         self.assertIs(self.config["automaticPublicationEnabled"], False)
         catalog = json.loads((ROOT / "prices.json").read_text(encoding="utf-8"))
         self.assertEqual(catalog["status"], "draft")

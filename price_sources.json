@@ -17,6 +17,11 @@
       "store": "Macons",
       "url": "https://macons.md/element-suspensie-065mm-60x125mm",
       "productCode": "1982"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/element-suspensie-0-65mm-60x125mm/1543",
+      "productCode": "1679"
     }
   ]
 },
@@ -47,6 +52,11 @@
       "store": "Macons",
       "url": "https://macons.md/conector-imbinare-profiluri-cd-60x27",
       "productCode": "894"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/conector-imbinare-profiluri-cd-60x27/445",
+      "productCode": "591"
     }
   ]
 },
@@ -79,6 +89,11 @@
       "store": "Macons",
       "url": "https://macons.md/diblu-cu-guler-cu-surub-cui-6x40mm-20buc",
       "productCode": "1090"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/diblu-cu-guler-cu-surub-cui-6x40mm-20buc/645",
+      "productCode": "787"
     }
   ]
 },
@@ -136,6 +151,16 @@
       "store": "Gebhardt",
       "url": "https://gebhardt.md/parchet-spc-ametista-classa-33-4mm-spanish-cedar-4v-1220-180-cafeniu.html",
       "productCode": "529163"
+    },
+    {
+      "store": "Veritan",
+      "url": "https://www.veritan.md/ro/catalog/laminat/laminat-ametista-spc-spanish-cedar-korichnevyjj-33-klass-1220kh180-mm-tolshhina-4-mm-2-6352-m2",
+      "productCode": "",
+      "matchTerms": [
+        "Ametista",
+        "Spanish Cedar",
+        "4 mm"
+      ]
     }
   ]
 },
@@ -212,6 +237,16 @@
       "store": "Gebhardt",
       "url": "https://gebhardt.md/prize/priza-unitara-cu-obturator-schneider-eph2900221-asfora-16-a-250-v-alb.html",
       "productCode": "EPH2900221"
+    },
+    {
+      "store": "Volta",
+      "url": "https://volta.md/produs/priza-schneider-eph2900221-250-v",
+      "productCode": "EPH2900221",
+      "matchTerms": [
+        "ASFORA",
+        "16 A",
+        "Schneider"
+      ]
     }
   ]
 },
@@ -231,6 +266,16 @@
       "store": "Gebhardt",
       "url": "https://gebhardt.md/intrerupatoare/intrerupator-unitar-elmos-8001-01-10-a-230-v-alb.html",
       "productCode": "8001-01"
+    },
+    {
+      "store": "Volta",
+      "url": "https://volta.md/produs/intrerupator-unitar-elmos-8001-01-230-v",
+      "productCode": "8001-01",
+      "matchTerms": [
+        "Elmos",
+        "10 A",
+        "alb"
+      ]
     }
   ]
 },
@@ -264,6 +309,15 @@
       "store": "Gebhardt",
       "url": "https://gebhardt.md/ru-ru/coedinitel-nie-klemmi-wago-compact-277998821.html",
       "productCode": "221-413"
+    },
+    {
+      "store": "Panlight",
+      "url": "https://www.panlight.md/ro/materiale-pentru-electro-instalare-si-izolare/conectori-pentru-cablu/clema-wago-3x40mm2-221-413--221-413.html",
+      "productCode": "221-413",
+      "matchTerms": [
+        "WAGO",
+        "221-413"
+      ]
     }
   ]
 },
@@ -279,6 +333,11 @@
       "store": "Macons",
       "url": "https://macons.md/cablu-electric-vvg-ng-3x25mm2",
       "productCode": "1959"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/cablu-electric-vvg-ng-3x2-5mm2/1520",
+      "productCode": "1656"
     }
   ]
 },
@@ -294,6 +353,11 @@
       "store": "Macons",
       "url": "https://macons.md/cablu-electric-vvg-ng-3x15mm2",
       "productCode": "1960"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/cablu-electric-vvg-ng-3x1-5mm2/1521",
+      "productCode": "1657"
     }
   ]
 },
@@ -444,6 +508,11 @@
       "store": "Macons",
       "url": "https://macons.md/gips-carton-technogips-2500x1200x125mm",
       "productCode": "2643"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/gips-carton-technogips-2500x1200x12-5mm/2104",
+      "productCode": "2214"
     }
   ]
 },
@@ -459,6 +528,11 @@
       "store": "Macons",
       "url": "https://macons.md/profil-cd-60-27-06mm-3m",
       "productCode": "1812"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/profil-cd-60-27-0-6mm-3m/1373",
+      "productCode": "1509"
     }
   ]
 },
@@ -474,6 +548,11 @@
       "store": "Macons",
       "url": "https://macons.md/profil-ud-27-28-06mm-3m",
       "productCode": "1739"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/profil-ud-27-28-0-6mm-3m/1300",
+      "productCode": "1436"
     }
   ]
 },
@@ -490,6 +569,11 @@
       "store": "Macons",
       "url": "https://macons.md/surub-autofiletant-pentru-metal-metal-35x95mm-1000buc",
       "productCode": "1730"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/surub-autofiletant-pentru-metal-metal-3-5x9-5mm-1000buc/1291",
+      "productCode": "1427"
     }
   ]
 },
@@ -506,6 +590,11 @@
       "store": "Macons",
       "url": "https://macons.md/surub-autofiletant-pentru-gips-metal-35x25mm-1000buc",
       "productCode": "1524"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/surub-autofiletant-pentru-gips-metal-3-5x25mm-1000buc/1085",
+      "productCode": "1221"
     }
   ]
 },
@@ -522,6 +611,11 @@
       "store": "Macons",
       "url": "https://macons.md/banda-pentru-rosturi-gips-carton-50mm-x-90m",
       "productCode": "1087"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/banda-pentru-rosturi-gips-carton-50mm-x-90m/642",
+      "productCode": "784"
     }
   ]
 },
@@ -670,6 +764,11 @@
       "store": "Macons",
       "url": "https://macons.md/tencuiala-decorativa-vinarom-f15-bob-de-orez-alb-25kg",
       "productCode": "2532"
+    },
+    {
+      "store": "Domic",
+      "url": "https://domic.md/ro/tencuiala-decorativa-vinarom-f15-bob-de-orez-alb-25kg/2189",
+      "productCode": "2289"
     }
   ]
 },
@@ -799,6 +898,11 @@
       "store": "Gebhardt",
       "url": "https://gebhardt.md/plinta-indo-03-stejar-loft.html",
       "productCode": "5580"
+    },
+    {
+      "store": "Dekora",
+      "url": "https://dekora.md/ro/product/plinta-indo-03-stejar-loft",
+      "productCode": "CHW00001080"
     }
   ]
 },
@@ -818,6 +922,11 @@
       "store": "Gebhardt",
       "url": "https://gebhardt.md/plinte-si-accesorii/plinta-mdf-arbiton-mp1101-paint-it.html",
       "productCode": "9211095"
+    },
+    {
+      "store": "Finisaj",
+      "url": "https://finisaj.md/collections/plintus-md-plinte-mdf/products/plinta-mdf-arbiton-mp1101-paint-it",
+      "productCode": "MP1101"
     }
   ]
 },

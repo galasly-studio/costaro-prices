@@ -93,7 +93,7 @@ class NanuSkirtingTests(unittest.TestCase):
         self.assertEqual(by_id["ceilingFrameFastenersPerM2"]["sources"], [])
         self.assertEqual(len(sources["materials"]), 45)
         self.assertEqual(sum(bool(item["sources"]) for item in sources["materials"]), 44)
-        self.assertEqual(sum(len(item["sources"]) for item in sources["materials"]), 61)
+        self.assertEqual(sum(len(item["sources"]) for item in sources["materials"]), 79)
         self.assertFalse(sources["automaticPublicationEnabled"])
         for item in sources["materials"]:
             self.assertIsNone(item.get("priceTier"))
