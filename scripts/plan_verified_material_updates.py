@@ -18,6 +18,7 @@ from pathlib import Path
 import statistics
 from urllib.parse import urlparse
 
+from audit_material_pack_alignment import _check_tier
 from validate_app_catalog import load, validate
 
 
@@ -63,20 +64,19 @@ def _utc(value):
 
 
 def _pack_tiers(entry, source):
-    """Only exact kg retail packages can match current kg catalog entries.
+    """Use the shared physical audit: only identical retail units/packs qualify.
 
-    Never scale a 20 kg store price to an 8 kg catalog pack, even if the
-    arithmetic looks plausible: shelf price and retail packaging differ.
+    This also allows exact pieces, m², metres, sheets, rolls and screw packs.
+    It never normalizes a different-sized pack, a piece-per-point estimate,
+    or an unverified package into a catalog price.
     """
-    if source.get("unit") not in ("bag", "bucket"):
+    if not isinstance(entry, dict) or not isinstance(source, dict):
         return []
-    amount = source.get("packageWeightKg")
-    if not _number(amount) or not isinstance(entry, dict):
+    key = source.get("catalogMaterialKey")
+    if not isinstance(key, str):
         return []
     return [tier for tier in TIERS
-            if isinstance(entry.get(tier), dict)
-            and entry[tier].get("unit") == "кг"
-            and entry[tier].get("amount") == amount]
+            if tier in entry and _check_tier(key, entry[tier], source)[0] == "exact"]
 
 
 def _evidence(sources, observation):
@@ -195,8 +195,11 @@ def plan(catalog, baseline, sources, observations, policy, now=None):
                 row["reason"] = error
             else:
                 tier = approval["tier"]
-                previous = catalog["materialPrices"][key][tier]["price"]
-                baseline_price = baseline["materialPrices"][key][tier]["price"]
+                current_slot = catalog["materialPrices"][key][tier]
+                baseline_slot = baseline["materialPrices"][key][tier]
+                previous = current_slot["price"] if isinstance(current_slot, dict) else current_slot
+                baseline_price = (baseline_slot["price"] if isinstance(baseline_slot, dict)
+                                  else baseline_slot)
                 movement = (median - previous) / previous
                 if abs(movement) < MIN_CHANGE:
                     row["reason"] = "price_change_below_two_percent"
@@ -205,10 +208,16 @@ def plan(catalog, baseline, sources, observations, policy, now=None):
                 elif not baseline_price * 0.7 <= median <= baseline_price * 1.3:
                     row["reason"] = "outside_embedded_app_thirty_percent_limit"
                 else:
-                    candidate["materialPrices"][key][tier]["price"] = median
+                    if isinstance(current_slot, dict):
+                        candidate["materialPrices"][key][tier]["price"] = median
+                    else:
+                        candidate["materialPrices"][key][tier] = median
                     errors = validate(candidate, baseline)
                     if errors:
-                        candidate["materialPrices"][key][tier]["price"] = previous
+                        if isinstance(current_slot, dict):
+                            candidate["materialPrices"][key][tier]["price"] = previous
+                        else:
+                            candidate["materialPrices"][key][tier] = previous
                         row["reason"] = "complete_catalog_validation_failed"
                     else:
                         row.update({"status": "proposed", "previousMDL": previous,

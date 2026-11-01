@@ -16,7 +16,7 @@ from pathlib import Path
 import statistics
 from urllib.parse import urlparse
 
-from plan_verified_material_updates import TIERS, _pack_tiers, _utc
+from plan_verified_material_updates import TIERS, _pack_tiers, _policy_valid, _utc
 from validate_app_catalog import load, validate
 
 
@@ -100,8 +100,11 @@ def build(catalog, baseline, sources, observations, audit, policy, *, now=None):
                        ("observations", observations), ("audit", audit)):
         if doc.get("country") != "MD" or doc.get("currency") != "MDL":
             raise ValueError(f"{label} must use Moldova/MDL")
-    if policy.get("enabled") is not False or policy.get("approvedMappings") != []:
-        raise ValueError("Manual report requires disabled policy and no approved mappings")
+    _policy_valid(policy)
+    if policy["enabled"] and not policy["approvedMappings"]:
+        raise ValueError("Enabled policy requires explicit approved mappings")
+    if not policy["enabled"] and policy["approvedMappings"]:
+        raise ValueError("Disabled policy cannot contain active approved mappings")
     if sources.get("automaticPublicationEnabled") is not False:
         raise ValueError("Source publication must remain disabled")
     if audit.get("status") != "audit_only":
@@ -115,6 +118,10 @@ def build(catalog, baseline, sources, observations, audit, policy, *, now=None):
     if set(source_by_id) != set(observation_by_id) or set(source_by_id) != set(audit_by_id):
         raise ValueError("Sources, observations and audit IDs differ")
 
+    approvals = {item["observationId"]: item for item in policy["approvedMappings"]}
+    if set(approvals) - set(source_by_id):
+        raise ValueError("Approved mapping references unknown source")
+
     products = []
     by_material = {key: [] for key in catalog["materialPrices"]}
     for product_id, product in source_by_id.items():
@@ -124,13 +131,20 @@ def build(catalog, baseline, sources, observations, audit, policy, *, now=None):
         hint = product.get("tierCandidateForReview")
         if hint is not None and hint not in TIERS:
             raise ValueError(f"Unknown tier hint for {product_id}")
-        if product.get("priceTier") is not None:
-            raise ValueError(f"Unexpected approved tier in source: {product_id}")
+        approval = approvals.get(product_id)
+        reviewed_tier = product.get("priceTier")
+        if approval is None and reviewed_tier is not None:
+            raise ValueError(f"Unapproved price tier in source: {product_id}")
+        if approval is not None and (reviewed_tier != approval["tier"] or
+                                     approval["catalogMaterialKey"] != material_key):
+            raise ValueError(f"Approved tier disagrees with source: {product_id}")
         matching_pack_tiers = _pack_tiers(catalog["materialPrices"][material_key], product)
         median, shop_prices, evidence_error = _evidence(
             product, observation_by_id[product_id], audit_by_id[product_id], fresh=fresh,
         )
-        if hint is None:
+        if approval is not None:
+            reason = None if reviewed_tier in matching_pack_tiers else "approved_mapping_pack_mismatch"
+        elif hint is None:
             reason = "tier_not_assessed_by_human"
         elif hint not in matching_pack_tiers:
             reason = "retail_pack_does_not_match_catalog_tier"
@@ -143,13 +157,14 @@ def build(catalog, baseline, sources, observations, audit, policy, *, now=None):
             "tierHintForHumanReview": hint, "exactPackMatchingTiers": matching_pack_tiers,
             "candidateMedianMDL": median,
             "sourceObservations": shop_prices,
-            "status": "manual_review_candidate" if reason is None else "held",
+            "status": ("approved_mapping_recorded" if approval is not None and reason is None
+                       else "manual_review_candidate" if reason is None else "held"),
             "reason": reason,
             "skuAndMethodReviewRequired": bool(shop_prices) and any(
                 not row["productCode"] or row["extractionMethod"] != "product_microdata"
                 for row in shop_prices
             ),
-            "tierQualityReviewed": False,
+            "tierQualityReviewed": approval is not None,
             "approvedForPublication": False,
         }
         products.append(row)
@@ -179,7 +194,7 @@ def build(catalog, baseline, sources, observations, audit, policy, *, now=None):
         "schemaVersion": 1, "country": "MD", "currency": "MDL",
         "status": "human_review_only", "generatedAt": now.isoformat(),
         "observationsFresh": fresh, "automaticPublicationEnabled": False,
-        "pricesChanged": False, "approvedTierMappings": 0,
+        "pricesChanged": False, "approvedTierMappings": len(approvals),
         "summary": {
             "catalogMaterialCount": len(material_rows), "productGroupCount": len(products),
             "reviewCandidates": len(ready),

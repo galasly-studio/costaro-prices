@@ -144,14 +144,36 @@ class HumanTierReviewTests(unittest.TestCase):
         self.assertEqual(output["summary"]["reviewCandidates"], 0)
         self.assertEqual(output["summary"]["materialsWithCompleteThreeTierCandidateSet"], 0)
 
-    def test_disabled_policy_and_clean_ids_are_mandatory(self):
+    def test_approval_policy_must_be_consistent_and_ids_clean(self):
         f = fixture()
         f[5]["enabled"] = True
-        with self.assertRaisesRegex(ValueError, "disabled policy"):
+        with self.assertRaisesRegex(ValueError, "requires explicit approved mappings"):
             self.evaluate(f)
         f = fixture()
         f[3]["materials"].append(deepcopy(f[3]["materials"][0]))
         with self.assertRaisesRegex(ValueError, "Duplicate ID"):
+            self.evaluate(f)
+
+    def test_approved_mapping_is_recorded_but_never_called_published(self):
+        f = fixture()
+        product = next(p for p in f[2]["materials"]
+                       if p["id"] == "glet_mesterul_manole_8kg")
+        product["priceTier"] = "budget"
+        f[5]["enabled"] = True
+        f[5]["approvedMappings"] = [{"observationId": product["id"],
+                                     "catalogMaterialKey": "finishPutty", "tier": "budget"}]
+        report = self.evaluate(f)
+        row = next(p for p in report["products"] if p["id"] == product["id"])
+        self.assertEqual(row["status"], "approved_mapping_recorded")
+        self.assertTrue(row["tierQualityReviewed"])
+        self.assertFalse(row["approvedForPublication"])
+        self.assertEqual(report["approvedTierMappings"], 1)
+        self.assertEqual(report["summary"]["reviewCandidates"], 5)
+
+    def test_unapproved_price_tier_fails_closed(self):
+        f = fixture()
+        f[2]["materials"][0]["priceTier"] = "premium"
+        with self.assertRaisesRegex(ValueError, "Unapproved price tier"):
             self.evaluate(f)
 
     def test_strong_method_does_not_automatically_approve_quality(self):

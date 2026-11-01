@@ -5,6 +5,15 @@ name: COSTARO Monthly Market Check
 # compatibility and live-source coverage are verified.
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/monthly-price-audit.yml'
+      - 'scripts/plan_verified_material_updates.py'
+      - 'scripts/build_material_tier_review.py'
+      - 'scripts/prepare_verified_catalog_release.py'
+      - 'tests/test_build_material_tier_review.py'
+      - 'tests/test_prepare_verified_catalog_release.py'
+      - 'tests/test_safe_publisher_wiring.py'
   schedule:
     - cron: '37 5 2 * *'
 
@@ -33,6 +42,7 @@ jobs:
           python3 -m py_compile scripts/plan_verified_material_updates.py
           python3 -m py_compile scripts/build_material_tier_review.py
           python3 -m py_compile scripts/audit_material_pack_alignment.py
+          python3 -m py_compile scripts/prepare_verified_catalog_release.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -58,6 +68,9 @@ jobs:
       - name: Prepare budget standard premium manual review (read-only)
         run: python3 scripts/build_material_tier_review.py
 
+      - name: Evaluate guarded publication readiness (read-only)
+        run: python3 scripts/prepare_verified_catalog_release.py
+
       - name: Summarize without changing published catalog
         shell: bash
         run: |
@@ -71,6 +84,7 @@ jobs:
           planned = json.loads(Path('material_update_proposals.json').read_text(encoding='utf-8'))
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
           packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
+          readiness = json.loads(Path('verified_release_readiness.json').read_text(encoding='utf-8'))
 
           assert catalog['schemaVersion'] == 1
           assert catalog['country'] == 'MD' and catalog['currency'] == 'MDL'
@@ -104,6 +118,8 @@ jobs:
               f"Tier product candidates for human review: {tier_review['summary']['reviewCandidates']}",
               f"Complete three-tier sets needing human review: {tier_review['summary']['materialsWithCompleteThreeTierCandidateSet']}",
               f"Automatic proposal policy enabled: {planned['policyEnabled']}",
+              f"Guarded release readiness: {readiness['status']}",
+              f"Release reasons held: {', '.join(readiness['holdReasons']) or 'none'}",
               'This monthly check does not publish price changes.',
               'Current prices were preserved.',
               '',
@@ -113,6 +129,12 @@ jobs:
           ]
           print('\n'.join(output))
           Path('monthly_price_summary.txt').write_text('\n'.join(output) + '\n', encoding='utf-8')
+          import os
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('## COSTARO — ежемесячная проверка цен (MDL)\n\n')
+              summary.write('```text\n' + '\n'.join(output) + '\n```\n\n')
+              summary.write('Данные видны здесь, без скачивания Artifacts. '
+                            'До отдельного подтверждения публикация запрещена.\n')
           PY
 
       - name: Upload monthly audit reports
@@ -129,6 +151,7 @@ jobs:
             material_update_proposals.json
             material_tier_review.json
             material_tier_review_RU.md
+            verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
           retention-days: 90

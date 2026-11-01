@@ -1,0 +1,125 @@
+# TEMPLATE ONLY — NOT an active workflow.
+# Activate ONLY after human-approved product/tier mappings, a verified initial
+# published prices.json, and GitHub Pages Source = GitHub Actions.
+# Rename to approved-price-publisher.yml after the one-time release checklist.
+name: COSTARO Approved Material Price Publisher
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 3 * *'
+
+concurrency:
+  group: costaro-approved-material-publisher
+  cancel-in-progress: false
+
+jobs:
+  verify-and-stage:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    outputs:
+      deploy: ${{ steps.gate.outputs.deploy }}
+    steps:
+      - name: Checkout reviewed repo
+        uses: actions/checkout@v6
+
+      - name: Run full safety regression suite
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+          python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
+
+      - name: Collect strong fresh price evidence
+        run: |
+          python3 scripts/collect_prices.py
+          python3 scripts/audit_prices.py
+          python3 scripts/audit_material_pack_alignment.py --market-audit price_audit_report.json
+
+      - name: Stage only fully approved bounded changes
+        run: python3 scripts/prepare_verified_catalog_release.py
+
+      - name: Determine publication gate
+        id: gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          catalog = json.loads(Path('prices.json').read_text(encoding='utf-8'))
+          policy = json.loads(Path('material_update_policy.json').read_text(encoding='utf-8'))
+          report = json.loads(Path('verified_release_readiness.json').read_text(encoding='utf-8'))
+          approved = (catalog['status'] == 'published'
+                      and catalog['automaticUpdatesEnabled'] is True
+                      and policy.get('enabled') is True
+                      and policy.get('automaticPublicationApproved') is True
+                      and bool(policy.get('approvedMappings')))
+          ready = report['status'] == 'ready_for_guarded_publication'
+          candidate = Path('release_candidate/prices.json')
+          if ready != candidate.is_file():
+              raise SystemExit('Release gate/file mismatch — refusing deployment')
+          deploy = approved and (ready or not report['proposedPriceChanges'])
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+              stream.write(f"deploy={'true' if deploy else 'false'}\n")
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
+              stream.write('## COSTARO guarded publisher\n\n')
+              stream.write('Status: **' + report['status'] + '**\n\n')
+              stream.write('Reasons held: ' + (', '.join(report['holdReasons']) or 'none') + '\n\n')
+              stream.write('Price changes proposed: ' + str(report['proposedPriceChanges']) + '\n\n')
+              stream.write('Deploy approved: **' + str(deploy) + '**\n')
+          PY
+
+      - name: Promote the validated candidate and commit full catalog
+        if: steps.gate.outputs.deploy == 'true'
+        shell: bash
+        run: |
+          if test -f release_candidate/prices.json; then
+            cp release_candidate/prices.json prices.json
+            python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
+            git diff --check -- prices.json
+            git config user.name 'costaro-price-bot'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -- prices.json
+            git commit -m 'Update human-approved COSTARO material prices' -- prices.json
+            git push origin HEAD:main
+          fi
+
+      - name: Prepare dedicated price feed for GitHub Pages
+        if: steps.gate.outputs.deploy == 'true'
+        shell: bash
+        run: |
+          mkdir -p public_price_feed
+          cp prices.json public_price_feed/prices.json
+          python3 - <<'PY'
+          from pathlib import Path
+          Path('public_price_feed/index.html').write_text(
+              '<!doctype html><html lang="ru"><meta charset="utf-8">'
+              '<title>COSTARO Prices</title><body><h1>COSTARO Price Feed</h1>'
+              '<p><a href="prices.json">prices.json</a></p></body></html>\n',
+              encoding='utf-8')
+          PY
+
+      - name: Upload price feed internally for Pages deployment
+        if: steps.gate.outputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public_price_feed
+
+  deploy:
+    needs: verify-and-stage
+    if: needs.verify-and-stage.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy the approved prices.json to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
