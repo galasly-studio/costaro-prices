@@ -95,7 +95,9 @@ class RecoveredSourceTests(unittest.TestCase):
 
     def test_monitoring_counts_and_catalog_remain_draft(self):
         self.assertEqual(len(self.config["materials"]), 45)
-        self.assertEqual(sum(len(row["sources"]) for row in self.config["materials"]), 54)
+        # Four recovered sources remain; a later monitoring-only wood skirting
+        # source increases the configured total from 54 to 55.
+        self.assertEqual(sum(len(row["sources"]) for row in self.config["materials"]), 55)
         self.assertIs(self.config["automaticPublicationEnabled"], False)
         catalog = json.loads((ROOT / "prices.json").read_text(encoding="utf-8"))
         self.assertEqual(catalog["status"], "draft")

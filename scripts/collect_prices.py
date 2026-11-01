@@ -191,6 +191,114 @@ def extract_primary_microdata_price(html, required_terms, product_code):
         return None
 
     return unique_prices[0]
+
+
+class NanuPrimaryProduct(HTMLParser):
+    """Read ONLY the visible code and per-piece price in Nanu's main #product."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.inside_heading = False
+        self.heading = []
+        self.product_depth = 0
+        self.active_model = False
+        self.active_price = False
+        self.active_unit = False
+        self.model_parts = []
+        self.price_parts = []
+        self.unit_parts = []
+        self.model_lines = []
+        self.price_lines = []
+        self.unit_lines = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+
+        if tag == "h1":
+            self.inside_heading = True
+
+        if tag == "div":
+            if self.product_depth:
+                self.product_depth += 1
+            elif attributes.get("id") == "product":
+                self.product_depth = 1
+
+            if self.product_depth:
+                classes = set(attributes.get("class", "").split())
+                if "price-new" in classes:
+                    self.active_price = True
+                    self.price_parts = []
+                if "for" in classes:
+                    self.active_unit = True
+                    self.unit_parts = []
+
+        if tag == "p" and self.product_depth:
+            if "product-model" in attributes.get("class", "").split():
+                self.active_model = True
+                self.model_parts = []
+
+    def handle_endtag(self, tag):
+        if tag == "h1":
+            self.inside_heading = False
+
+        if tag == "p" and self.active_model:
+            self.model_lines.append(" ".join(self.model_parts))
+            self.active_model = False
+
+        if tag == "div" and self.product_depth:
+            if self.active_price:
+                self.price_lines.append(" ".join(self.price_parts))
+                self.active_price = False
+            if self.active_unit:
+                self.unit_lines.append(" ".join(self.unit_parts))
+                self.active_unit = False
+            self.product_depth -= 1
+
+    def handle_data(self, data):
+        if self.inside_heading:
+            self.heading.append(data)
+        if self.active_model:
+            self.model_parts.append(data)
+        if self.active_price:
+            self.price_parts.append(data)
+        if self.active_unit:
+            self.unit_parts.append(data)
+
+
+def extract_nanu_per_piece_price(html, required_terms, product_code):
+    """Reject recommendations, mismatched SKUs, and whole-pack prices."""
+    if not product_code:
+        return None
+
+    parser = NanuPrimaryProduct()
+    parser.feed(html)
+
+    if not matches(" ".join(parser.heading), required_terms):
+        return None
+
+    product_codes = []
+    for line in parser.model_lines:
+        found = re.fullmatch(r"\s*Cod\s*:\s*(\S+)\s*", line, re.IGNORECASE)
+        if found:
+            product_codes.append(found.group(1))
+
+    if product_codes != [product_code]:
+        return None
+
+    if len(parser.unit_lines) != 1 or "pret per buc" not in normalize(parser.unit_lines[0]):
+        return None
+
+    if len(parser.price_lines) != 1:
+        return None
+
+    found = re.fullmatch(
+        r"\s*(\d{1,6}(?:[.,]\d{1,2})?)\s*(?:mdl|lei)\s*",
+        parser.price_lines[0],
+        re.IGNORECASE,
+    )
+    return parse_price(found.group(1)) if found else None
+
+
 def matches(name, required_terms):
     text = normalize(name)
 
@@ -254,7 +362,16 @@ def download_page(url):
         )
 
 
-def extract_price(html, required_terms, product_code):
+def extract_price(html, required_terms, product_code, source_url=None):
+    # Nanu does not expose the main price as schema.org microdata/JSON-LD.
+    # Its price must be pinned to #product + exact "Cod" + "pret per buc".
+    # Fail closed: never fall back to a related product's visible price.
+    if source_url and urlparse(source_url).hostname in ("nanu.md", "www.nanu.md"):
+        price = extract_nanu_per_piece_price(html, required_terms, product_code)
+        if price is not None:
+            return price, "candidate", "product_scoped_visible_text"
+        return None, "unavailable", "product_scoped_visible_text"
+
     primary_price = extract_primary_microdata_price(
         html,
         required_terms,
@@ -429,6 +546,7 @@ def main():
                     html,
                     terms,
                     str(source.get("productCode", "")),
+                    source["url"],
                 )
 
                 observation["price"] = price

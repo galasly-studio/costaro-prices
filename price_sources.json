@@ -793,9 +793,20 @@
 },
     {
       "id": "woodSkirtingPiece",
-      "name": "Деревянный плинтус",
+      "name": "Напольный плинтус из массива дуба Ellora 55 мм × 2,5 м",
       "catalogMaterialKey": "woodSkirtingPiece",
-      "sources": []
+      "priceTier": null,
+      "unit": "piece",
+      "packageLengthM": 2.5,
+      "retailPackQuantity": 40,
+      "matchTerms": ["Plinta pardoseala", "Ellora", "55"],
+      "sources": [
+        {
+          "store": "Nanu",
+          "url": "https://nanu.md/amenajari-interioare/pardoseli/plinte-si-profile/9053460-plinta-pardoseala-oak-ellora-55-mm-x-m-40-buc-ellora.html",
+          "productCode": "9053460"
+        }
+      ]
     }
   ]
 }
