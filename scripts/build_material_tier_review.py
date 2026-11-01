@@ -161,7 +161,8 @@ def build(catalog, baseline, sources, observations, audit, policy, *, now=None):
                        else "manual_review_candidate" if reason is None else "held"),
             "reason": reason,
             "skuAndMethodReviewRequired": bool(shop_prices) and any(
-                not row["productCode"] or row["extractionMethod"] != "product_microdata"
+                not row["productCode"] or row["extractionMethod"] not in (
+                    "product_microdata", "product_structured_sku")
                 for row in shop_prices
             ),
             "tierQualityReviewed": approval is not None,

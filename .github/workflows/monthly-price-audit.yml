@@ -16,6 +16,7 @@ on:
       - 'tests/test_prepare_verified_catalog_release.py'
       - 'tests/test_safe_publisher_wiring.py'
       - 'tests/test_collect_price_source_health.py'
+      - 'tests/test_verified_structured_sku.py'
   schedule:
     - cron: '37 5 2 * *'
 
@@ -89,6 +90,16 @@ jobs:
           readiness = json.loads(Path('verified_release_readiness.json').read_text(encoding='utf-8'))
           observed = json.loads(Path('price_observations.json').read_text(encoding='utf-8'))
           store_health = observed.get('sourceHealth', [])
+          individual_observations = [row for product in observed['materials']
+                                     for row in product['observations']]
+          strongly_identified = sum(
+              row['status'] == 'candidate' and row['extractionMethod'] in
+              ('product_microdata', 'product_structured_sku')
+              for row in individual_observations)
+          research_only = sum(
+              row['status'] == 'candidate' and row['extractionMethod'] not in
+              ('product_microdata', 'product_structured_sku')
+              for row in individual_observations)
           assert store_health, 'Retail source diagnostics missing'
           assert sum(item['total'] for item in store_health) == sum(
               len(item['sources']) for item in json.loads(
@@ -130,6 +141,8 @@ jobs:
               f"Release reasons held: {', '.join(readiness['holdReasons']) or 'none'}",
               f"Retail stores monitored: {len(store_health)}",
               f"Successful retail observations: {sum(row['candidate'] for row in store_health)} / {sum(row['total'] for row in store_health)}",
+              f"Strict SKU and main-product verified prices: {strongly_identified}",
+              f"Research-only retailer prices (identity not fully verified): {research_only}",
               'This monthly check does not publish price changes.',
               'Current prices were preserved.',
               '',
@@ -145,6 +158,11 @@ jobs:
               summary.write('```text\n' + '\n'.join(output) + '\n```\n\n')
               summary.write('Данные видны здесь, без скачивания Artifacts. '
                             'До отдельного подтверждения публикация запрещена.\n')
+              summary.write('\n**Проверка артикула:** надёжные наблюдения привязаны '
+                            'к главному заголовку карточки, точному SKU/MPN, URL товара '
+                            'и цене в MDL. Остальные цены остаются исследовательскими; '
+                            'даже надёжные наблюдения не означают утверждённый '
+                            'уровень бюджет/стандарт/премиум.\n')
               summary.write('\n### Доступность магазинов — ошибки и методы получения цен\n\n')
               summary.write('| Магазин | Успешно | Всего | Причины отказов | Способ получения цены |\n')
               summary.write('|---|---:|---:|---|---|\n')

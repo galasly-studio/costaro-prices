@@ -102,7 +102,8 @@ def _evidence(sources, observation):
             return None, "observation_does_not_match_source"
         if actual.get("status") != "candidate":
             return None, "store_unavailable_or_ambiguous"
-        if actual.get("extractionMethod") != "product_microdata":
+        if actual.get("extractionMethod") not in (
+                "product_microdata", "product_structured_sku"):
             return None, "product_identity_not_strongly_verified"
         price = actual.get("price")
         if not _number(price):

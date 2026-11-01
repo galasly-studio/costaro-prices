@@ -131,6 +131,9 @@ class ProductHTML(HTMLParser):
 
         self.text_parts = []
         self.products = []
+        self.headings = []
+        self.inside_h1 = False
+        self.heading_parts = []
         self.inside_script = False
         self.inside_style = False
         self.is_json_ld = False
@@ -138,6 +141,10 @@ class ProductHTML(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
+
+        if tag == "h1":
+            self.inside_h1 = True
+            self.heading_parts = []
 
         if tag == "style":
             self.inside_style = True
@@ -151,6 +158,11 @@ class ProductHTML(HTMLParser):
             self.script_parts = []
 
     def handle_endtag(self, tag):
+        if tag == "h1" and self.inside_h1:
+            self.headings.append(" ".join(self.heading_parts).strip())
+            self.heading_parts = []
+            self.inside_h1 = False
+
         if tag == "style":
             self.inside_style = False
 
@@ -178,6 +190,9 @@ class ProductHTML(HTMLParser):
 
         if self.inside_style:
             return
+
+        if self.inside_h1:
+            self.heading_parts.append(data)
 
         text = " ".join(data.split())
 
@@ -366,6 +381,24 @@ def matches(name, required_terms):
     )
 
 
+def same_product_url(candidate, configured):
+    """Match the real HTTPS product path, not a recommendation or other host."""
+    if not isinstance(candidate, str) or not isinstance(configured, str):
+        return False
+    try:
+        actual, expected = urlparse(candidate), urlparse(configured)
+        if (actual.scheme != "https" or expected.scheme != "https"
+                or actual.username or actual.password or expected.username
+                or expected.password or actual.port or expected.port):
+            return False
+    except ValueError:
+        return False
+    return (actual.hostname or "").casefold().removeprefix("www.") == (
+        expected.hostname or "").casefold().removeprefix("www.") and (
+        actual.path.rstrip("/") or "/") == (
+        expected.path.rstrip("/") or "/") and actual.query == expected.query
+
+
 def download_page(url):
     parsed = urlparse(url)
 
@@ -447,6 +480,12 @@ def extract_price(html, required_terms, product_code, source_url=None):
     parser.feed(html)
 
     structured_prices = []
+    strongly_identified_prices = []
+    identity_conflict = False
+    main_heading_matches = (
+        len(parser.headings) == 1
+        and matches(parser.headings[0], required_terms)
+    )
 
     for product in parser.products:
         if not matches(
@@ -462,6 +501,7 @@ def extract_price(html, required_terms, product_code, source_url=None):
         # but display their retail product code as schema.org mpn.
         # Accept that exact code without accepting an unrelated SKU/MPN.
         if product_code and (sku or mpn) and product_code not in (sku, mpn):
+            identity_conflict = True
             continue
 
         offers = product.get("offers", [])
@@ -487,10 +527,32 @@ def extract_price(html, required_terms, product_code, source_url=None):
 
             if price is not None:
                 structured_prices.append(price)
+                # JSON-LD by itself may describe recommended products.
+                # Promote evidence ONLY for the unique main product with
+                # exact retail code, explicit MDL and canonical product URL.
+                identity_urls = [product.get("url"), offer.get("url")]
+                identity_urls = [url for url in identity_urls if url is not None]
+                strong_identity = (
+                    main_heading_matches
+                    and bool(product_code)
+                    and product_code in (sku, mpn)
+                    and currency == "MDL"
+                    and str(offer.get("priceCurrency", "")).strip().upper() == "MDL"
+                    and bool(identity_urls)
+                    and all(same_product_url(url, source_url)
+                            for url in identity_urls)
+                )
+                if strong_identity:
+                    strongly_identified_prices.append(price)
+                else:
+                    identity_conflict = True
 
     unique = sorted(set(structured_prices))
 
     if len(unique) == 1:
+        if (not identity_conflict and len(strongly_identified_prices) ==
+                len(structured_prices) and strongly_identified_prices):
+            return unique[0], "candidate", "product_structured_sku"
         return unique[0], "candidate", "structured_data"
 
     if len(unique) > 1:
