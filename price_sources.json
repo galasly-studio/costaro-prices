@@ -357,10 +357,33 @@
       ]
     },
     {
+      "id": "glet_mesterul_manole_8kg",
+      "name": "Glet Mesterul Manole 8kg",
+      "catalogMaterialKey": "finishPutty",
+      "priceTier": null,
+      "tierCandidateForReview": "budget",
+      "unit": "bucket",
+      "packageWeightKg": 8,
+      "matchTerms": ["Mesterul Manole", "8kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/glet-mesterul-manole-8kg",
+          "productCode": "543"
+        },
+        {
+          "store": "Domic",
+          "url": "https://domic.md/ro/glet-mesterul-manole-8kg/91",
+          "productCode": "240"
+        }
+      ]
+    },
+    {
       "id": "glet_b62_satroc_8kg",
       "name": "Glet finisare acril B-62 SATROC 8kg",
       "catalogMaterialKey": "finishPutty",
       "priceTier": null,
+      "tierCandidateForReview": "standard",
       "unit": "bucket",
       "packageWeightKg": 8,
       "matchTerms": ["B-62", "Satroc", "8kg"],
@@ -374,6 +397,28 @@
           "store": "ObraMag",
           "url": "https://obramag.md/product/glet-finisare-acril-b-62-satroc-8kg",
           "productCode": "370035"
+        }
+      ]
+    },
+    {
+      "id": "glet_satroc_8kg",
+      "name": "Glet finisare acril SATROC 8kg",
+      "catalogMaterialKey": "finishPutty",
+      "priceTier": null,
+      "tierCandidateForReview": "premium",
+      "unit": "bucket",
+      "packageWeightKg": 8,
+      "matchTerms": ["Satroc", "8kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/glet-satroc-8kg",
+          "productCode": "518"
+        },
+        {
+          "store": "ObraMag",
+          "url": "https://obramag.md/product/glet-finisare-acril-satroc-8kg",
+          "productCode": "6000120"
         }
       ]
     },
@@ -492,10 +537,33 @@
   ]
 },
     {
+      "id": "romanita_7kg",
+      "name": "Vopsea interior Supraten ROMANITA 7kg",
+      "catalogMaterialKey": "interiorPaint",
+      "priceTier": null,
+      "tierCandidateForReview": "budget",
+      "unit": "bucket",
+      "packageWeightKg": 7,
+      "matchTerms": ["Romanita", "7kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/vopsea-romanita-7kg",
+          "productCode": "588"
+        },
+        {
+          "store": "Domic",
+          "url": "https://domic.md/ro/vopsea-romanita-7kg/136",
+          "productCode": "285"
+        }
+      ]
+    },
+    {
   "id": "euroton_lav_7kg",
   "name": "Vopsea interior Supraten EUROTON LAV 7kg",
   "catalogMaterialKey": "interiorPaint",
   "priceTier": null,
+  "tierCandidateForReview": "standard",
   "unit": "bucket",
   "packageWeightKg": 7,
   "matchTerms": ["Euroton", "Lav", "7kg"],
@@ -512,6 +580,28 @@
     }
   ]
 },
+    {
+      "id": "sansiro_7kg",
+      "name": "Vopsea universala Supraten SANSIRO 7kg",
+      "catalogMaterialKey": "interiorPaint",
+      "priceTier": null,
+      "tierCandidateForReview": "premium",
+      "unit": "bucket",
+      "packageWeightKg": 7,
+      "matchTerms": ["Sansiro", "7kg"],
+      "sources": [
+        {
+          "store": "Macons",
+          "url": "https://macons.md/vopsea-sansiro-7kg",
+          "productCode": "591"
+        },
+        {
+          "store": "ObraMag",
+          "url": "https://obramag.md/product/vopsea-universala-supraten-sansiro-7kg",
+          "productCode": "6000231"
+        }
+      ]
+    },
     {
   "id": "wallpaper",
   "name": "Виниловые обои на флизелине 10x1,06 м, DXC 1588/1",

@@ -18,6 +18,15 @@ def load_json(path):
         return json.load(file)
 
 
+def comparison_counts(rows):
+    """One catalog material may have several distinct monitored products."""
+    ready_products = [row for row in rows if row["comparisonReady"]]
+    ready_material_keys = {
+        row["catalogMaterialKey"] for row in ready_products
+    }
+    return len(ready_material_keys), len(ready_products)
+
+
 def main():
     catalog = load_json(CATALOG_FILE)
     sources = load_json(SOURCES_FILE)
@@ -136,6 +145,8 @@ def main():
         report_materials.append({
             "id": material_id,
             "catalogMaterialKey": catalog_key,
+            "tierCandidateForReview": material.get("tierCandidateForReview"),
+            "reviewedPriceTier": material.get("priceTier"),
             "configuredSources": len(configured_sources),
             "successfulCandidates": len(candidates),
             "independentStoreNames": sorted(unique_stores),
@@ -150,11 +161,7 @@ def main():
         catalog_keys - covered_catalog_keys
     )
 
-    comparison_ready_count = sum(
-        1
-        for material in report_materials
-        if material["comparisonReady"]
-    )
+    comparison_ready_count, ready_product_count = comparison_counts(report_materials)
 
     report = {
         "generatedAt": datetime.now(
@@ -181,6 +188,8 @@ def main():
             "materialsReadyForComparison": (
                 comparison_ready_count
             ),
+            "monitoredProductGroups": len(source_materials),
+            "productGroupsReadyForComparison": ready_product_count,
             "verifiedForPublication": 0,
         },
         "uncoveredMaterialKeys": uncovered_keys,
@@ -229,12 +238,21 @@ def main():
         "Materials ready for comparison:",
         summary["materialsReadyForComparison"],
     )
+    print(
+        "Product groups ready for comparison:",
+        summary["productGroupsReadyForComparison"],
+        "/",
+        summary["monitoredProductGroups"],
+    )
 
     print("\n=== MATERIAL STATUS ===")
 
     for material in report_materials:
         print(
             material["catalogMaterialKey"],
+            "[" + material["id"] + "]"
+            if material["id"] != material["catalogMaterialKey"]
+            else "",
             "|",
             "COMPARISON READY"
             if material["comparisonReady"]
