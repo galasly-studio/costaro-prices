@@ -502,6 +502,7 @@
   "catalogMaterialKey": "gypsumBoardCeiling",
   "priceTier": null,
   "unit": "sheet",
+  "packageAreaM2": 3,
   "matchTerms": ["Technogips", "2500x1200", "12.5mm"],
   "sources": [
     {
@@ -522,6 +523,7 @@
   "catalogMaterialKey": "ceilingCdProfile",
   "priceTier": null,
   "unit": "piece",
+  "packageLengthM": 3,
   "matchTerms": ["Profil CD", "60/27", "0.6mm", "3m"],
   "sources": [
     {
@@ -542,6 +544,7 @@
   "catalogMaterialKey": "ceilingUdProfile",
   "priceTier": null,
   "unit": "piece",
+  "packageLengthM": 3,
   "matchTerms": ["Profil UD", "27/28", "0.6mm", "3m"],
   "sources": [
     {
@@ -888,6 +891,7 @@
   "catalogMaterialKey": "pvcSkirtingPiece",
   "priceTier": null,
   "unit": "piece",
+  "packageLengthM": 2.5,
   "matchTerms": [
     "INDO",
     "03",
@@ -912,6 +916,7 @@
   "catalogMaterialKey": "mdfSkirtingPiece",
   "priceTier": null,
   "unit": "piece",
+  "packageLengthM": 2.4,
   "matchTerms": [
     "MDF",
     "Arbiton",

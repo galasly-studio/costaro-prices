@@ -32,6 +32,7 @@ jobs:
           python3 -m py_compile scripts/audit_labor_prices.py
           python3 -m py_compile scripts/plan_verified_material_updates.py
           python3 -m py_compile scripts/build_material_tier_review.py
+          python3 -m py_compile scripts/audit_material_pack_alignment.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -44,6 +45,9 @@ jobs:
 
       - name: Audit material observations
         run: python3 scripts/audit_prices.py
+
+      - name: Audit catalog pack and unit alignment (read-only)
+        run: python3 scripts/audit_material_pack_alignment.py
 
       - name: Audit labor sources and 37 work rates
         run: python3 scripts/audit_labor_prices.py
@@ -66,6 +70,7 @@ jobs:
           labor = json.loads(Path('labor_audit_report.json').read_text(encoding='utf-8'))
           planned = json.loads(Path('material_update_proposals.json').read_text(encoding='utf-8'))
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
+          packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
 
           assert catalog['schemaVersion'] == 1
           assert catalog['country'] == 'MD' and catalog['currency'] == 'MDL'
@@ -84,6 +89,10 @@ jobs:
               f"Material catalog positions: {material_summary['catalogMaterials']}",
               f"Materials monitored: {material_summary['materialsWithMonitoring']}",
               f"Materials ready for comparison: {material_summary['materialsReadyForComparison']}",
+              f"Physical pack checks: {packs['summary']['productTierChecks']}",
+              f"Exactly aligned retail packs: {packs['summary']['checksByStatus']['exact']}",
+              f"Wrong retail pack sizes: {packs['summary']['checksByStatus']['different_pack']}",
+              f"Pack-to-unit conversions requiring review: {packs['summary']['checksByStatus']['conversion_review']}",
               f"Work rates: {labor['laborCount']}",
               f"Work rates ready for comparison: {labor['readyCount']}",
               f"Work rates requiring review: {labor['needsReviewCount']}",
@@ -112,6 +121,7 @@ jobs:
           path: |
             price_observations.json
             price_audit_report.json
+            material_pack_alignment_report.json
             labor_audit_report.json
             labor_audit_summary.txt
             material_update_proposals.json
