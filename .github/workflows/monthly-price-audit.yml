@@ -11,9 +11,11 @@ on:
       - 'scripts/plan_verified_material_updates.py'
       - 'scripts/build_material_tier_review.py'
       - 'scripts/prepare_verified_catalog_release.py'
+      - 'scripts/collect_prices.py'
       - 'tests/test_build_material_tier_review.py'
       - 'tests/test_prepare_verified_catalog_release.py'
       - 'tests/test_safe_publisher_wiring.py'
+      - 'tests/test_collect_price_source_health.py'
   schedule:
     - cron: '37 5 2 * *'
 
@@ -85,6 +87,12 @@ jobs:
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
           packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
           readiness = json.loads(Path('verified_release_readiness.json').read_text(encoding='utf-8'))
+          observed = json.loads(Path('price_observations.json').read_text(encoding='utf-8'))
+          store_health = observed.get('sourceHealth', [])
+          assert store_health, 'Retail source diagnostics missing'
+          assert sum(item['total'] for item in store_health) == sum(
+              len(item['sources']) for item in json.loads(
+                  Path('price_sources.json').read_text(encoding='utf-8'))['materials'])
 
           assert catalog['schemaVersion'] == 1
           assert catalog['country'] == 'MD' and catalog['currency'] == 'MDL'
@@ -120,6 +128,8 @@ jobs:
               f"Automatic proposal policy enabled: {planned['policyEnabled']}",
               f"Guarded release readiness: {readiness['status']}",
               f"Release reasons held: {', '.join(readiness['holdReasons']) or 'none'}",
+              f"Retail stores monitored: {len(store_health)}",
+              f"Successful retail observations: {sum(row['candidate'] for row in store_health)} / {sum(row['total'] for row in store_health)}",
               'This monthly check does not publish price changes.',
               'Current prices were preserved.',
               '',
@@ -135,6 +145,16 @@ jobs:
               summary.write('```text\n' + '\n'.join(output) + '\n```\n\n')
               summary.write('Данные видны здесь, без скачивания Artifacts. '
                             'До отдельного подтверждения публикация запрещена.\n')
+              summary.write('\n### Доступность магазинов — ошибки и методы получения цен\n\n')
+              summary.write('| Магазин | Успешно | Всего | Причины отказов | Способ получения цены |\n')
+              summary.write('|---|---:|---:|---|---|\n')
+              for row in store_health:
+                  errors = ', '.join(f'{key}: {n}' for key, n in row['errors'].items()) or '—'
+                  methods = ', '.join(f'{key}: {n}' for key, n in row['methods'].items()) or '—'
+                  summary.write(f"| {row['store']} | {row['candidate']} | {row['total']} | {errors} | {methods} |\n")
+              summary.write('\nHTTP 403/429 означает ограничение доступа или частоты запросов. '
+                            'После такого ответа повторные обращения к этому хосту '
+                            'в данном запуске пропускаются.\n')
           PY
 
       - name: Upload monthly audit reports

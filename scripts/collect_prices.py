@@ -2,9 +2,12 @@
 
 import json
 import re
+import socket
+import ssl
 import statistics
 import urllib.error
 import urllib.request
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -13,6 +16,61 @@ from urllib.parse import urlparse
 
 SOURCES = Path("price_sources.json")
 OUTPUT = Path("price_observations.json")
+
+
+def error_category(error):
+    """Expose a safe failure category, never response HTML or credentials."""
+    if isinstance(error, urllib.error.HTTPError):
+        return f"http_{error.code}"
+    if isinstance(error, (TimeoutError, socket.timeout)):
+        return "timeout"
+    if isinstance(error, urllib.error.URLError):
+        reason = error.reason
+        if isinstance(reason, (TimeoutError, socket.timeout)):
+            return "timeout"
+        if isinstance(reason, socket.gaierror):
+            return "dns_error"
+        if isinstance(reason, ssl.SSLError):
+            return "tls_error"
+        return "network_error"
+    if isinstance(error, ValueError):
+        return {
+            "Unexpected redirect": "unexpected_redirect",
+            "Unexpected content type": "unexpected_content_type",
+            "Page too large": "response_too_large",
+            "Only approved Moldova HTTPS sources are allowed": "invalid_source_url",
+        }.get(str(error), "invalid_response")
+    if isinstance(error, UnicodeError):
+        return "decoding_error"
+    return "unknown_error"
+
+
+def source_health(material_rows):
+    """Aggregate source failures for Actions Summary without assuming prices."""
+    by_store = defaultdict(lambda: {"total": 0, "candidate": 0,
+                                    "unavailable": 0, "ambiguous": 0,
+                                    "errors": Counter(), "methods": Counter()})
+    for material in material_rows:
+        for observation in material.get("observations", []):
+            store = observation.get("store") or "Unknown"
+            result = by_store[store]
+            result["total"] += 1
+            status = observation.get("status")
+            if status in ("candidate", "unavailable", "ambiguous"):
+                result[status] += 1
+            else:
+                result["unavailable"] += 1
+                result["errors"]["invalid_status"] += 1
+            if observation.get("error"):
+                result["errors"][observation["error"]] += 1
+            if status == "candidate":
+                result["methods"][observation.get("extractionMethod") or "none"] += 1
+    return [{"store": store,
+             "total": row["total"], "candidate": row["candidate"],
+             "unavailable": row["unavailable"], "ambiguous": row["ambiguous"],
+             "errors": dict(sorted(row["errors"].items())),
+             "methods": dict(sorted(row["methods"].items()))}
+            for store, row in sorted(by_store.items())]
 
 
 def normalize(value):
@@ -503,11 +561,15 @@ def main():
         "mode": "observation_only",
         "materials": [],
     }
+    # A 403/429 is a site-level access/rate-limit refusal, not a reason to
+    # request dozens of additional product pages from the same hostname.
+    blocked_hosts = {}
 
     for material in materials:
         observations = []
 
         for source in material["sources"]:
+            host = (urlparse(source["url"]).hostname or "").lower()
             observation = {
                 "store": source["store"],
                 "url": source["url"],
@@ -539,35 +601,45 @@ def main():
                     "Invalid matchTerms configuration"
                 )
 
-            try:
-                html = download_page(source["url"])
+            if host in blocked_hosts:
+                observation["error"] = "skipped_after_" + blocked_hosts[host]
+            else:
+                try:
+                    html = download_page(source["url"])
 
-                price, status, method = extract_price(
-                    html,
-                    terms,
-                    str(source.get("productCode", "")),
-                    source["url"],
-                )
+                    price, status, method = extract_price(
+                        html,
+                        terms,
+                        str(source.get("productCode", "")),
+                        source["url"],
+                    )
 
-                observation["price"] = price
-                observation["status"] = status
-                observation["extractionMethod"] = method
+                    observation["price"] = price
+                    observation["status"] = status
+                    observation["extractionMethod"] = method
+                    if status == "ambiguous":
+                        observation["error"] = "multiple_possible_prices"
+                    elif status != "candidate":
+                        observation["error"] = "product_identity_or_price_not_verified"
 
-            except (
-                ValueError,
-                TimeoutError,
-                urllib.error.URLError,
-                UnicodeError,
-            ) as error:
-                observation["status"] = "unavailable"
-                observation["error"] = type(error).__name__
+                except (
+                    ValueError,
+                    TimeoutError,
+                    urllib.error.URLError,
+                    UnicodeError,
+                ) as error:
+                    category = error_category(error)
+                    observation["error"] = category
+                    if category in ("http_403", "http_429"):
+                        blocked_hosts[host] = category
 
             observations.append(observation)
 
             print(
                 f"{source['store']}: "
                 f"{observation['status']} | "
-                f"{observation['price']} MDL"
+                f"{observation['price']} MDL | "
+                f"{observation.get('error', observation['extractionMethod'])}"
             )
 
         candidates = [
@@ -597,6 +669,13 @@ def main():
                 "readyForPublication": False,
             }
         )
+
+    report["sourceHealth"] = source_health(report["materials"])
+    print("=== COSTARO RETAIL SOURCE HEALTH ===")
+    for row in report["sourceHealth"]:
+        reasons = ", ".join(f"{kind}:{count}" for kind, count in row["errors"].items())
+        print(f"{row['store']}: {row['candidate']}/{row['total']} candidates"
+              f" | {reasons or 'no errors'}")
 
     with OUTPUT.open("w", encoding="utf-8") as file:
         json.dump(
