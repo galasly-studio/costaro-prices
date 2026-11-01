@@ -357,23 +357,23 @@
       ]
     },
     {
-      "id": "finito_sv_plus_20kg",
-      "name": "Glet Finito SV+ 20kg",
+      "id": "glet_b62_satroc_8kg",
+      "name": "Glet finisare acril B-62 SATROC 8kg",
       "catalogMaterialKey": "finishPutty",
       "priceTier": null,
-      "unit": "bag",
-      "packageWeightKg": 20,
-      "matchTerms": ["Finito", "SV+", "20kg"],
+      "unit": "bucket",
+      "packageWeightKg": 8,
+      "matchTerms": ["B-62", "Satroc", "8kg"],
       "sources": [
         {
           "store": "Macons",
-          "url": "https://macons.md/glet-finito-sv-20kg",
-          "productCode": "1190"
+          "url": "https://macons.md/glet-b-62-satroc-8kg",
+          "productCode": "513"
         },
         {
-          "store": "Gebhardt",
-          "url": "https://gebhardt.md/glet-finito-sv-20kg.html",
-          "productCode": "6000557"
+          "store": "ObraMag",
+          "url": "https://obramag.md/product/glet-finisare-acril-b-62-satroc-8kg",
+          "productCode": "370035"
         }
       ]
     },
@@ -492,23 +492,23 @@
   ]
 },
     {
-  "id": "sansiro_14kg",
-  "name": "Vopsea Sansiro 14kg",
+  "id": "euroton_lav_7kg",
+  "name": "Vopsea interior Supraten EUROTON LAV 7kg",
   "catalogMaterialKey": "interiorPaint",
   "priceTier": null,
   "unit": "bucket",
-  "packageWeightKg": 14,
-  "matchTerms": ["Sansiro", "14kg"],
+  "packageWeightKg": 7,
+  "matchTerms": ["Euroton", "Lav", "7kg"],
   "sources": [
     {
       "store": "Macons",
-      "url": "https://macons.md/vopsea-sansiro-14kg",
-      "productCode": "590"
+      "url": "https://macons.md/vopsea-euroton-lav-7kg",
+      "productCode": "583"
     },
     {
       "store": "ObraMag",
-      "url": "https://obramag.md/product/vopsea-universala-supraten-sansiro-14kg",
-      "productCode": "6000232"
+      "url": "https://obramag.md/product/vopsea-interior-supraten-euroton-lav-7kg",
+      "productCode": "350014"
     }
   ]
 },
