@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "market": "MD",
+  "currency": "MDL",
+  "publicationAllowed": false,
+  "description": "Exact HTML row labels. A matching row is research evidence, never permission to publish. Units and work scope must be reviewed.",
+  "rules": [
+    {"workKey": "plasterWork", "url": "https://remont.md/ru/preturi/clerical/facing/", "format": "min_avg_max", "label": "Внутренняя штукатурка стен кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "plaster_technology_and_thickness_unspecified"},
+    {"workKey": "puttyWork", "url": "https://remont.md/ru/preturi/clerical/facing/", "format": "min_avg_max", "label": "Шпатлевка внутренняя кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "finish_stage_unspecified"},
+    {"workKey": "wallpaperWork", "url": "https://remont.md/ru/preturi/clerical/facing/", "format": "min_avg_max", "label": "Поклейка обоев на стены кв.м", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "wallpaper_on_walls"},
+    {"workKey": "wallPaintWork", "url": "https://remont.md/ru/preturi/clerical/facing/", "format": "min_avg_max", "label": "Покраска стен кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "costaro_uses_two_coats_source_coats_unspecified"},
+    {"workKey": "drywallCeilingWork", "url": "https://remont.md/ru/preturi/clerical/facing/", "format": "min_avg_max", "label": "Монтаж гипсокартона на потолок кв.м", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "flat_ceiling_installation"},
+
+    {"workKey": "plasterWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Штукатурка стен по маякам", "unit": "m2", "scope": "review_required", "scopeReason": "costaro_gypsum_or_cement_thickness_unspecified"},
+    {"workKey": "puttyWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Финишная шпаклевка стен", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "finish_putty_walls"},
+    {"workKey": "wallpaperWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Поклейка обоев на стены", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "wallpaper_on_walls"},
+    {"workKey": "wallPaintWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Покраска стен", "unit": "m2", "scope": "review_required", "scopeReason": "costaro_uses_two_coats_source_coats_unspecified"},
+    {"workKey": "drywallCeilingWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Монтаж гипсокартона на потолок", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "flat_ceiling_installation"},
+
+    {"workKey": "plasterWork", "url": "https://remontexpert.md/service/tencuitor-zugrav/", "format": "single_price", "label": "Штукатурка стен по маякам", "unit": "m2", "scope": "review_required", "scopeReason": "technology_thickness_unspecified"},
+    {"workKey": "puttyWork", "url": "https://remontexpert.md/service/tencuitor-zugrav/", "format": "single_price", "label": "Финишная шпаклевка стен", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "finish_putty_walls"},
+    {"workKey": "wallPaintWork", "url": "https://remontexpert.md/service/tencuitor-zugrav/", "format": "single_price", "label": "Покраска стен, 2 слоя", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "two_coat_wall_paint"},
+    {"workKey": "startPuttyWork", "url": "https://remontexpert.md/service/tencuitor-zugrav/", "format": "single_price", "label": "Стартовая шпаклевка стен", "unit": "m2", "scope": "preliminarily_aligned", "scopeReason": "start_putty_separate_stage"}
+  ]
+}

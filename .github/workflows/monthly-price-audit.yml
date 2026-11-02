@@ -13,7 +13,9 @@ on:
       - 'scripts/prepare_verified_catalog_release.py'
       - 'scripts/audit_consumption_alignment.py'
       - 'scripts/check_labor_source_health.py'
+      - 'scripts/collect_live_labor_quotes.py'
       - 'scripts/collect_prices.py'
+      - 'labor_live_match_rules.json'
       - 'material_consumption_evidence.json'
       - 'tests/test_build_material_tier_review.py'
       - 'tests/test_prepare_verified_catalog_release.py'
@@ -22,6 +24,7 @@ on:
       - 'tests/test_verified_structured_sku.py'
       - 'tests/test_audit_consumption_alignment.py'
       - 'tests/test_check_labor_source_health.py'
+      - 'tests/test_collect_live_labor_quotes.py'
       - 'labor_market_sources.json'
   schedule:
     - cron: '37 5 2 * *'
@@ -49,6 +52,7 @@ jobs:
           python3 -m py_compile scripts/audit_prices.py
           python3 -m py_compile scripts/audit_labor_prices.py
           python3 -m py_compile scripts/check_labor_source_health.py
+          python3 -m py_compile scripts/collect_live_labor_quotes.py
           python3 -m py_compile scripts/plan_verified_material_updates.py
           python3 -m py_compile scripts/build_material_tier_review.py
           python3 -m py_compile scripts/audit_material_pack_alignment.py
@@ -76,6 +80,9 @@ jobs:
       - name: Check labor source availability without verifying or publishing labor prices
         run: python3 scripts/check_labor_source_health.py
 
+      - name: Extract precisely matched labor quotes for manual research only
+        run: python3 scripts/collect_live_labor_quotes.py
+
       - name: Plan only strongly verified material changes (read-only)
         run: python3 scripts/plan_verified_material_updates.py
 
@@ -99,6 +106,7 @@ jobs:
           materials = json.loads(Path('price_audit_report.json').read_text(encoding='utf-8'))
           labor = json.loads(Path('labor_audit_report.json').read_text(encoding='utf-8'))
           labor_health = json.loads(Path('labor_source_health.json').read_text(encoding='utf-8'))
+          live_labor = json.loads(Path('live_labor_quotes.json').read_text(encoding='utf-8'))
           planned = json.loads(Path('material_update_proposals.json').read_text(encoding='utf-8'))
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
           packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
@@ -136,6 +144,14 @@ jobs:
           assert labor_health['publishedPricesChanged'] is False
           assert labor_health['flutterCalculationsChanged'] is False
           assert labor_health['automaticLaborPublicationEnabled'] is False
+          assert live_labor['status'] == 'technical_research_only'
+          assert live_labor['summary']['workTypesInPilot'] == 6
+          assert live_labor['summary']['mappedSourceWorkPairs'] == 14
+          assert live_labor['summary']['publicationReadyLaborRates'] == 0
+          assert live_labor['publishedPricesChanged'] is False
+          assert live_labor['flutterCalculationsChanged'] is False
+          assert live_labor['automaticLaborPublicationEnabled'] is False
+          assert all(not q['approvedForPublication'] for q in live_labor['observations'])
           assert consumption['status'] == 'technical_research_only'
           assert consumption['publishedPricesChanged'] is False
           assert consumption['flutterCalculationsChanged'] is False
@@ -167,6 +183,9 @@ jobs:
               f"Labor rates with only one independent domain: {labor_health['summary']['laborRatesWithOneCurrentIndependentDomain']}",
               f"Labor rates with at least two independent domains: {labor_health['summary']['laborRatesWithAtLeastTwoCurrentIndependentDomains']}",
               f"Labor prices actually reverified live: {labor_health['summary']['laborRatesLivePriceVerified']}",
+              f"Live labor quote row matches (research only): {live_labor['summary']['quoteRowsExtracted']} / 14",
+              f"Labor quotes needing work-scope review: {live_labor['summary']['quotesWithScopeReviewRequired']}",
+              f"Labor work types with two aligned bounded sources (not approved): {live_labor['summary']['workTypesWithTwoBoundedAlignedSourcesForComparison']}",
               f"Start putty: {labor['startPuttyMarketStatus']}",
               f"Catalog publication status: {status}",
               f"Strict material update proposals (not published): {planned['proposedCount']}",
@@ -188,7 +207,7 @@ jobs:
               'Current prices were preserved.',
               '',
               'NOTE: comparison-ready does not mean verified for publication.',
-              'Live material observations and stored labor benchmarks are different evidence classes.',
+              'Live materials, preliminary labor quote matches and stored labor benchmarks are separate evidence classes.',
               'Never derive new tier prices from missing or stale evidence.',
           ]
           print('\n'.join(output))
@@ -223,6 +242,44 @@ jobs:
                             'Текущие расценки не изменены; автоматическая публикация '
                             'отключена. Сохранённые ранее ценовые диапазоны — лишь '
                             'справочные данные.\n')
+              summary.write('\n### Поиск точных строк с расценками работ — исследование\n\n')
+              lq = live_labor['summary']
+              summary.write(
+                  f"Проверено соответствий «работа × сайт»: **{lq['mappedSourceWorkPairs']}**; "
+                  f"строк с точным названием и единицей: **{lq['quoteRowsExtracted']}**; "
+                  f"несовпадений условий работы: **{lq['quotesWithScopeReviewRequired']}**. "
+                  f"Подтверждено для публикации: **0**.\n\n"
+              )
+              summary.write('| Работа COSTARO | Сайт | Найденная цена, MDL | Сопоставимость |\n')
+              summary.write('|---|---|---:|---|\n')
+              names = {
+                  'plasterWork': 'Штукатурка стен',
+                  'puttyWork': 'Финишная шпаклёвка стен',
+                  'wallpaperWork': 'Поклейка обоев',
+                  'wallPaintWork': 'Покраска стен (2 слоя)',
+                  'drywallCeilingWork': 'Гипсокартонный потолок',
+                  'startPuttyWork': 'Стартовая шпаклёвка стен',
+              }
+              for q in live_labor['observations']:
+                  if q['status'] != 'research_quote':
+                      value = '— (' + q['reason'] + ')'
+                  elif q['priceKind'] == 'lower_bound':
+                      value = 'от ' + str(q['minimumMDL'])
+                  elif q['priceKind'] == 'fixed_price':
+                      value = str(q['minimumMDL'])
+                  else:
+                      value = str(q['minimumMDL']) + '–' + str(q['maximumMDL'])
+                  scope_note = ('Предварительное соответствие'
+                                if q['scopeStatus'] == 'preliminarily_aligned'
+                                else 'Условия требуют проверки')
+                  summary.write(f"| {names[q['workKey']]} | {q['source']} | {value} | {scope_note} |\n")
+              summary.write('\n**Принцип безопасности:** найденная цена — ещё не подтверждённый '
+                            'тариф. Указания «от» остаются нижней границей. '
+                            'Нельзя сравнивать цену за один слой с ценой COSTARO '
+                            'за два слоя, объединять стартовую и финишную шпаклёвку '
+                            'или скрывать толщину штукатурки. Даты публикации '
+                            'конкретных строк автоматически не подтверждаются. '
+                            'Бюджет/стандарт/премиум НЕ назначаются.\n')
               summary.write('\n### Сопоставление предварительного расхода с производителем\n\n')
               summary.write('Исследование 6 товаров: **без изменения формул и цен COSTARO**. '
                             'Нормы Flutter зафиксированы на 02.11.2026; перед релизом '
@@ -276,6 +333,7 @@ jobs:
             labor_audit_report.json
             labor_audit_summary.txt
             labor_source_health.json
+            live_labor_quotes.json
             material_update_proposals.json
             material_tier_review.json
             material_tier_review_RU.md
