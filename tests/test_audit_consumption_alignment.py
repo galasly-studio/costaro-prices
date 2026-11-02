@@ -34,6 +34,8 @@ class ManufacturerConsumptionAuditTests(unittest.TestCase):
             "reviewedProducts": 6,
             "preliminaryConsumptionCompatible": 4,
             "consumptionReviewRequired": 2,
+            "paintCandidatesDryRoomOnly": 1,
+            "paintCandidatesHumidRoomCapable": 2,
             "unapprovedAlternatives": 1,
         })
         self.assertEqual(json.dumps(f, ensure_ascii=False, sort_keys=True), frozen)
@@ -73,6 +75,7 @@ class ManufacturerConsumptionAuditTests(unittest.TestCase):
         alt = audit(*fixture())["alternativeForHumanResearch"]
         self.assertEqual(alt["manufacturerProductCode"], "6000378")
         self.assertTrue(alt["compatibleConsumptionCandidate"])
+        self.assertTrue(alt["roomCoverageCompatibleWithGenericTier"])
         self.assertFalse(alt["configuredForCollection"])
         self.assertFalse(alt["approvedForPublication"])
 
@@ -81,7 +84,57 @@ class ManufacturerConsumptionAuditTests(unittest.TestCase):
         self.assertIn("Только исследование", report)
         self.assertIn("Sansiro", report)
         self.assertIn("подготовка потолка", report)
+        self.assertIn("Romanita разрешена", report)
         self.assertIn("не утверждены", report)
+
+    def test_romanita_dry_only_blocks_generic_budget_room_use(self):
+        result = audit(*fixture())
+        rows = {item["id"]: item for item in result["products"]}
+        dry = rows["romanita_7kg"]
+        self.assertEqual(dry["status"], "preliminary_norm_within_manufacturer_range")
+        self.assertEqual(dry["manufacturerRoomUse"], "dry_only")
+        self.assertEqual(dry["roomCoverageStatus"],
+                         "blocked_dry_only_for_generic_all_room_tier")
+        self.assertTrue(dry["requiresRoomUseReview"])
+        self.assertFalse(dry["roomCoverageCompatibleWithGenericTier"])
+        self.assertFalse(dry["approvedForPublication"])
+
+    def test_other_paints_allow_humid_rooms_but_are_unapproved(self):
+        rows = {row["id"]: row for row in audit(*fixture())["products"]}
+        for product_id in ("euroton_lav_7kg", "sansiro_7kg"):
+            row = rows[product_id]
+            self.assertEqual(row["manufacturerRoomUse"], "dry_and_humid")
+            self.assertTrue(row["roomCoverageCompatibleWithGenericTier"])
+            self.assertFalse(row["requiresRoomUseReview"])
+            self.assertFalse(row["approvedForPublication"])
+
+    def test_maker_room_scope_cannot_be_silently_edited(self):
+        for product_id, replacement in (("romanita_7kg", "dry_and_humid"),
+                                        ("sansiro_7kg", "dry_only"),
+                                        ("euroton_lav_7kg", None)):
+            f = fixture()
+            product(f[3], product_id)["manufacturerRoomUse"] = replacement
+            with self.subTest(product_id=product_id), self.assertRaisesRegex(
+                    ValueError, "room-use evidence mismatch"):
+                audit(*f)
+
+    def test_app_generic_room_coverage_guard_cannot_be_disabled(self):
+        f = fixture()
+        f[3]["genericInteriorPaintCoversWetRooms"] = False
+        with self.assertRaisesRegex(ValueError, "Generic Flutter paint slot"):
+            audit(*f)
+
+    def test_putty_room_use_must_not_be_assumed(self):
+        f = fixture()
+        product(f[3], "glet_satroc_8kg")["manufacturerRoomUse"] = "dry_and_humid"
+        with self.assertRaisesRegex(ValueError, "Unexpected room-use"):
+            audit(*f)
+
+    def test_alternative_room_use_cannot_be_silently_changed(self):
+        f = fixture()
+        f[3]["alternativesForHumanResearch"][0]["manufacturerRoomUse"] = "dry_only"
+        with self.assertRaisesRegex(ValueError, "Unverified alternative"):
+            audit(*f)
 
     def test_unexpected_or_duplicate_manufacturer_product_id_is_rejected(self):
         for bad_id in ("not_six_products", "glet_b62_satroc_8kg"):

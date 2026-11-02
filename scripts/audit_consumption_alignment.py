@@ -31,6 +31,14 @@ EXPECTED_REVIEW_IDS = {
     "romanita_7kg", "euroton_lav_7kg", "sansiro_7kg",
 }
 TIERS = ("budget", "standard", "premium")
+# Maker room-use snapshot verified on 2026-11-02. The Flutter estimate uses
+# one generic interiorPaint tier slot for dry and humid room types alike.
+# A dry-only paint must therefore never be proposed as a universal tier SKU.
+EXPECTED_PAINT_ROOM_USE = {
+    "romanita_7kg": "dry_only",
+    "euroton_lav_7kg": "dry_and_humid",
+    "sansiro_7kg": "dry_and_humid",
+}
 
 
 def _positive(value):
@@ -92,6 +100,8 @@ def audit(catalog, baseline, sources, evidence, *, area_m2=50.0):
         raise ValueError("Invalid technical evidence document")
     if not isinstance(evidence.get("reviewDate"), str) or not evidence["reviewDate"]:
         raise ValueError("Manufacturer review date required")
+    if evidence.get("genericInteriorPaintCoversWetRooms") is not True:
+        raise ValueError("Generic Flutter paint slot must cover wet rooms")
 
     app_norms = evidence.get("appNormSnapshot")
     if not isinstance(app_norms, list) or len(app_norms) != len(APP_NORM_SNAPSHOT):
@@ -140,6 +150,16 @@ def audit(catalog, baseline, sources, evidence, *, area_m2=50.0):
                 or source.get("packageWeightKg") != package_kg
                 or not _manufacturer_url(row.get("manufacturerUrl"))):
             raise ValueError(f"Unverified technical identity or package: {product_id}")
+        if key == "interiorPaint":
+            if row.get("manufacturerRoomUse") != EXPECTED_PAINT_ROOM_USE.get(product_id):
+                raise ValueError(f"Manufacturer room-use evidence mismatch: {product_id}")
+            room_use = row["manufacturerRoomUse"]
+            room_coverage = ("blocked_dry_only_for_generic_all_room_tier"
+                             if room_use == "dry_only" else "covers_dry_and_humid_rooms")
+        else:
+            if "manufacturerRoomUse" in row:
+                raise ValueError(f"Unexpected room-use assessment for putty: {product_id}")
+            room_use, room_coverage = "not_assessed", "not_assessed_for_putty"
         for tier in TIERS:
             slot = catalog["materialPrices"][key][tier]
             if not isinstance(slot, dict) or slot.get("amount") != package_kg:
@@ -173,6 +193,11 @@ def audit(catalog, baseline, sources, evidence, *, area_m2=50.0):
             },
             "status": state,
             "requiresConsumptionReview": state != "preliminary_norm_within_manufacturer_range",
+            "manufacturerRoomUse": room_use,
+            "roomCoverageStatus": room_coverage,
+            "roomCoverageCompatibleWithGenericTier": (
+                room_use == "dry_and_humid" if key == "interiorPaint" else False),
+            "requiresRoomUseReview": room_use == "dry_only",
             "tierQualityApproved": False,
             "approvedForPublication": False,
         }
@@ -188,6 +213,7 @@ def audit(catalog, baseline, sources, evidence, *, area_m2=50.0):
             or option.get("catalogMaterialKey") != "interiorPaint"
             or option.get("packageWeightKg") != 7
             or option.get("manufacturerProductCode") != "6000378"
+            or option.get("manufacturerRoomUse") != "dry_and_humid"
             or option.get("status") != "not_configured_not_approved"
             or not _manufacturer_url(option.get("manufacturerUrl"))
             or not _valid_shop_url(option.get("secondShopUrl"))):
@@ -208,6 +234,8 @@ def audit(catalog, baseline, sources, evidence, *, area_m2=50.0):
             "maximum": round(alt_max * alt_coats, 4)},
         "appPreliminaryKgPerM2": alt_app,
         "compatibleConsumptionCandidate": (alt_min * alt_coats <= alt_app <= alt_max * alt_coats),
+        "manufacturerRoomUse": option["manufacturerRoomUse"],
+        "roomCoverageCompatibleWithGenericTier": True,
         "configuredForCollection": False,
         "approvedForPublication": False,
     }
@@ -223,6 +251,10 @@ def audit(catalog, baseline, sources, evidence, *, area_m2=50.0):
             "reviewedProducts": len(results),
             "preliminaryConsumptionCompatible": len(results) - len(blocked),
             "consumptionReviewRequired": len(blocked),
+            "paintCandidatesDryRoomOnly": sum(
+                row["manufacturerRoomUse"] == "dry_only" for row in results),
+            "paintCandidatesHumidRoomCapable": sum(
+                row["manufacturerRoomUse"] == "dry_and_humid" for row in results),
             "unapprovedAlternatives": 1,
         },
         "products": results,
@@ -239,9 +271,12 @@ def markdown(report):
              "Нормы COSTARO — предварительные, проверенные по снимку кода "
              "`lib/data/material_norms.dart` от 02.11.2026. "
              "Перед релизом снимок нужно сверить с текущим Flutter-кодом.", "",
+             "Один общий товар `interiorPaint` используется в приложении и для сухих, "
+             "и для влажных помещений; технические ограничения производителя "
+             "проверяются отдельно от расхода и цены.", "",
              "| Товар | Предварительная норма, кг/м² | Производитель, кг/м² | "
-             "Упаковок на 50 м²: COSTARO / возможный диапазон | Итог |",
-             "|---|---:|---:|---:|---|"]
+             "Упаковок на 50 м²: COSTARO / возможный диапазон | Расход | Применение |",
+             "|---|---:|---:|---:|---|---|"]
     for row in report["products"]:
         spread = row["manufacturerKgPerM2ForConfiguredCoats"]
         packs = row["examplePackages"]
@@ -250,7 +285,7 @@ def markdown(report):
             f"{spread['minimum']:.3f}–{spread['maximum']:.3f} | "
             f"{packs['appPreliminary']} / "
             f"{packs['manufacturerMinimum']}–{packs['manufacturerMaximum']} | "
-            f"{row['status']} |"
+            f"{row['status']} | {row['roomCoverageStatus']} |"
         )
     alt = report["alternativeForHumanResearch"]
     lines.extend(["", "## Выводы и ограничения", "",
@@ -259,10 +294,17 @@ def markdown(report):
                   "- Sansiro: нейтральная норма для двух слоёв ниже "
                   "минимального расхода производителя; не утверждать "
                   "его как универсальную премиальную краску.",
+                  "- Romanita разрешена производителем только в сухих помещениях. "
+                  "Она не может представлять универсальную бюджетную краску "
+                  "для всех типов комнат (в том числе ванной) в текущем Flutter.",
+                  "- Euroton Lav и Sansiro по заявленному назначению подходят "
+                  "для влажных помещений, но это ещё не подтверждение "
+                  "качества, свежей цены, нормы расхода или уровня цен.",
                   f"- Альтернатива для исследования: {alt['name']} "
                   "(артикул производителя " + alt["manufacturerProductCode"] + "). "
                   "Фасовка и расход предварительно сопоставимы, "
-                  "но две независимые строгие цены и качество не утверждены.",
+                  "производитель допускает влажные помещения, но две "
+                  "независимые строгие цены и качество не утверждены.",
                   "- Ни один товар не получает автоматического утверждения "
                   "уровня budget/standard/premium только по расходу или цене.",
                   "- Для шпаклёвки здесь сравнивается только "

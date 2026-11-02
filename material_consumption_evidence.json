@@ -4,6 +4,7 @@
   "currency": "MDL",
   "status": "technical_research_only",
   "reviewDate": "2026-11-02",
+  "genericInteriorPaintCoversWetRooms": true,
   "appNormSnapshot": [
     {
       "catalogMaterialKey": "finishPutty",
@@ -50,6 +51,7 @@
       "catalogMaterialKey": "interiorPaint",
       "tierHintForHumanReview": "budget",
       "packageWeightKg": 7,
+      "manufacturerRoomUse": "dry_only",
       "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.125, "maximum": 0.17},
       "manufacturerUrl": "https://supraten.md/kraska-romanita-7kg-54889-ru"
     },
@@ -58,6 +60,7 @@
       "catalogMaterialKey": "interiorPaint",
       "tierHintForHumanReview": "standard",
       "packageWeightKg": 7,
+      "manufacturerRoomUse": "dry_and_humid",
       "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.125, "maximum": 0.17},
       "manufacturerUrl": "https://supraten.md/vopsea-euroton-lav-7kg-55106-ro"
     },
@@ -66,6 +69,7 @@
       "catalogMaterialKey": "interiorPaint",
       "tierHintForHumanReview": "premium",
       "packageWeightKg": 7,
+      "manufacturerRoomUse": "dry_and_humid",
       "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.2, "maximum": 0.22},
       "manufacturerUrl": "https://supraten.md/vopsea-sansiro-7kg-136353-ro"
     }
@@ -77,6 +81,7 @@
       "manufacturerProductCode": "6000378",
       "catalogMaterialKey": "interiorPaint",
       "packageWeightKg": 7,
+      "manufacturerRoomUse": "dry_and_humid",
       "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.125, "maximum": 0.17},
       "manufacturerUrl": "https://supraten.md/kraska-euroton-eco-7kg-213157-ru",
       "secondShopUrl": "https://gebhardt.md/vopsea-euroton-eco-7kg.html",

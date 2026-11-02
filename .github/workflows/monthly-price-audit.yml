@@ -127,6 +127,8 @@ jobs:
           assert consumption['flutterCalculationsChanged'] is False
           assert consumption['automaticTierApprovalEnabled'] is False
           assert consumption['summary']['reviewedProducts'] == 6
+          assert consumption['summary']['paintCandidatesDryRoomOnly'] == 1
+          assert consumption['summary']['paintCandidatesHumidRoomCapable'] == 2
           assert all(not item['approvedForPublication'] for item in consumption['products'])
 
           material_summary = materials['summary']
@@ -160,6 +162,8 @@ jobs:
               f"Manufacturer consumption candidates reviewed: {consumption['summary']['reviewedProducts']}",
               f"Preliminary consumption-compatible candidates (not approved): {consumption['summary']['preliminaryConsumptionCompatible']}",
               f"Consumption mismatches or wide ranges requiring review: {consumption['summary']['consumptionReviewRequired']}",
+              f"Paint products restricted to dry rooms (not universal): {consumption['summary']['paintCandidatesDryRoomOnly']}",
+              f"Paint products stated as suitable for humid rooms (not approved): {consumption['summary']['paintCandidatesHumidRoomCapable']}",
               'This monthly check does not publish price changes.',
               'Current prices were preserved.',
               '',
@@ -184,20 +188,31 @@ jobs:
               summary.write('Исследование 6 товаров: **без изменения формул и цен COSTARO**. '
                             'Нормы Flutter зафиксированы на 02.11.2026; перед релизом '
                             'их необходимо повторно проверить в исходном коде.\n\n')
-              summary.write('| Товар | Расход, статус | Упаковок на 50 м²: COSTARO / диапазон | Решение |\n')
-              summary.write('|---|---|---|---|\n')
+              summary.write('| Товар | Расход, статус | Упаковок на 50 м²: COSTARO / диапазон | Применение | Решение |\n')
+              summary.write('|---|---|---|---|---|\n')
               for item in consumption['products']:
                   package = item['examplePackages']
-                  decision = 'Требует проверки' if item['requiresConsumptionReview'] else 'Предварительно сопоставимо, не утверждено'
+                  decision = ('Нельзя для всех комнат: проверка'
+                              if item['requiresRoomUseReview'] else
+                              'Требует проверки расхода'
+                              if item['requiresConsumptionReview'] else
+                              'Предварительно сопоставимо, не утверждено')
                   summary.write(
                       f"| `{item['id']}` | {item['status']} | "
                       f"{package['appPreliminary']} / "
                       f"{package['manufacturerMinimum']}–{package['manufacturerMaximum']} "
-                      f"| {decision} |\n")
+                      f"| {item['roomCoverageStatus']} | {decision} |\n")
               summary.write('\n**Sansiro и Meșterul Manole требуют проверки расхода.** '
                             'Euroton Eco — лишь кандидат для изучения, без настройки '
                             'сбора и без утверждения. Расход шпаклёвки потолка этим '
                             'аудитом не проверяется.\n')
+              summary.write('\n**Ограничение по типу помещения:** Romanita только для '
+                            'сухих комнат по документации производителя. В COSTARO '
+                            'одна общая позиция интерьерной краски для всех типов комнат, '
+                            'поэтому универсальная бюджетная привязка Romanita запрещена. '
+                            'Euroton Lav и Sansiro производитель допускает для влажных '
+                            'комнат, но их качество и пригодность к автоматическим ценовым '
+                            'уровням всё ещё не утверждены.\n')
               summary.write('\n### Доступность магазинов — ошибки и методы получения цен\n\n')
               summary.write('| Магазин | Успешно | Всего | Причины отказов | Способ получения цены |\n')
               summary.write('|---|---:|---:|---|---|\n')
