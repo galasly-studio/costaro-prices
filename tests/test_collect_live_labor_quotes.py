@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REMONT = "https://remont.md/ru/preturi/clerical/facing/"
 CONSTRUCT = "https://construct.md/ru/pages/price/"
 EXPERT = "https://remontexpert.md/service/tencuitor-zugrav/"
+BUILDING = "https://remont.md/ru/preturi/clerical/building_installation_work/"
+ELECTRIC = "https://remont.md/ru/preturi/clerical/repair_electric/"
 NOW = datetime(2026, 11, 2, 18, 0, tzinfo=timezone.utc)
 
 
@@ -62,6 +64,8 @@ def fixtures():
 
 def collect_fixtures(fetcher=None):
     catalog, sources, rules = fixtures()
+    # Stage 19 pilot must remain covered independently of the new, wider stage.
+    rules = {**rules, "rules": rules["rules"][:14]}
     pages = {REMONT: REMONT_HTML, CONSTRUCT: CONSTRUCT_HTML, EXPERT: EXPERT_HTML}
     return collect(catalog, sources, rules, NOW,
                    fetcher=fetcher or (lambda url: pages[url]))
@@ -126,11 +130,13 @@ class ParsingTests(unittest.TestCase):
 
 
 class SafeguardTests(unittest.TestCase):
-    def test_rules_cover_5_labor_keys_plus_separate_start_putty(self):
+    def test_expanded_rules_include_all_pilot_mappings_and_are_allowlisted(self):
         _, sources, doc = fixtures()
         rules = validate_rules(doc, sources)
-        self.assertEqual(len(rules), 14)
-        self.assertEqual(len({r["workKey"] for r in rules}), 6)
+        self.assertEqual(len(rules), 42)
+        self.assertEqual(len({r["workKey"] for r in rules}), 30)
+        self.assertEqual(len({r["workKey"] for r in rules if r["workKey"] != "startPuttyWork"}), 29)
+        self.assertEqual(len(rules[:14]), 14)
 
     def test_unknown_site_and_key_rejected(self):
         _, sources, doc = fixtures()
@@ -192,11 +198,62 @@ class SafeguardTests(unittest.TestCase):
     def test_unchanged_catalog_sources_and_rules(self):
         catalog, sources, doc = fixtures()
         before = copy.deepcopy((catalog, sources, doc))
-        collect(catalog, sources, doc, NOW,
+        pilot_doc = {**doc, "rules": doc["rules"][:14]}
+        collect(catalog, sources, pilot_doc, NOW,
                 fetcher=lambda url: {REMONT: REMONT_HTML,
                                      CONSTRUCT: CONSTRUCT_HTML,
                                      EXPERT: EXPERT_HTML}[url])
         self.assertEqual((catalog, sources, doc), before)
+
+    def test_new_mapping_does_not_accept_other_unit_or_unapproved_source(self):
+        _, sources, doc = fixtures()
+        building = [r for r in validate_rules(doc, sources) if r["url"] == BUILDING]
+        self.assertEqual(len(building), 15)
+        self.assertTrue(any(r["workKey"] == "electricalCableLayWork" for r in building))
+        self.assertTrue(any(r["workKey"] == "removeWallpaperWork" for r in building))
+
+    def test_actual_source_unit_errors_cannot_be_turned_into_prices(self):
+        _, sources, doc = fixtures()
+        rules = validate_rules(doc, sources)
+        for key, label, source_unit in (
+            ("skirtingWork", "Монтаж плинтусов м/п", ""),
+            ("electricalCableLayWork", "Прокладка кабеля в ПВХ трубе м/п", "buc."),
+        ):
+            rule = next(r for r in rules if r["workKey"] == key and r["url"] == BUILDING)
+            found = match_quote([[label, "10", "20", "50", source_unit, "→"]], rule)
+            self.assertEqual(found, {"status": "rejected", "reason": "unit_mismatch"})
+
+    def test_extended_exact_table_research_remains_unpublished(self):
+        catalog, sources, doc = fixtures()
+        pages = {
+            REMONT: REMONT_HTML + "<table>" + row(
+                "Шпатлёвка потолока под покраску кв.м", "30", "45", "70", "m²", "→")
+                + row("Покраска потолок Кв.м", "30", "40", "65", "m²", "→")
+                + row("Грунтовка потолков м2", "10", "15", "25", "m²", "→") + "</table>",
+            CONSTRUCT: CONSTRUCT_HTML + "<table>" + row("Настил ламината", "м2", "100")
+                + row("Монтаж напольного плинтуса", "м.п.", "48") + "</table>",
+            EXPERT: EXPERT_HTML,
+            BUILDING: "<table>" + row("Снятие обоев м2", "25", "38", "40", "m²", "→")
+                + row("Устройство наливных полов м2", "50", "120", "200", "m²", "→")
+                + row("Установка подразетников шт", "25", "60", "160", "buc.", "→")
+                + row("Монтаж плинтусов м/п", "25", "70", "140", "", "→") + "</table>",
+            ELECTRIC: "<table>" + row("Демонтаж розеток и выключателей шт",
+                                          "30", "50", "80", "buc.", "→") + "</table>",
+        }
+        report = collect(catalog, sources, doc, NOW, fetcher=lambda url: pages[url])
+        self.assertEqual(report["summary"]["workTypesInPilot"], 30)
+        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 42)
+        self.assertEqual(report["summary"]["catalogLaborRates"], 37)
+        self.assertEqual(report["summary"]["quoteRowsRejectedByUnit"], 1)
+        self.assertFalse(report["publishedPricesChanged"])
+        self.assertEqual(report["summary"]["publicationReadyLaborRates"], 0)
+        quotes = [o for o in report["observations"] if o["status"] == "research_quote"]
+        self.assertTrue(any(o["workKey"] == "removeWallpaperWork" and
+                            o["minimumMDL"] == 25 for o in quotes))
+        self.assertTrue(any(o["workKey"] == "laminateWork" and
+                            o["minimumMDL"] == 100 for o in quotes))
+        self.assertTrue(all(not o["priceDateVerified"] and
+                            not o["approvedForPublication"] for o in quotes))
 
 
 class CollectionTests(unittest.TestCase):

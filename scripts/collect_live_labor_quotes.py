@@ -28,10 +28,7 @@ MAX_HTML_BYTES = 2_000_000
 KINDS = frozenset({"min_avg_max", "single_price"})
 SCOPES = frozenset({"preliminarily_aligned", "review_required"})
 PRICE = re.compile(r"^(от\s+)?(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:mdl|лей|lei)?$", re.I)
-EXACT_KEYS = frozenset({
-    "plasterWork", "puttyWork", "wallpaperWork",
-    "wallPaintWork", "drywallCeilingWork", "startPuttyWork",
-})
+EXACT_KEYS = frozenset(LABOR_KEYS) | {"startPuttyWork"}
 
 
 def normalize_label(value: str) -> str:
@@ -197,7 +194,7 @@ def validate_rules(rules_doc: dict, source_doc: dict) -> list[dict]:
         }:
             raise ValueError("Unexpected rule schema")
         key = rule["workKey"]
-        if (key not in EXACT_KEYS or key not in set(LABOR_KEYS) | {"startPuttyWork"}
+        if (key not in EXACT_KEYS
                 or rule["format"] not in KINDS or rule["scope"] not in SCOPES
                 or rule["unit"] != required_unit(key)
                 or not isinstance(rule["label"], str) or len(rule["label"]) < 12
@@ -300,16 +297,24 @@ def collect(catalog: dict, sources: dict, rules_doc: dict,
         })
 
     statuses = Counter(o["status"] for o in observations)
+    matched_keys = {o["workKey"] for o in observations
+                    if o["status"] == "research_quote"}
     return {
         "status": "technical_research_only",
         "checkedAtUtc": checked_at.astimezone(timezone.utc).isoformat(),
         "country": "MD", "currency": "MDL", "catalogVersion": catalog["catalogVersion"],
         "summary": {
+            "workTypesMapped": len(reviewed),
             "workTypesInPilot": len(reviewed),
+            "catalogLaborRates": len(LABOR_KEYS),
+            "catalogWorkTypesWithResearchQuotes": len(matched_keys & set(LABOR_KEYS)),
+            "catalogWorkTypesWithoutResearchQuotes": len(set(LABOR_KEYS) - matched_keys),
             "mappedSourceWorkPairs": len(observations),
             "distinctSourcePages": len(source_results),
             "pagesParsed": sum(r["status"] == "parsed" for r in source_results.values()),
             "quoteRowsExtracted": statuses["research_quote"],
+            "quoteRowsRejectedByUnit": sum(
+                o["reason"] == "unit_mismatch" for o in observations),
             "quotesWithScopeReviewRequired": sum(
                 o["status"] == "research_quote" and
                 o["scopeStatus"] == "review_required" for o in observations),
