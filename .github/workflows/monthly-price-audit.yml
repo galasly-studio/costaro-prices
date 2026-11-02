@@ -11,12 +11,15 @@ on:
       - 'scripts/plan_verified_material_updates.py'
       - 'scripts/build_material_tier_review.py'
       - 'scripts/prepare_verified_catalog_release.py'
+      - 'scripts/audit_consumption_alignment.py'
       - 'scripts/collect_prices.py'
+      - 'material_consumption_evidence.json'
       - 'tests/test_build_material_tier_review.py'
       - 'tests/test_prepare_verified_catalog_release.py'
       - 'tests/test_safe_publisher_wiring.py'
       - 'tests/test_collect_price_source_health.py'
       - 'tests/test_verified_structured_sku.py'
+      - 'tests/test_audit_consumption_alignment.py'
   schedule:
     - cron: '37 5 2 * *'
 
@@ -46,6 +49,7 @@ jobs:
           python3 -m py_compile scripts/build_material_tier_review.py
           python3 -m py_compile scripts/audit_material_pack_alignment.py
           python3 -m py_compile scripts/prepare_verified_catalog_release.py
+          python3 -m py_compile scripts/audit_consumption_alignment.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -71,6 +75,9 @@ jobs:
       - name: Prepare budget standard premium manual review (read-only)
         run: python3 scripts/build_material_tier_review.py
 
+      - name: Compare manufacturer consumption with preliminary app norms (read-only)
+        run: python3 scripts/audit_consumption_alignment.py
+
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
 
@@ -88,6 +95,7 @@ jobs:
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
           packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
           readiness = json.loads(Path('verified_release_readiness.json').read_text(encoding='utf-8'))
+          consumption = json.loads(Path('consumption_alignment_report.json').read_text(encoding='utf-8'))
           observed = json.loads(Path('price_observations.json').read_text(encoding='utf-8'))
           store_health = observed.get('sourceHealth', [])
           individual_observations = [row for product in observed['materials']
@@ -114,6 +122,12 @@ jobs:
           assert ((status == 'draft' and enabled is False)
                   or (status == 'published' and enabled is True))
           assert labor['ok'] is True
+          assert consumption['status'] == 'technical_research_only'
+          assert consumption['publishedPricesChanged'] is False
+          assert consumption['flutterCalculationsChanged'] is False
+          assert consumption['automaticTierApprovalEnabled'] is False
+          assert consumption['summary']['reviewedProducts'] == 6
+          assert all(not item['approvedForPublication'] for item in consumption['products'])
 
           material_summary = materials['summary']
           output = [
@@ -143,6 +157,9 @@ jobs:
               f"Successful retail observations: {sum(row['candidate'] for row in store_health)} / {sum(row['total'] for row in store_health)}",
               f"Strict SKU and main-product verified prices: {strongly_identified}",
               f"Research-only retailer prices (identity not fully verified): {research_only}",
+              f"Manufacturer consumption candidates reviewed: {consumption['summary']['reviewedProducts']}",
+              f"Preliminary consumption-compatible candidates (not approved): {consumption['summary']['preliminaryConsumptionCompatible']}",
+              f"Consumption mismatches or wide ranges requiring review: {consumption['summary']['consumptionReviewRequired']}",
               'This monthly check does not publish price changes.',
               'Current prices were preserved.',
               '',
@@ -163,6 +180,24 @@ jobs:
                             'и цене в MDL. Остальные цены остаются исследовательскими; '
                             'даже надёжные наблюдения не означают утверждённый '
                             'уровень бюджет/стандарт/премиум.\n')
+              summary.write('\n### Сопоставление предварительного расхода с производителем\n\n')
+              summary.write('Исследование 6 товаров: **без изменения формул и цен COSTARO**. '
+                            'Нормы Flutter зафиксированы на 02.11.2026; перед релизом '
+                            'их необходимо повторно проверить в исходном коде.\n\n')
+              summary.write('| Товар | Расход, статус | Упаковок на 50 м²: COSTARO / диапазон | Решение |\n')
+              summary.write('|---|---|---|---|\n')
+              for item in consumption['products']:
+                  package = item['examplePackages']
+                  decision = 'Требует проверки' if item['requiresConsumptionReview'] else 'Предварительно сопоставимо, не утверждено'
+                  summary.write(
+                      f"| `{item['id']}` | {item['status']} | "
+                      f"{package['appPreliminary']} / "
+                      f"{package['manufacturerMinimum']}–{package['manufacturerMaximum']} "
+                      f"| {decision} |\n")
+              summary.write('\n**Sansiro и Meșterul Manole требуют проверки расхода.** '
+                            'Euroton Eco — лишь кандидат для изучения, без настройки '
+                            'сбора и без утверждения. Расход шпаклёвки потолка этим '
+                            'аудитом не проверяется.\n')
               summary.write('\n### Доступность магазинов — ошибки и методы получения цен\n\n')
               summary.write('| Магазин | Успешно | Всего | Причины отказов | Способ получения цены |\n')
               summary.write('|---|---:|---:|---|---|\n')
@@ -189,6 +224,8 @@ jobs:
             material_update_proposals.json
             material_tier_review.json
             material_tier_review_RU.md
+            consumption_alignment_report.json
+            consumption_alignment_RU.md
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn

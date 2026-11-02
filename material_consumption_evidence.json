@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "country": "MD",
+  "currency": "MDL",
+  "status": "technical_research_only",
+  "reviewDate": "2026-11-02",
+  "appNormSnapshot": [
+    {
+      "catalogMaterialKey": "finishPutty",
+      "scope": "wall_finishing_only",
+      "codeConstant": "MaterialNorms.finishPuttyKgPerM2",
+      "kgPerM2ForConfiguredCoats": 0.6,
+      "coats": 1
+    },
+    {
+      "catalogMaterialKey": "interiorPaint",
+      "scope": "walls_and_ceilings",
+      "codeConstant": "MaterialNorms.paintKgPerM2TwoCoats",
+      "kgPerM2ForConfiguredCoats": 0.3,
+      "coats": 2
+    }
+  ],
+  "products": [
+    {
+      "id": "glet_mesterul_manole_8kg",
+      "catalogMaterialKey": "finishPutty",
+      "tierHintForHumanReview": "budget",
+      "packageWeightKg": 8,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.4, "maximum": 1.7},
+      "manufacturerUrl": "https://supraten.md/shpatlevka-mesterul-manole-8kg-54800-ru"
+    },
+    {
+      "id": "glet_b62_satroc_8kg",
+      "catalogMaterialKey": "finishPutty",
+      "tierHintForHumanReview": "standard",
+      "packageWeightKg": 8,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.5, "maximum": 0.7},
+      "manufacturerUrl": "https://supraten.md/glet-b-62-satroc-8kg-54796-ro"
+    },
+    {
+      "id": "glet_satroc_8kg",
+      "catalogMaterialKey": "finishPutty",
+      "tierHintForHumanReview": "premium",
+      "packageWeightKg": 8,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.5, "maximum": 0.7},
+      "manufacturerUrl": "https://supraten.md/shpatlevka-satroc-8kg-54810-ru"
+    },
+    {
+      "id": "romanita_7kg",
+      "catalogMaterialKey": "interiorPaint",
+      "tierHintForHumanReview": "budget",
+      "packageWeightKg": 7,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.125, "maximum": 0.17},
+      "manufacturerUrl": "https://supraten.md/kraska-romanita-7kg-54889-ru"
+    },
+    {
+      "id": "euroton_lav_7kg",
+      "catalogMaterialKey": "interiorPaint",
+      "tierHintForHumanReview": "standard",
+      "packageWeightKg": 7,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.125, "maximum": 0.17},
+      "manufacturerUrl": "https://supraten.md/vopsea-euroton-lav-7kg-55106-ro"
+    },
+    {
+      "id": "sansiro_7kg",
+      "catalogMaterialKey": "interiorPaint",
+      "tierHintForHumanReview": "premium",
+      "packageWeightKg": 7,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.2, "maximum": 0.22},
+      "manufacturerUrl": "https://supraten.md/vopsea-sansiro-7kg-136353-ro"
+    }
+  ],
+  "alternativesForHumanResearch": [
+    {
+      "replacesCandidateId": "sansiro_7kg",
+      "name": "Euroton Eco 7kg",
+      "manufacturerProductCode": "6000378",
+      "catalogMaterialKey": "interiorPaint",
+      "packageWeightKg": 7,
+      "manufacturerConsumptionKgPerM2PerCoat": {"minimum": 0.125, "maximum": 0.17},
+      "manufacturerUrl": "https://supraten.md/kraska-euroton-eco-7kg-213157-ru",
+      "secondShopUrl": "https://gebhardt.md/vopsea-euroton-eco-7kg.html",
+      "status": "not_configured_not_approved"
+    }
+  ]
+}
