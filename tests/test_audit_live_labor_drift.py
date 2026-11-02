@@ -50,6 +50,28 @@ def sample():
 
 
 class DriftReportTests(unittest.TestCase):
+    def test_plumbing_meter_research_does_not_approve_unspecified_scope(self):
+        catalog = load(ROOT / "prices.json")
+        sources = load(ROOT / "labor_market_sources.json")
+        all_rules = load(ROOT / "labor_live_match_rules.json")
+        keys = {"plumbingWaterPipeWork", "plumbingSewerPipeWork"}
+        rules = {**all_rules, "rules": [r for r in all_rules["rules"]
+                                           if r["workKey"] in keys]}
+        html = "<table>" + row("Установка труб в/с м/п", "мин 30 MDL",
+                                "макс 100 MDL", "в среднем 90 MDL", "Все цены")
+        html += row("Установка труб канализации м/п", "мин 100 MDL",
+                    "макс 200 MDL", "в среднем 114 MDL", "Все цены") + "</table>"
+        live = collect(catalog, sources, rules, datetime.now(timezone.utc),
+                       fetcher=lambda _: html)
+        result = audit(catalog, live)
+        for r in result["workReview"]:
+            if r["workKey"] in keys:
+                self.assertEqual(r["quoteRows"], 1)
+                self.assertEqual(r["quotesNeedingScopeReview"], 1)
+                self.assertEqual(r["boundedAlignedIndependentDomains"], 0)
+                self.assertEqual(r["screeningStatus"], "not_comparable")
+                self.assertFalse(r["approvedForPublication"])
+
     def test_all_37_and_optional_stage_reported_and_prices_preserved(self):
         catalog, live = sample()
         snapshot = copy.deepcopy((catalog, live))

@@ -154,8 +154,8 @@ jobs:
           assert labor_health['automaticLaborPublicationEnabled'] is False
           assert live_labor['status'] == 'technical_research_only'
           assert live_rules['publicationAllowed'] is False
-          assert live_labor['summary']['mappedSourceWorkPairs'] == len(live_rules['rules']) == 42
-          assert live_labor['summary']['workTypesInPilot'] == len({r['workKey'] for r in live_rules['rules']}) == 30
+          assert live_labor['summary']['mappedSourceWorkPairs'] == len(live_rules['rules']) == 49
+          assert live_labor['summary']['workTypesInPilot'] == len({r['workKey'] for r in live_rules['rules']}) == 35
           assert live_labor['summary']['workTypesMapped'] == live_labor['summary']['workTypesInPilot']
           assert live_labor['summary']['catalogLaborRates'] == 37
           assert live_labor['summary']['catalogWorkTypesWithResearchQuotes'] + live_labor['summary']['catalogWorkTypesWithoutResearchQuotes'] == 37
@@ -287,10 +287,13 @@ jobs:
                   'primerWork': 'Грунтовка стен',
                   'wallpaperWork': 'Поклейка обоев',
                   'wallPaintWork': 'Покраска стен (2 слоя)',
+                  'wallTileWork': 'Укладка настенной плитки',
+                  'decorativeWork': 'Декоративная штукатурка стен',
                   'floorRemoveSoftCoverWork': 'Демонтаж мягкого покрытия пола',
                   'floorRemoveTileWork': 'Демонтаж плитки пола',
                   'floorScreedWork': 'Стяжка пола',
                   'selfLevelingFloorWork': 'Наливной пол',
+                  'floorPrimerWork': 'Грунтовка пола',
                   'floorWaterproofingWork': 'Гидроизоляция пола',
                   'laminateWork': 'Укладка ламината',
                   'linoleumWork': 'Укладка линолеума',
@@ -308,6 +311,8 @@ jobs:
                   'electricalLightInstallWork': 'Монтаж светильников',
                   'electricalDeviceRemovalWork': 'Демонтаж розеток и выключателей',
                   'electricalLightRemovalWork': 'Демонтаж светильников',
+                  'plumbingWaterPipeWork': 'Прокладка труб водоснабжения',
+                  'plumbingSewerPipeWork': 'Прокладка канализационных труб',
                   'startPuttyWork': 'Стартовая шпаклёвка стен',
               }
               for q in live_labor['observations']:

@@ -37,6 +37,15 @@ class UrlSafetyTests(unittest.TestCase):
     def test_explicit_configured_provider_is_accepted(self):
         self.assertEqual(validate_url("https://www.remont.md/ru/prices"), "remont.md")
 
+    def test_topmaster_only_exact_https_host_is_accepted(self):
+        self.assertEqual(
+            validate_url("https://topmaster.md/price/montazhnyje-raboty-po-santehnike/"),
+            "topmaster.md")
+        for url in ("http://topmaster.md/price/", "https://topmaster.md.evil.md/a",
+                    "https://user:password@topmaster.md/a", "https://topmaster.md:1234/a"):
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                validate_url(url)
+
     def test_url_unsafe_hosts_rejected(self):
         for url in (
             "http://remont.md/prices", "https://evil.md/prices",

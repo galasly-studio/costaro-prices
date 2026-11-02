@@ -52,6 +52,16 @@
     {"workKey": "floorTileWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Укладка напольной плитки (20×20–60×60 см)", "unit": "m2", "scope": "review_required", "scopeReason": "specific_tile_dimensions_not_generic_work"},
     {"workKey": "linoleumWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Укладка линолеума или ковролина", "unit": "m2", "scope": "review_required", "scopeReason": "linoleum_and_carpet_are_mixed"},
     {"workKey": "ceilingPuttyWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Финишная шпаклевка потолка под покраску", "unit": "m2", "scope": "review_required", "scopeReason": "finish_only_vs_possible_full_putty_technique"},
-    {"workKey": "ceilingPaintWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Покраска потолка", "unit": "m2", "scope": "review_required", "scopeReason": "ceiling_paint_coats_unspecified"}
+    {"workKey": "ceilingPaintWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Покраска потолка", "unit": "m2", "scope": "review_required", "scopeReason": "ceiling_paint_coats_unspecified"},
+
+    {"workKey": "wallTileWork", "url": "https://remont.md/ru/preturi/clerical/facing/", "format": "min_avg_max", "label": "Укладка плитки на стены, от 20 до 60 см кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "tile_size_scope_must_match_flutter_dimensions"},
+    {"workKey": "decorativeWork", "url": "https://construct.md/ru/pages/price/", "format": "single_price", "label": "Нанесение декоративной штукатурки (2 цвета и более)", "unit": "m2", "scope": "review_required", "scopeReason": "two_color_decorative_technology_not_generic"},
+
+    {"workKey": "wallTileWork", "url": "https://remont.md/ru/preturi/clerical/tiling/", "format": "min_avg_max", "label": "Укладка настенной плитки, длинна и ширина до 40 см кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "up_to_40cm_tile_not_all_situations"},
+    {"workKey": "floorPrimerWork", "url": "https://remont.md/ru/preturi/clerical/tiling/", "format": "min_avg_max", "label": "Грунтовка стяжки под плитку кв.м.", "unit": "m2", "scope": "review_required", "scopeReason": "tile_floor_screed_only_other_floor_substrates_unassessed"},
+    {"workKey": "floorTileWork", "url": "https://remont.md/ru/preturi/clerical/tiling/", "format": "min_avg_max", "label": "Укладка напольной плитки длина и ширина до 40 см кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "floor_tile_dimensions_and_substrate_limit"},
+
+    {"workKey": "plumbingWaterPipeWork", "url": "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/", "format": "topmaster_min_max_avg", "label": "Установка труб в/с м/п", "unit": "m", "scope": "review_required", "scopeReason": "water_and_wastewater_mixed_pipe_material_diameter_and_trench_unverified"},
+    {"workKey": "plumbingSewerPipeWork", "url": "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/", "format": "topmaster_min_max_avg", "label": "Установка труб канализации м/п", "unit": "m", "scope": "review_required", "scopeReason": "pipe_diameter_slope_excavation_and_fittings_unverified"}
   ]
 }

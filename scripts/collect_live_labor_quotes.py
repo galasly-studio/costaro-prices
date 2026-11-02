@@ -25,10 +25,18 @@ from check_labor_source_health import (
 
 
 MAX_HTML_BYTES = 2_000_000
-KINDS = frozenset({"min_avg_max", "single_price"})
+KINDS = frozenset({"min_avg_max", "single_price", "topmaster_min_max_avg"})
 SCOPES = frozenset({"preliminarily_aligned", "review_required"})
 PRICE = re.compile(r"^(от\s+)?(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:mdl|лей|lei)?$", re.I)
 EXACT_KEYS = frozenset(LABOR_KEYS) | {"startPuttyWork"}
+TOPMASTER_CATEGORY = "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/"
+# Additional HTML pages are allowed for this research ONLY, not approved as
+# stored market benchmarks and not added to labor_market_sources.json.
+EXTRA_RESEARCH_PAGES = frozenset({
+    "https://remont.md/ru/preturi/clerical/tiling/",
+    TOPMASTER_CATEGORY,
+})
+TOPMASTER_AMOUNT = re.compile(r"^(мин|макс|в среднем)\s+(\d{1,4}(?:[.,]\d{1,2})?)\s+MDL$", re.I)
 
 
 def normalize_label(value: str) -> str:
@@ -58,6 +66,15 @@ def parse_value(value: str) -> tuple[float, bool] | None:
     if not 1 <= amount <= 3000:
         return None
     return amount, bool(match.group(1))
+
+
+def parse_topmaster_amount(value: str, expected_prefix: str) -> float | None:
+    """Strictly parse one clearly labelled, MDL-denominated category price."""
+    match = TOPMASTER_AMOUNT.fullmatch(" ".join(value.split()))
+    if not match or match.group(1).casefold() != expected_prefix:
+        return None
+    parsed = parse_value(match.group(2))
+    return parsed[0] if parsed is not None and not parsed[1] else None
 
 
 class StrictTableRows(HTMLParser):
@@ -144,6 +161,22 @@ def match_quote(rows: list[list[str]], rule: dict) -> dict:
     if len(matches) != 1:
         return {"status": "rejected", "reason": "duplicate_label_ambiguous"}
     row = matches[0]
+    if rule["format"] == "topmaster_min_max_avg":
+        # The unit is embedded in the exact service label, not a data column.
+        # Do NOT interpret an offer priced by the connection/point as a meter.
+        if len(row) != 5 or normalize_label(row[4]) != normalize_label("Все цены"):
+            return {"status": "rejected", "reason": "unexpected_table_columns"}
+        if not re.search(r"м\s*/\s*п\s*$", row[0], re.I) or rule["unit"] != "m":
+            return {"status": "rejected", "reason": "unit_mismatch"}
+        low = parse_topmaster_amount(row[1], "мин")
+        high = parse_topmaster_amount(row[2], "макс")
+        avg = parse_topmaster_amount(row[3], "в среднем")
+        if any(price is None for price in (low, high, avg)) or not (low <= avg <= high):
+            return {"status": "rejected", "reason": "invalid_min_avg_max"}
+        return {"status": "research_quote", "reason": "exact_row_and_unit_match",
+                "observedLabel": row[0], "unit": "m",
+                "priceKind": "range_with_average", "minimumMDL": low,
+                "averageMDL": avg, "maximumMDL": high}
     if rule["format"] == "min_avg_max":
         if len(row) not in (5, 6):
             return {"status": "rejected", "reason": "unexpected_table_columns"}
@@ -187,6 +220,7 @@ def validate_rules(rules_doc: dict, source_doc: dict) -> list[dict]:
     allowed_urls = {entry.get("url") for refs in source_map.values()
                     if isinstance(refs, list) for entry in refs
                     if isinstance(entry, dict) and isinstance(entry.get("url"), str)}
+    allowed_urls |= EXTRA_RESEARCH_PAGES
     seen = set()
     for rule in items:
         if not isinstance(rule, dict) or set(rule) != {
@@ -204,6 +238,11 @@ def validate_rules(rules_doc: dict, source_doc: dict) -> list[dict]:
         validate_url(rule["url"])
         if rule["url"] not in allowed_urls:
             raise ValueError("Mapping points outside documented labor source URLs")
+        if ((rule["format"] == "topmaster_min_max_avg") !=
+                (rule["url"] == TOPMASTER_CATEGORY)):
+            raise ValueError("Topmaster format must use its exact research page")
+        if rule["format"] == "topmaster_min_max_avg" and rule["unit"] != "m":
+            raise ValueError("Topmaster meter category cannot supply piece or m2 prices")
         identity = (key, rule["url"])
         if identity in seen:
             raise ValueError("Duplicate mapping for one work and URL")

@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from audit_labor_prices import load
 from collect_live_labor_quotes import (
     collect, download_html, html_rows, match_quote, normalize_label, normalized_unit,
-    parse_value, validate_rules,
+    parse_value, parse_topmaster_amount, validate_rules,
 )
 
 
@@ -23,6 +23,8 @@ CONSTRUCT = "https://construct.md/ru/pages/price/"
 EXPERT = "https://remontexpert.md/service/tencuitor-zugrav/"
 BUILDING = "https://remont.md/ru/preturi/clerical/building_installation_work/"
 ELECTRIC = "https://remont.md/ru/preturi/clerical/repair_electric/"
+TILING = "https://remont.md/ru/preturi/clerical/tiling/"
+TOPMASTER = "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/"
 NOW = datetime(2026, 11, 2, 18, 0, tzinfo=timezone.utc)
 
 
@@ -72,6 +74,44 @@ def collect_fixtures(fetcher=None):
 
 
 class ParsingTests(unittest.TestCase):
+    def test_topmaster_explicit_currency_and_price_label_parser(self):
+        self.assertEqual(parse_topmaster_amount("мин 30 MDL", "мин"), 30)
+        self.assertEqual(parse_topmaster_amount("макс 100 MDL", "макс"), 100)
+        self.assertEqual(parse_topmaster_amount("в среднем 90 MDL", "в среднем"), 90)
+        for invalid in ("мин 30 RUB", "30 MDL", "мин от 30 MDL", "мин 0 MDL"):
+            self.assertIsNone(parse_topmaster_amount(invalid, "мин"))
+
+    def test_topmaster_exact_per_meter_table_can_only_create_research_quote(self):
+        rule = {"format": "topmaster_min_max_avg", "unit": "m",
+                "label": "Установка труб канализации м/п"}
+        result = match_quote([["Установка труб канализации м/п", "мин 100 MDL",
+                               "макс 200 MDL", "в среднем 114 MDL", "Все цены"]], rule)
+        self.assertEqual(result["status"], "research_quote")
+        self.assertEqual(result["unit"], "m")
+        self.assertEqual([result[k] for k in ("minimumMDL", "averageMDL", "maximumMDL")],
+                         [100, 114, 200])
+
+    def test_topmaster_point_or_wrong_unit_does_not_become_meter(self):
+        rule = {"format": "topmaster_min_max_avg", "unit": "m",
+                "label": "Установка труб канализации"}
+        result = match_quote([["Установка труб канализации", "мин 100 MDL",
+                               "макс 200 MDL", "в среднем 114 MDL", "Все цены"]], rule)
+        self.assertEqual(result["reason"], "unit_mismatch")
+
+    def test_topmaster_bad_column_order_or_averages_rejected(self):
+        rule = {"format": "topmaster_min_max_avg", "unit": "m",
+                "label": "Установка труб канализации м/п"}
+        invalid_rows = [
+            ["Установка труб канализации м/п", "мин 100 MDL",
+             "макс 200 MDL", "в среднем 240 MDL", "Все цены"],
+            ["Установка труб канализации м/п", "макс 100 MDL",
+             "мин 200 MDL", "в среднем 114 MDL", "Все цены"],
+            ["Установка труб канализации м/п", "мин 100 MDL",
+             "макс 200 MDL", "в среднем 114 MDL", "Реклама"],
+        ]
+        for invalid in invalid_rows:
+            self.assertEqual(match_quote([invalid], rule)["status"], "rejected")
+
     def test_parser_reads_only_table_rows_not_unrelated_marketing(self):
         source = '<div>Шпаклевка стен 9999 MDL</div><script>test</script>' + row(
             "<a href='/item'>Финишная шпаклевка стен</a>", "м²", "50")
@@ -133,9 +173,9 @@ class SafeguardTests(unittest.TestCase):
     def test_expanded_rules_include_all_pilot_mappings_and_are_allowlisted(self):
         _, sources, doc = fixtures()
         rules = validate_rules(doc, sources)
-        self.assertEqual(len(rules), 42)
-        self.assertEqual(len({r["workKey"] for r in rules}), 30)
-        self.assertEqual(len({r["workKey"] for r in rules if r["workKey"] != "startPuttyWork"}), 29)
+        self.assertEqual(len(rules), 49)
+        self.assertEqual(len({r["workKey"] for r in rules}), 35)
+        self.assertEqual(len({r["workKey"] for r in rules if r["workKey"] != "startPuttyWork"}), 34)
         self.assertEqual(len(rules[:14]), 14)
 
     def test_unknown_site_and_key_rejected(self):
@@ -195,6 +235,19 @@ class SafeguardTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "outside documented"):
             validate_rules(unsafe, sources)
 
+    def test_topmaster_format_and_url_bound_together(self):
+        _, sources, doc = fixtures()
+        unsafe = copy.deepcopy(doc)
+        entry = next(r for r in unsafe["rules"] if r["url"] == TOPMASTER)
+        entry["format"] = "single_price"
+        with self.assertRaisesRegex(ValueError, "Topmaster format"):
+            validate_rules(unsafe, sources)
+        unsafe = copy.deepcopy(doc)
+        entry = next(r for r in unsafe["rules"] if r["url"] == TOPMASTER)
+        entry["url"] = CONSTRUCT
+        with self.assertRaisesRegex(ValueError, "Topmaster format"):
+            validate_rules(unsafe, sources)
+
     def test_unchanged_catalog_sources_and_rules(self):
         catalog, sources, doc = fixtures()
         before = copy.deepcopy((catalog, sources, doc))
@@ -229,9 +282,12 @@ class SafeguardTests(unittest.TestCase):
             REMONT: REMONT_HTML + "<table>" + row(
                 "Шпатлёвка потолока под покраску кв.м", "30", "45", "70", "m²", "→")
                 + row("Покраска потолок Кв.м", "30", "40", "65", "m²", "→")
-                + row("Грунтовка потолков м2", "10", "15", "25", "m²", "→") + "</table>",
+                + row("Грунтовка потолков м2", "10", "15", "25", "m²", "→")
+                + row("Укладка плитки на стены, от 20 до 60 см кв.м", "110", "165", "240", "m²", "→") + "</table>",
             CONSTRUCT: CONSTRUCT_HTML + "<table>" + row("Настил ламината", "м2", "100")
-                + row("Монтаж напольного плинтуса", "м.п.", "48") + "</table>",
+                + row("Монтаж напольного плинтуса", "м.п.", "48")
+                + row("Нанесение декоративной штукатурки (2 цвета и более)", "м2", "280")
+                + "</table>",
             EXPERT: EXPERT_HTML,
             BUILDING: "<table>" + row("Снятие обоев м2", "25", "38", "40", "m²", "→")
                 + row("Устройство наливных полов м2", "50", "120", "200", "m²", "→")
@@ -239,10 +295,20 @@ class SafeguardTests(unittest.TestCase):
                 + row("Монтаж плинтусов м/п", "25", "70", "140", "", "→") + "</table>",
             ELECTRIC: "<table>" + row("Демонтаж розеток и выключателей шт",
                                           "30", "50", "80", "buc.", "→") + "</table>",
+            TILING: "<table>" + row("Грунтовка стяжки под плитку кв.м.",
+                                      "10", "18", "30", "m²", "→")
+                + row("Укладка настенной плитки, длинна и ширина до 40 см кв.м",
+                      "120", "180", "300", "m²", "→")
+                + row("Укладка напольной плитки длина и ширина до 40 см кв.м",
+                      "100", "160", "280", "m²", "→") + "</table>",
+            TOPMASTER: "<table>" + row("Установка труб в/с м/п", "мин 30 MDL",
+                                         "макс 100 MDL", "в среднем 90 MDL", "Все цены")
+                + row("Установка труб канализации м/п", "мин 100 MDL",
+                      "макс 200 MDL", "в среднем 114 MDL", "Все цены") + "</table>",
         }
         report = collect(catalog, sources, doc, NOW, fetcher=lambda url: pages[url])
-        self.assertEqual(report["summary"]["workTypesInPilot"], 30)
-        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 42)
+        self.assertEqual(report["summary"]["workTypesInPilot"], 35)
+        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 49)
         self.assertEqual(report["summary"]["catalogLaborRates"], 37)
         self.assertEqual(report["summary"]["quoteRowsRejectedByUnit"], 1)
         self.assertFalse(report["publishedPricesChanged"])
@@ -252,6 +318,11 @@ class SafeguardTests(unittest.TestCase):
                             o["minimumMDL"] == 25 for o in quotes))
         self.assertTrue(any(o["workKey"] == "laminateWork" and
                             o["minimumMDL"] == 100 for o in quotes))
+        self.assertTrue(any(o["workKey"] == "plumbingSewerPipeWork" and
+                            o["minimumMDL"] == 100 and
+                            o["maximumMDL"] == 200 for o in quotes))
+        self.assertTrue(all(o["scopeStatus"] == "review_required"
+                            for o in quotes if o["source"] == "topmaster.md"))
         self.assertTrue(all(not o["priceDateVerified"] and
                             not o["approvedForPublication"] for o in quotes))
 
