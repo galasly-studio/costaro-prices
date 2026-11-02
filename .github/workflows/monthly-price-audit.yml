@@ -12,6 +12,7 @@ on:
       - 'scripts/build_material_tier_review.py'
       - 'scripts/prepare_verified_catalog_release.py'
       - 'scripts/audit_consumption_alignment.py'
+      - 'scripts/check_labor_source_health.py'
       - 'scripts/collect_prices.py'
       - 'material_consumption_evidence.json'
       - 'tests/test_build_material_tier_review.py'
@@ -20,6 +21,8 @@ on:
       - 'tests/test_collect_price_source_health.py'
       - 'tests/test_verified_structured_sku.py'
       - 'tests/test_audit_consumption_alignment.py'
+      - 'tests/test_check_labor_source_health.py'
+      - 'labor_market_sources.json'
   schedule:
     - cron: '37 5 2 * *'
 
@@ -45,6 +48,7 @@ jobs:
           python3 -m py_compile scripts/collect_prices.py
           python3 -m py_compile scripts/audit_prices.py
           python3 -m py_compile scripts/audit_labor_prices.py
+          python3 -m py_compile scripts/check_labor_source_health.py
           python3 -m py_compile scripts/plan_verified_material_updates.py
           python3 -m py_compile scripts/build_material_tier_review.py
           python3 -m py_compile scripts/audit_material_pack_alignment.py
@@ -69,6 +73,9 @@ jobs:
       - name: Audit labor sources and 37 work rates
         run: python3 scripts/audit_labor_prices.py
 
+      - name: Check labor source availability without verifying or publishing labor prices
+        run: python3 scripts/check_labor_source_health.py
+
       - name: Plan only strongly verified material changes (read-only)
         run: python3 scripts/plan_verified_material_updates.py
 
@@ -91,6 +98,7 @@ jobs:
           catalog = json.loads(Path('prices.json').read_text(encoding='utf-8'))
           materials = json.loads(Path('price_audit_report.json').read_text(encoding='utf-8'))
           labor = json.loads(Path('labor_audit_report.json').read_text(encoding='utf-8'))
+          labor_health = json.loads(Path('labor_source_health.json').read_text(encoding='utf-8'))
           planned = json.loads(Path('material_update_proposals.json').read_text(encoding='utf-8'))
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
           packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
@@ -122,6 +130,12 @@ jobs:
           assert ((status == 'draft' and enabled is False)
                   or (status == 'published' and enabled is True))
           assert labor['ok'] is True
+          assert labor_health['status'] == 'research_only'
+          assert labor_health['summary']['catalogLaborRates'] == 37
+          assert labor_health['summary']['laborRatesLivePriceVerified'] == 0
+          assert labor_health['publishedPricesChanged'] is False
+          assert labor_health['flutterCalculationsChanged'] is False
+          assert labor_health['automaticLaborPublicationEnabled'] is False
           assert consumption['status'] == 'technical_research_only'
           assert consumption['publishedPricesChanged'] is False
           assert consumption['flutterCalculationsChanged'] is False
@@ -147,6 +161,12 @@ jobs:
               f"Work rates: {labor['laborCount']}",
               f"Work rates ready for comparison: {labor['readyCount']}",
               f"Work rates requiring review: {labor['needsReviewCount']}",
+              f"Labor price reference pages checked: {labor_health['summary']['uniqueUrlsConfiguredAndCurrent']}",
+              f"Accessible labor price pages (not rate-verified): {labor_health['summary']['uniqueUrlsReachable']}",
+              f"Labor rates with no current reference: {labor_health['summary']['laborRatesWithNoCurrentReferences']}",
+              f"Labor rates with only one independent domain: {labor_health['summary']['laborRatesWithOneCurrentIndependentDomain']}",
+              f"Labor rates with at least two independent domains: {labor_health['summary']['laborRatesWithAtLeastTwoCurrentIndependentDomains']}",
+              f"Labor prices actually reverified live: {labor_health['summary']['laborRatesLivePriceVerified']}",
               f"Start putty: {labor['startPuttyMarketStatus']}",
               f"Catalog publication status: {status}",
               f"Strict material update proposals (not published): {planned['proposedCount']}",
@@ -184,6 +204,25 @@ jobs:
                             'и цене в MDL. Остальные цены остаются исследовательскими; '
                             'даже надёжные наблюдения не означают утверждённый '
                             'уровень бюджет/стандарт/премиум.\n')
+              summary.write('\n### Доступность источников стоимости работ\n\n')
+              sh = labor_health['summary']
+              summary.write(
+                  f"Проверено URL: **{sh['uniqueUrlsConfiguredAndCurrent']}**, "
+                  f"доступных HTML-страниц: **{sh['uniqueUrlsReachable']}**, "
+                  f"страниц с отказом/блокировкой: "
+                  f"**{sh['uniqueUrlsBlockedOrUnavailable']}**, "
+                  f"пропущено после ограничения доступа: **{sh['uniqueUrlsSkipped']}**.\n\n"
+              )
+              summary.write('| Состояние источников | Работ |\n|---|---:|\n')
+              summary.write(f"| Нет актуальных справочных источников | {sh['laborRatesWithNoCurrentReferences']} |\n")
+              summary.write(f"| Один независимый источник | {sh['laborRatesWithOneCurrentIndependentDomain']} |\n")
+              summary.write(f"| Два и более независимых источника | {sh['laborRatesWithAtLeastTwoCurrentIndependentDomains']} |\n")
+              summary.write('\n**Важно:** доступность страницы НЕ подтверждает цену конкретной '
+                            'работы, единицу измерения, объём работ и дату изменения '
+                            'расценки. Подтверждено новых актуальных цен работ: **0**. '
+                            'Текущие расценки не изменены; автоматическая публикация '
+                            'отключена. Сохранённые ранее ценовые диапазоны — лишь '
+                            'справочные данные.\n')
               summary.write('\n### Сопоставление предварительного расхода с производителем\n\n')
               summary.write('Исследование 6 товаров: **без изменения формул и цен COSTARO**. '
                             'Нормы Flutter зафиксированы на 02.11.2026; перед релизом '
@@ -236,6 +275,7 @@ jobs:
             material_pack_alignment_report.json
             labor_audit_report.json
             labor_audit_summary.txt
+            labor_source_health.json
             material_update_proposals.json
             material_tier_review.json
             material_tier_review_RU.md
