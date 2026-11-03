@@ -62,6 +62,9 @@
     {"workKey": "floorTileWork", "url": "https://remont.md/ru/preturi/clerical/tiling/", "format": "min_avg_max", "label": "Укладка напольной плитки длина и ширина до 40 см кв.м", "unit": "m2", "scope": "review_required", "scopeReason": "floor_tile_dimensions_and_substrate_limit"},
 
     {"workKey": "plumbingWaterPipeWork", "url": "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/", "format": "topmaster_min_max_avg", "label": "Установка труб в/с м/п", "unit": "m", "scope": "review_required", "scopeReason": "water_and_wastewater_mixed_pipe_material_diameter_and_trench_unverified"},
-    {"workKey": "plumbingSewerPipeWork", "url": "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/", "format": "topmaster_min_max_avg", "label": "Установка труб канализации м/п", "unit": "m", "scope": "review_required", "scopeReason": "pipe_diameter_slope_excavation_and_fittings_unverified"}
+    {"workKey": "plumbingSewerPipeWork", "url": "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/", "format": "topmaster_min_max_avg", "label": "Установка труб канализации м/п", "unit": "m", "scope": "review_required", "scopeReason": "pipe_diameter_slope_excavation_and_fittings_unverified"},
+
+    {"workKey": "electricalCableLayWork", "url": "https://euroremontstyle.md/remont-kvartir-ceny", "format": "single_price", "label": "Монтаж провода в гофру", "unit": "m", "scope": "review_required", "scopeReason": "conduit_and_wiring_route_included_other_costaro_cable_techniques_unassessed"},
+    {"workKey": "skirtingWork", "url": "https://euroremontstyle.md/remont-kvartir-ceny", "format": "single_price", "label": "Установка плинтуса", "unit": "m", "scope": "review_required", "scopeReason": "skirting_material_corners_fastening_and_substrate_unspecified"}
   ]
 }

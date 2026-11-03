@@ -35,6 +35,7 @@ TOPMASTER_CATEGORY = "https://topmaster.md/price/montazhnyje-raboty-po-santehnik
 EXTRA_RESEARCH_PAGES = frozenset({
     "https://remont.md/ru/preturi/clerical/tiling/",
     TOPMASTER_CATEGORY,
+    "https://euroremontstyle.md/remont-kvartir-ceny",
 })
 TOPMASTER_AMOUNT = re.compile(r"^(мин|макс|в среднем)\s+(\d{1,4}(?:[.,]\d{1,2})?)\s+MDL$", re.I)
 

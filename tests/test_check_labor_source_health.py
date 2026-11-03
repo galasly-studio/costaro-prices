@@ -46,6 +46,19 @@ class UrlSafetyTests(unittest.TestCase):
             with self.subTest(url=url), self.assertRaises(ValueError):
                 validate_url(url)
 
+    def test_euroremont_research_host_is_exact(self):
+        url = "https://euroremontstyle.md/remont-kvartir-ceny"
+        self.assertEqual(validate_url(url), "euroremontstyle.md")
+        for invalid in (
+            "http://euroremontstyle.md/remont-kvartir-ceny",
+            "https://euroremontstyle.md.evil.com/prices",
+            "https://user:pass@euroremontstyle.md/prices",
+            "https://euroremontstyle.md:8080/prices",
+        ):
+            with self.subTest(url=invalid):
+                with self.assertRaises(ValueError):
+                    validate_url(invalid)
+
     def test_url_unsafe_hosts_rejected(self):
         for url in (
             "http://remont.md/prices", "https://evil.md/prices",

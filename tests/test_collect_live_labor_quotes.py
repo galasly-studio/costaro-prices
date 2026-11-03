@@ -25,6 +25,7 @@ BUILDING = "https://remont.md/ru/preturi/clerical/building_installation_work/"
 ELECTRIC = "https://remont.md/ru/preturi/clerical/repair_electric/"
 TILING = "https://remont.md/ru/preturi/clerical/tiling/"
 TOPMASTER = "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/"
+EURO = "https://euroremontstyle.md/remont-kvartir-ceny"
 NOW = datetime(2026, 11, 2, 18, 0, tzinfo=timezone.utc)
 
 
@@ -173,7 +174,7 @@ class SafeguardTests(unittest.TestCase):
     def test_expanded_rules_include_all_pilot_mappings_and_are_allowlisted(self):
         _, sources, doc = fixtures()
         rules = validate_rules(doc, sources)
-        self.assertEqual(len(rules), 49)
+        self.assertEqual(len(rules), 51)
         self.assertEqual(len({r["workKey"] for r in rules}), 35)
         self.assertEqual(len({r["workKey"] for r in rules if r["workKey"] != "startPuttyWork"}), 34)
         self.assertEqual(len(rules[:14]), 14)
@@ -306,9 +307,14 @@ class SafeguardTests(unittest.TestCase):
                 + row("Установка труб канализации м/п", "мин 100 MDL",
                       "макс 200 MDL", "в среднем 114 MDL", "Все цены") + "</table>",
         }
+        pages[EURO] = "<table>" + row(
+            "Монтаж провода в гофру", "м", "от 20"
+        ) + row(
+            "Установка плинтуса", "м", "от 50"
+        ) + "</table>"
         report = collect(catalog, sources, doc, NOW, fetcher=lambda url: pages[url])
         self.assertEqual(report["summary"]["workTypesInPilot"], 35)
-        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 49)
+        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 51)
         self.assertEqual(report["summary"]["catalogLaborRates"], 37)
         self.assertEqual(report["summary"]["quoteRowsRejectedByUnit"], 1)
         self.assertFalse(report["publishedPricesChanged"])
@@ -325,6 +331,90 @@ class SafeguardTests(unittest.TestCase):
                             for o in quotes if o["source"] == "topmaster.md"))
         self.assertTrue(all(not o["priceDateVerified"] and
                             not o["approvedForPublication"] for o in quotes))
+
+
+
+class Stage23ResearchTests(unittest.TestCase):
+    def test_exact_meter_source_is_allowlisted(self):
+        _, sources, doc = fixtures()
+        entries = [
+            rule for rule in validate_rules(doc, sources)
+            if rule["url"] == EURO
+        ]
+        self.assertEqual(len(entries), 2)
+        self.assertEqual(
+            {item["workKey"] for item in entries},
+            {"electricalCableLayWork", "skirtingWork"}
+        )
+        self.assertTrue(all(item["unit"] == "m" for item in entries))
+        self.assertTrue(all(
+            item["scope"] == "review_required" for item in entries
+        ))
+
+    def test_lower_bounds_are_not_verified_rates(self):
+        _, sources, doc = fixtures()
+        entries = [
+            rule for rule in validate_rules(doc, sources)
+            if rule["url"] == EURO
+        ]
+        rows = [
+            ["Монтаж провода в гофру", "м", "от 20"],
+            ["Установка плинтуса", "м", "от 50"],
+        ]
+        for rule in entries:
+            result = match_quote(rows, rule)
+            self.assertEqual(result["status"], "research_quote")
+            self.assertEqual(result["priceKind"], "lower_bound")
+            self.assertEqual(result["unit"], "m")
+            self.assertIsNone(result["maximumMDL"])
+
+    def test_wrong_unit_and_different_technology_fail_closed(self):
+        rule = {
+            "label": "Монтаж провода в гофру",
+            "unit": "m",
+            "format": "single_price"
+        }
+        incorrect = match_quote(
+            [["Монтаж провода в гофру", "шт", "от 20"]],
+            rule
+        )
+        self.assertEqual(incorrect["reason"], "unit_mismatch")
+
+        wrong_job = match_quote(
+            [["Монтаж провода без гофры", "м", "от 20"]],
+            rule
+        )
+        self.assertEqual(wrong_job["status"], "not_found")
+
+    def test_new_quotes_never_enable_publication(self):
+        catalog, sources, doc = fixtures()
+        selected = {
+            **doc,
+            "rules": [
+                rule for rule in doc["rules"]
+                if rule["url"] == EURO
+            ]
+        }
+        html = (
+            "<table>"
+            + row("Монтаж провода в гофру", "м", "от 20")
+            + row("Установка плинтуса", "м", "от 50")
+            + "</table>"
+        )
+        report = collect(
+            catalog, sources, selected, NOW,
+            fetcher=lambda _: html
+        )
+        self.assertEqual(report["summary"]["quoteRowsExtracted"], 2)
+        self.assertEqual(report["summary"]["publicationReadyLaborRates"], 0)
+        self.assertFalse(report["publishedPricesChanged"])
+        self.assertFalse(report["flutterCalculationsChanged"])
+        self.assertFalse(report["automaticLaborPublicationEnabled"])
+        self.assertTrue(all(
+            not item["approvedForPublication"]
+            and not item["priceDateVerified"]
+            for item in report["observations"]
+        ))
 
 
 class CollectionTests(unittest.TestCase):
