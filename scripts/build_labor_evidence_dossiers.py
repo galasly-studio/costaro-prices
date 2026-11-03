@@ -219,6 +219,13 @@ def quote_text(record):
     if kind == "fixed_price":
         return str(quote["minimumMDL"]) + " MDL/" + unit
 
+    if kind == "range_without_average":
+        return (
+            str(quote["minimumMDL"]) + "–"
+            + str(quote["maximumMDL"])
+            + " MDL/" + unit + " (без среднего)"
+        )
+
     return (
         str(quote["minimumMDL"])
         + "–"

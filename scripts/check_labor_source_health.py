@@ -35,6 +35,8 @@ ALLOWED_HOSTS = frozenset({
     "clickwork.md", "www.clickwork.md",
     "topmaster.md", "www.topmaster.md",
     "euroremontstyle.md", "www.euroremontstyle.md",
+    "electricchisinau.md", "www.electricchisinau.md",
+    "lumeamesterilor.md", "www.lumeamesterilor.md",
 })
 MAX_HTML_PREFIX = 32768
 AGE_LIMIT_DAYS = 180

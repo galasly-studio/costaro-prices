@@ -73,7 +73,7 @@ class LaborEvidenceDossierTests(unittest.TestCase):
         self.assertEqual(summary["workTypesWithExactMappings"], 35)
         self.assertEqual(summary["workTypesWithoutExactMappings"], 3)
         self.assertEqual(summary["technologySpecificManualLeads"], 5)
-        self.assertEqual(summary["sourceObservations"], 51)
+        self.assertEqual(summary["sourceObservations"], 53)
         self.assertEqual(len(report["dossiers"]), 38)
 
         self.assertEqual(summary["publicationReadyLaborRates"], 0)
@@ -184,7 +184,7 @@ class LaborEvidenceDossierTests(unittest.TestCase):
         report = build_dossiers(*fixtures(include_lower_bound=False))
 
         self.assertEqual(report["summary"]["workTypesReviewed"], 38)
-        self.assertEqual(report["summary"]["sourceObservations"], 51)
+        self.assertEqual(report["summary"]["sourceObservations"], 53)
         self.assertEqual(report["summary"]["publicationReadyLaborRates"], 0)
         self.assertEqual(report["summary"]["lowerBoundQuotes"], 0)
 

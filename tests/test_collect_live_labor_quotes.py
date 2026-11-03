@@ -174,7 +174,7 @@ class SafeguardTests(unittest.TestCase):
     def test_expanded_rules_include_all_pilot_mappings_and_are_allowlisted(self):
         _, sources, doc = fixtures()
         rules = validate_rules(doc, sources)
-        self.assertEqual(len(rules), 51)
+        self.assertEqual(len(rules), 53)
         self.assertEqual(len({r["workKey"] for r in rules}), 35)
         self.assertEqual(len({r["workKey"] for r in rules if r["workKey"] != "startPuttyWork"}), 34)
         self.assertEqual(len(rules[:14]), 14)
@@ -312,9 +312,9 @@ class SafeguardTests(unittest.TestCase):
         ) + row(
             "Установка плинтуса", "м", "от 50"
         ) + "</table>"
-        report = collect(catalog, sources, doc, NOW, fetcher=lambda url: pages[url])
+        report = collect(catalog, sources, doc, NOW, fetcher=lambda url: pages.get(url, '<html><table></table></html>'))
         self.assertEqual(report["summary"]["workTypesInPilot"], 35)
-        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 51)
+        self.assertEqual(report["summary"]["mappedSourceWorkPairs"], 53)
         self.assertEqual(report["summary"]["catalogLaborRates"], 37)
         self.assertEqual(report["summary"]["quoteRowsRejectedByUnit"], 1)
         self.assertFalse(report["publishedPricesChanged"])

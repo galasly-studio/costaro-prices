@@ -20,7 +20,7 @@ from check_labor_source_health import validate_url
 
 ALL_KEYS = set(LABOR_KEYS) | {"startPuttyWork"}
 SOURCE_STATUSES = {"research_quote", "rejected", "not_found", "not_checked"}
-KINDS = {"fixed_price", "range_with_average", "lower_bound"}
+KINDS = {"fixed_price", "range_with_average", "range_without_average", "lower_bound"}
 MARGIN = 0.20  # Only a screening tolerance, NEVER a price-update threshold.
 
 
@@ -77,6 +77,8 @@ def _check_report(catalog: dict, live: dict) -> list[dict]:
                 raise ValueError("Malformed bounded quote")
             elif obs["priceKind"] == "fixed_price" and maximum != obs["minimumMDL"]:
                 raise ValueError("Fixed quote has different min/max values")
+            elif obs["priceKind"] == "range_without_average" and "averageMDL" in obs:
+                raise ValueError("Two-point range must not invent an average")
         elif "minimumMDL" in obs or "maximumMDL" in obs:
             raise ValueError("Unmatched row has price fields")
     return observations

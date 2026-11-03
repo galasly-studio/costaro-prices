@@ -65,6 +65,8 @@
     {"workKey": "plumbingSewerPipeWork", "url": "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/", "format": "topmaster_min_max_avg", "label": "Установка труб канализации м/п", "unit": "m", "scope": "review_required", "scopeReason": "pipe_diameter_slope_excavation_and_fittings_unverified"},
 
     {"workKey": "electricalCableLayWork", "url": "https://euroremontstyle.md/remont-kvartir-ceny", "format": "single_price", "label": "Монтаж провода в гофру", "unit": "m", "scope": "review_required", "scopeReason": "conduit_and_wiring_route_included_other_costaro_cable_techniques_unassessed"},
-    {"workKey": "skirtingWork", "url": "https://euroremontstyle.md/remont-kvartir-ceny", "format": "single_price", "label": "Установка плинтуса", "unit": "m", "scope": "review_required", "scopeReason": "skirting_material_corners_fastening_and_substrate_unspecified"}
+    {"workKey": "skirtingWork", "url": "https://euroremontstyle.md/remont-kvartir-ceny", "format": "single_price", "label": "Установка плинтуса", "unit": "m", "scope": "review_required", "scopeReason": "skirting_material_corners_fastening_and_substrate_unspecified"},
+    {"workKey": "electricalCableLayWork", "url": "https://electricchisinau.md/", "format": "two_point_range", "label": "Pozare cablu (fără șanț / pe tavan)", "unit": "m", "scope": "review_required", "scopeReason": "cable_without_chasing_only"},
+    {"workKey": "skirtingWork", "url": "https://lumeamesterilor.md/ru/styazhka-pola/", "format": "single_price", "label": "Монтаж ПВХ-плинтуса", "unit": "m", "scope": "review_required", "scopeReason": "pvc_skirting_only_not_mdf_or_other"}
   ]
 }

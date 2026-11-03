@@ -27,9 +27,10 @@ from check_labor_source_health import (
 from labor_network_retry import open_with_guarded_retry
 
 MAX_HTML_BYTES = 2_000_000
-KINDS = frozenset({"min_avg_max", "single_price", "topmaster_min_max_avg"})
+KINDS = frozenset({"min_avg_max", "single_price", "topmaster_min_max_avg", "two_point_range"})
 SCOPES = frozenset({"preliminarily_aligned", "review_required"})
 PRICE = re.compile(r"^(от\s+)?(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:mdl|лей|lei)?$", re.I)
+PAIR_PRICE = re.compile(r"^(\d{1,4}(?:[.,]\d{1,2})?)\s*[-–—]\s*(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:MDL|lei|лей)?$", re.I)
 EXACT_KEYS = frozenset(LABOR_KEYS) | {"startPuttyWork"}
 TOPMASTER_CATEGORY = "https://topmaster.md/price/montazhnyje-raboty-po-santehnike/"
 # Additional HTML pages are allowed for this research ONLY, not approved as
@@ -38,6 +39,8 @@ EXTRA_RESEARCH_PAGES = frozenset({
     "https://remont.md/ru/preturi/clerical/tiling/",
     TOPMASTER_CATEGORY,
     "https://euroremontstyle.md/remont-kvartir-ceny",
+    "https://electricchisinau.md/",
+    "https://lumeamesterilor.md/ru/styazhka-pola/",
 })
 TOPMASTER_AMOUNT = re.compile(r"^(мин|макс|в среднем)\s+(\d{1,4}(?:[.,]\d{1,2})?)\s+MDL$", re.I)
 
@@ -52,7 +55,7 @@ def normalized_unit(value: str) -> str | None:
     text = re.sub(r"[\s.]+", "", text).replace("²", "2")
     if text in {"m2", "м2", "квм", "квм2", "квметр"}:
         return "m2"
-    if text in {"м", "m", "пм", "мп", "мпог", "ml", "мл"}:
+    if text in {"м", "m", "пм", "мп", "мпог", "ml", "мл", "permetruliniar", "metruliniar"}:
         return "m"
     if text in {"шт", "buc", "piece", "unitate"}:
         return "piece"
@@ -69,6 +72,20 @@ def parse_value(value: str) -> tuple[float, bool] | None:
     if not 1 <= amount <= 3000:
         return None
     return amount, bool(match.group(1))
+
+
+def parse_two_point_range(value: str) -> tuple[float, float] | None:
+    """Read two explicit endpoints without inventing an average."""
+    clean = unicodedata.normalize("NFKC", value).strip()
+    clean = re.sub(r"\s+", " ", clean.replace("\xa0", " "))
+    match = PAIR_PRICE.fullmatch(clean)
+    if match is None:
+        return None
+    start = parse_value(match.group(1))
+    end = parse_value(match.group(2))
+    if start is None or end is None or start[1] or end[1] or start[0] >= end[0]:
+        return None
+    return start[0], end[0]
 
 
 def parse_topmaster_amount(value: str, expected_prefix: str) -> float | None:
@@ -164,6 +181,23 @@ def match_quote(rows: list[list[str]], rule: dict) -> dict:
     if len(matches) != 1:
         return {"status": "rejected", "reason": "duplicate_label_ambiguous"}
     row = matches[0]
+    if rule["format"] == "two_point_range":
+        if len(row) != 3:
+            return {"status": "rejected", "reason": "unexpected_table_columns"}
+        if normalized_unit(row[1]) != rule["unit"]:
+            return {"status": "rejected", "reason": "unit_mismatch"}
+        bounds = parse_two_point_range(row[2])
+        if bounds is None:
+            return {"status": "rejected", "reason": "invalid_or_unbounded_price"}
+        return {
+            "status": "research_quote",
+            "reason": "exact_row_and_unit_match",
+            "observedLabel": row[0],
+            "unit": rule["unit"],
+            "priceKind": "range_without_average",
+            "minimumMDL": bounds[0],
+            "maximumMDL": bounds[1],
+        }
     if rule["format"] == "topmaster_min_max_avg":
         # The unit is embedded in the exact service label, not a data column.
         # Do NOT interpret an offer priced by the connection/point as a meter.
