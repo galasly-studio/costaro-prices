@@ -28,6 +28,8 @@ on:
       - 'tests/test_manufacturer_evidence_leads.py'
       - 'scripts/build_manufacturer_review_queue.py'
       - 'scripts/build_retail_identity_crosscheck.py'
+      - 'scripts/build_product_provenance_review.py'
+      - 'tests/test_product_provenance_review.py'
       - 'tests/test_retail_identity_crosscheck.py'
       - 'tests/test_manufacturer_review_queue.py'
       - 'scripts/check_labor_source_health.py'
@@ -100,6 +102,7 @@ jobs:
           python3 -m py_compile scripts/build_manufacturer_evidence_leads.py
           python3 -m py_compile scripts/build_manufacturer_review_queue.py
           python3 -m py_compile scripts/build_retail_identity_crosscheck.py
+          python3 -m py_compile scripts/build_product_provenance_review.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -247,6 +250,9 @@ jobs:
 
       - name: Cross-check Moldova retail identities (read-only)
         run: python3 scripts/build_retail_identity_crosscheck.py
+
+      - name: Review manufacturer and retailer provenance (read-only)
+        run: python3 scripts/build_product_provenance_review.py
 
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
@@ -637,6 +643,8 @@ jobs:
             manufacturer_review_queue_RU.md
             retail_identity_crosscheck.json
             retail_identity_crosscheck_RU.md
+            product_provenance_review.json
+            product_provenance_review_RU.md
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
