@@ -25,6 +25,8 @@ from audit_labor_prices import (
 )
 
 
+from labor_network_retry import open_with_guarded_retry
+
 # Explicitly configured providers, not an open URL-fetching proxy.
 ALLOWED_HOSTS = frozenset({
     "remont.md", "www.remont.md",
@@ -71,7 +73,7 @@ def fetch_html_prefix(url: str) -> str:
         "User-Agent": "COSTARO-LaborAvailabilityResearch/1.0",
         "Accept": "text/html",
     })
-    with opener.open(request, timeout=12) as response:
+    with open_with_guarded_retry(opener, request, timeout=12) as response:
         validate_url(response.geturl())
         content_type = response.headers.get("Content-Type", "").lower()
         if "text/html" not in content_type:

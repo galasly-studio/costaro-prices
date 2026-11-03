@@ -13,6 +13,7 @@ on:
       - 'scripts/prepare_verified_catalog_release.py'
       - 'scripts/audit_consumption_alignment.py'
       - 'scripts/check_labor_source_health.py'
+      - 'scripts/labor_network_retry.py'
       - 'scripts/collect_live_labor_quotes.py'
       - 'scripts/audit_live_labor_drift.py'
       - 'scripts/build_labor_review_queue.py'
@@ -28,6 +29,7 @@ on:
       - 'tests/test_verified_structured_sku.py'
       - 'tests/test_audit_consumption_alignment.py'
       - 'tests/test_check_labor_source_health.py'
+      - 'tests/test_labor_network_retry.py'
       - 'tests/test_collect_live_labor_quotes.py'
       - 'tests/test_audit_live_labor_drift.py'
       - 'tests/test_build_labor_review_queue.py'
@@ -59,6 +61,7 @@ jobs:
           python3 -m py_compile scripts/audit_prices.py
           python3 -m py_compile scripts/audit_labor_prices.py
           python3 -m py_compile scripts/check_labor_source_health.py
+          python3 -m py_compile scripts/labor_network_retry.py
           python3 -m py_compile scripts/collect_live_labor_quotes.py
           python3 -m py_compile scripts/audit_live_labor_drift.py
           python3 -m py_compile scripts/build_labor_review_queue.py

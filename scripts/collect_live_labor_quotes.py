@@ -24,6 +24,8 @@ from check_labor_source_health import (
 )
 
 
+from labor_network_retry import open_with_guarded_retry
+
 MAX_HTML_BYTES = 2_000_000
 KINDS = frozenset({"min_avg_max", "single_price", "topmaster_min_max_avg"})
 SCOPES = frozenset({"preliminarily_aligned", "review_required"})
@@ -138,7 +140,7 @@ def download_html(url: str) -> str:
         "Accept": "text/html",
     })
     opener = urllib.request.build_opener(OnlyApprovedRedirects())
-    with opener.open(request, timeout=15) as response:
+    with open_with_guarded_retry(opener, request, timeout=15) as response:
         if validate_url(response.geturl()) != original_host:
             # A move to another approved domain is still a different source.
             # Counting both would falsely create two independent market quotes.
