@@ -273,10 +273,11 @@ jobs:
         run: python3 scripts/audit_priority_sources_batch.py
       - name: Define criteria for all 41 material positions (read-only)
         run: python3 scripts/build_complete_material_criteria.py
-      - name: Build joint material and labor market decision dashboard (read-only)
-        run: python3 scripts/build_market_decision_dashboard.py
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
+
+      - name: Build joint material and labor market decision dashboard (read-only)
+        run: python3 scripts/build_market_decision_dashboard.py
 
       - name: Summarize without changing published catalog
         shell: bash
