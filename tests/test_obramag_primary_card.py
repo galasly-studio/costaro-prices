@@ -25,7 +25,7 @@ CASES = (
     ),
     (
         "glet_satroc_8kg",
-        "Glet finisare acril Satroc 8kg",
+        "Glet finisare acril SATROC 8kg",
         "6000120",
         234.0,
     ),
