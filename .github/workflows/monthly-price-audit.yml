@@ -16,6 +16,7 @@ on:
       - 'scripts/collect_live_labor_quotes.py'
       - 'scripts/audit_live_labor_drift.py'
       - 'scripts/build_labor_review_queue.py'
+      - 'scripts/build_labor_evidence_dossiers.py'
       - 'scripts/collect_prices.py'
       - 'labor_live_match_rules.json'
       - 'labor_manual_research_leads.json'
@@ -30,6 +31,7 @@ on:
       - 'tests/test_collect_live_labor_quotes.py'
       - 'tests/test_audit_live_labor_drift.py'
       - 'tests/test_build_labor_review_queue.py'
+      - 'tests/test_build_labor_evidence_dossiers.py'
       - 'labor_market_sources.json'
   schedule:
     - cron: '37 5 2 * *'
@@ -60,6 +62,7 @@ jobs:
           python3 -m py_compile scripts/collect_live_labor_quotes.py
           python3 -m py_compile scripts/audit_live_labor_drift.py
           python3 -m py_compile scripts/build_labor_review_queue.py
+          python3 -m py_compile scripts/build_labor_evidence_dossiers.py
           python3 -m py_compile scripts/plan_verified_material_updates.py
           python3 -m py_compile scripts/build_material_tier_review.py
           python3 -m py_compile scripts/audit_material_pack_alignment.py
@@ -95,6 +98,87 @@ jobs:
 
       - name: Prepare complete human labor research queue without price changes
         run: python3 scripts/build_labor_review_queue.py
+
+      - name: Build 38 research-only labor evidence dossiers
+        run: python3 scripts/build_labor_evidence_dossiers.py
+
+      - name: Validate labor dossier summary and list top manual priorities
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report = json.loads(
+              Path('labor_evidence_dossiers.json').read_text(encoding='utf-8')
+          )
+          summary = report['summary']
+
+          assert report['status'] == 'manual_evidence_review_only'
+          assert summary['workTypesReviewed'] == 38
+          assert summary['workTypesWithExactMappings'] == 35
+          assert summary['workTypesWithoutExactMappings'] == 3
+          assert summary['technologySpecificManualLeads'] == 5
+          assert summary['sourceObservations'] == 51
+          assert summary['publicationReadyLaborRates'] == 0
+
+          assert report['publishedPricesChanged'] is False
+          assert report['flutterCalculationsChanged'] is False
+          assert report['automaticLaborPublicationEnabled'] is False
+
+          assert all(
+              not item['approvedForPublication']
+              and not item['priceDateVerified']
+              for item in report['dossiers']
+          )
+
+          with open(
+              os.environ['GITHUB_STEP_SUMMARY'],
+              'a',
+              encoding='utf-8',
+          ) as output:
+              output.write(
+                  '### Досье проверки 38 расценок'
+                  + chr(10) * 2
+              )
+
+              output.write(
+                  '38 работ проверяются вручную. '
+                  '51 исследовательская строка; '
+                  '3 работы не имеют точного сопоставления; '
+                  '5 подсказок не являются ценами. '
+                  'Подтверждено для публикации: **0**.'
+                  + chr(10) * 2
+              )
+
+              output.write(
+                  '| Приоритет | Работа | Причина | Строк |'
+                  + chr(10)
+              )
+
+              output.write(
+                  '|---:|---|---|---:|'
+                  + chr(10)
+              )
+
+              for item in report['dossiers'][:10]:
+                  output.write(
+                      f"| {item['priority']} | "
+                      f"{item['workKey']} | "
+                      f"{item['reviewReasonRU']} | "
+                      f"{len(item['evidenceRows'])} |"
+                      + chr(10)
+                  )
+
+              output.write(
+                  chr(10)
+                  + 'Полный отчёт: Artifact '
+                  'labor_evidence_dossiers_RU.md. '
+                  'Действующие цены не изменены.'
+                  + chr(10)
+              )
+          PY
 
       - name: Plan only strongly verified material changes (read-only)
         run: python3 scripts/plan_verified_material_updates.py
@@ -469,6 +553,8 @@ jobs:
             live_labor_quotes.json
             labor_drift_review.json
             labor_manual_review_queue.json
+            labor_evidence_dossiers.json
+            labor_evidence_dossiers_RU.md
             material_update_proposals.json
             material_tier_review.json
             material_tier_review_RU.md
