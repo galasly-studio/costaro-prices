@@ -34,6 +34,8 @@ on:
       - 'scripts/build_complete_material_criteria.py'
       - 'scripts/build_market_decision_dashboard.py'
       - 'scripts/build_bulk_sku_tier_evidence.py'
+      - 'scripts/build_official_manufacturer_batch.py'
+      - 'tests/test_official_manufacturer_batch.py'
       - 'tests/test_bulk_sku_tier_evidence.py'
       - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
@@ -631,6 +633,8 @@ jobs:
                             'в данном запуске пропускаются.\n')
           PY
 
+      - name: Assemble official manufacturer source batch (research only)
+        run: python3 scripts/build_official_manufacturer_batch.py
       - name: Upload monthly audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -685,6 +689,9 @@ jobs:
             market_decision_queue.json
             bulk_sku_quality_evidence.json
             bulk_sku_quality_evidence_RU.md
+            official_source_batch_review.json
+            official_source_batch_review_RU.md
+            official_source_batch_queue.json
             bulk_sku_quality_review_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt
