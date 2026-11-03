@@ -222,7 +222,7 @@ def evaluate(
             if row["status"] == "two_shop_exact_pack_research_candidate"
         ]
 
-        if not groups:
+        if not groups or key in set(material_audit.get('uncoveredMaterialKeys', [])):
             status = "source_monitoring_missing"
             priority = 1
             action = (
