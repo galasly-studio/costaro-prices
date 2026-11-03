@@ -29,6 +29,8 @@ on:
       - 'scripts/build_manufacturer_review_queue.py'
       - 'scripts/build_retail_identity_crosscheck.py'
       - 'scripts/build_product_provenance_review.py'
+      - 'scripts/check_live_sku_listing.py'
+      - 'tests/test_live_sku_listing.py'
       - 'tests/test_product_provenance_review.py'
       - 'tests/test_retail_identity_crosscheck.py'
       - 'tests/test_manufacturer_review_queue.py'
@@ -103,6 +105,7 @@ jobs:
           python3 -m py_compile scripts/build_manufacturer_review_queue.py
           python3 -m py_compile scripts/build_retail_identity_crosscheck.py
           python3 -m py_compile scripts/build_product_provenance_review.py
+          python3 -m py_compile scripts/check_live_sku_listing.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -253,6 +256,9 @@ jobs:
 
       - name: Review manufacturer and retailer provenance (read-only)
         run: python3 scripts/build_product_provenance_review.py
+
+      - name: Check one exact Moldova SKU listing live (read-only)
+        run: python3 scripts/check_live_sku_listing.py
 
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
@@ -645,6 +651,8 @@ jobs:
             retail_identity_crosscheck_RU.md
             product_provenance_review.json
             product_provenance_review_RU.md
+            live_sku_listing_check.json
+            live_sku_listing_check_RU.md
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
