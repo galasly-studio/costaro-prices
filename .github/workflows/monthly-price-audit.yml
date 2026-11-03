@@ -22,6 +22,8 @@ on:
       - 'tests/test_quality_first_review.py'
       - 'scripts/build_material_family_criteria.py'
       - 'tests/test_material_family_criteria.py'
+      - 'scripts/build_priority_material_criteria.py'
+      - 'tests/test_priority_material_criteria.py'
       - 'scripts/check_labor_source_health.py'
       - 'scripts/labor_network_retry.py'
       - 'scripts/collect_live_labor_quotes.py'
@@ -88,6 +90,7 @@ jobs:
           python3 -m py_compile scripts/audit_material_source_traceability.py
           python3 -m py_compile scripts/build_quality_first_review.py
           python3 -m py_compile scripts/build_material_family_criteria.py
+          python3 -m py_compile scripts/build_priority_material_criteria.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -223,6 +226,9 @@ jobs:
 
       - name: Build eight material family quality criteria (read-only)
         run: python3 scripts/build_material_family_criteria.py
+
+      - name: Build priority material evidence criteria (read-only)
+        run: python3 scripts/build_priority_material_criteria.py
 
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
@@ -605,6 +611,8 @@ jobs:
             material_quality_first_review_RU.md
             material_family_criteria.json
             material_family_criteria_RU.md
+            priority_material_criteria.json
+            priority_material_criteria_RU.md
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
