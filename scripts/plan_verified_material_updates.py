@@ -28,6 +28,7 @@ MAX_FUTURE_CLOCK_DRIFT = timedelta(minutes=5)
 MIN_CHANGE = 0.02
 MAX_CHANGE = 0.08
 MAX_STORE_SPREAD = 0.12
+TECHNICAL_HOLD_MATERIALS = frozenset(('finishPutty', 'interiorPaint'))
 
 
 def _number(value):
@@ -190,6 +191,11 @@ def plan(catalog, baseline, sources, observations, policy, now=None):
               or approval["catalogMaterialKey"] != key
               or approval["tier"] not in matching):
             row["reason"] = "approved_mapping_does_not_match_source_or_pack"
+        elif key in TECHNICAL_HOLD_MATERIALS:
+            # Fail closed: reviewed retail prices do not establish safe
+            # manufacturer consumption, wet-room scope or tier quality.
+            # Releasing these keys requires a separate reviewed code change.
+            row["reason"] = "manufacturer_scope_consumption_and_tier_review_not_approved"
         else:
             median, error = _evidence(source, seen.get(material_id))
             if error:

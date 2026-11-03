@@ -12,6 +12,8 @@ on:
       - 'scripts/build_material_tier_review.py'
       - 'scripts/prepare_verified_catalog_release.py'
       - 'scripts/audit_consumption_alignment.py'
+      - 'scripts/build_material_candidate_dossiers.py'
+      - 'tests/test_build_material_candidate_dossiers.py'
       - 'scripts/check_labor_source_health.py'
       - 'scripts/labor_network_retry.py'
       - 'scripts/collect_live_labor_quotes.py'
@@ -72,6 +74,7 @@ jobs:
           python3 -m py_compile scripts/audit_material_pack_alignment.py
           python3 -m py_compile scripts/prepare_verified_catalog_release.py
           python3 -m py_compile scripts/audit_consumption_alignment.py
+          python3 -m py_compile scripts/build_material_candidate_dossiers.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -192,6 +195,9 @@ jobs:
 
       - name: Compare manufacturer consumption with preliminary app norms (read-only)
         run: python3 scripts/audit_consumption_alignment.py
+
+      - name: Build six material research dossiers (read-only)
+        run: python3 scripts/build_material_candidate_dossiers.py
 
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
@@ -564,6 +570,8 @@ jobs:
             material_tier_review_RU.md
             consumption_alignment_report.json
             consumption_alignment_RU.md
+            material_candidate_dossiers.json
+            material_candidate_dossiers_RU.md
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
