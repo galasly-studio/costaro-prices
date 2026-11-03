@@ -29,6 +29,7 @@ on:
       - 'tests/test_safe_publisher_wiring.py'
       - 'tests/test_collect_price_source_health.py'
       - 'tests/test_verified_structured_sku.py'
+      - 'tests/test_obramag_primary_card.py'
       - 'tests/test_audit_consumption_alignment.py'
       - 'tests/test_check_labor_source_health.py'
       - 'tests/test_labor_network_retry.py'

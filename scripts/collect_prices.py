@@ -453,7 +453,172 @@ def download_page(url):
         )
 
 
+# Stage 28: exact ObraMag main-card research.
+# These pinned products stay research-only. A visually scoped price is
+# NOT strong structured-SKU evidence for automatic publication.
+OBRAMAG_SCOPED_RESEARCH = {
+    "/product/glet-finisare-acril-b-62-satroc-8kg": "370035",
+    "/product/glet-finisare-acril-satroc-8kg": "6000120",
+    "/product/vopsea-interior-supraten-euroton-lav-7kg": "350014",
+}
+
+
+class ObraMagPrimaryCard(HTMLParser):
+    """Collect text after the unique H1, excluding scripts and related cards."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.headings = []
+        self.parts = []
+        self.in_h1 = False
+        self.heading_parts = []
+        self.after_h1 = False
+        self.stopped = False
+        self.ignored = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style", "noscript", "template"):
+            self.ignored += 1
+            return
+
+        if self.ignored:
+            return
+
+        if tag == "h1":
+            if self.after_h1:
+                self.stopped = True
+            self.in_h1 = True
+            self.heading_parts = []
+
+        elif self.after_h1 and tag in (
+            "h2", "h3", "h4", "aside", "footer"
+        ):
+            self.stopped = True
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style", "noscript", "template"):
+            if self.ignored:
+                self.ignored -= 1
+            return
+
+        if self.ignored:
+            return
+
+        if tag == "h1" and self.in_h1:
+            self.headings.append(
+                " ".join(self.heading_parts).strip()
+            )
+            self.in_h1 = False
+            self.after_h1 = True
+
+    def handle_data(self, data):
+        if self.ignored:
+            return
+
+        value = " ".join(data.split())
+        if not value:
+            return
+
+        if self.in_h1:
+            self.heading_parts.append(value)
+            return
+
+        if self.after_h1 and not self.stopped:
+            if value.casefold() in (
+                "cantitate",
+                "quantity",
+                "adaugă în coș",
+                "cumpără acum",
+            ):
+                self.stopped = True
+                return
+
+            self.parts.append(value)
+
+            # The main SKU and price should be close to the main heading.
+            # Never scan the rest of a long product/recommendation page.
+            if len(self.parts) > 100:
+                self.stopped = True
+
+
+def extract_obramag_primary_card_price(
+    html, required_terms, product_code
+):
+    """Research price only when main H1, exact code and MDL/bucket agree."""
+    if not isinstance(html, str) or not product_code:
+        return None
+
+    parser = ObraMagPrimaryCard()
+    parser.feed(html)
+
+    if len(parser.headings) != 1:
+        return None
+
+    if not matches(parser.headings[0], required_terms):
+        return None
+
+    body = " ".join(parser.parts)
+
+    codes = re.findall(
+        r"\bCod(?:\s+produs)?\s*:\s*([a-zA-Z0-9-]+)\b",
+        body,
+        flags=re.IGNORECASE,
+    )
+
+    if codes != [product_code]:
+        return None
+
+    prices = re.findall(
+        r"\b(?:Pre[țţt]|Price)\s*:?\s*"
+        r"(\d{1,6}(?:[.,]\d{1,2})?)"
+        r"\s*MDL\s*/\s*cal\b",
+        body,
+        flags=re.IGNORECASE,
+    )
+
+    # Zero prices, two possible prices, or a different unit are unsafe.
+    if len(prices) != 1:
+        return None
+
+    return parse_price(prices[0])
+
 def extract_price(html, required_terms, product_code, source_url=None):
+    # Stage 28: pinned ObraMag pages must pass main-card checks.
+    # No fallback to loose page text or related-product recommendations.
+    parsed_source = (
+        urlparse(source_url)
+        if isinstance(source_url, str)
+        else None
+    )
+
+    if (
+        parsed_source
+        and parsed_source.hostname in ("obramag.md", "www.obramag.md")
+        and parsed_source.path.rstrip("/") in OBRAMAG_SCOPED_RESEARCH
+    ):
+        expected_code = OBRAMAG_SCOPED_RESEARCH[
+            parsed_source.path.rstrip("/")
+        ]
+
+        if (
+            parsed_source.scheme != "https"
+            or parsed_source.username
+            or parsed_source.password
+            or parsed_source.port
+            or parsed_source.query
+            or product_code != expected_code
+        ):
+            return None, "unavailable", "product_scoped_visible_text"
+
+        scoped_price = extract_obramag_primary_card_price(
+            html, required_terms, product_code
+        )
+
+        if scoped_price is None:
+            return None, "unavailable", "product_scoped_visible_text"
+
+        return scoped_price, "candidate", "product_scoped_visible_text"
+
     # Nanu does not expose the main price as schema.org microdata/JSON-LD.
     # Its price must be pinned to #product + exact "Cod" + "pret per buc".
     # Fail closed: never fall back to a related product's visible price.
