@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "market": "MD",
+  "currency": "MDL",
+  "researchOnly": true,
+  "publicationAllowed": false,
+  "description": "Unverified, technology-specific leads for labor work with no machine-extractable exact mapping. Never use these leads as catalog prices.",
+  "leads": [
+    {
+      "workKey": "removeDecorativeWork",
+      "url": "https://euroremontstyle.md/remont-kvartir-ceny",
+      "label": "Очистка стен от декоративной краски",
+      "unit": "m2",
+      "technology": "decorative_paint_only",
+      "scopeLimitation": "does_not_cover_all_decorative_plaster_or_textured_finishes",
+      "accessNeedsVerification": false,
+      "approvedForPublication": false
+    },
+    {
+      "workKey": "floorRemoveOtherWork",
+      "url": "https://euroremontstyle.md/remont-kvartir-ceny",
+      "label": "Демонтаж полов из паркета",
+      "unit": "m2",
+      "technology": "parquet_floor_only",
+      "scopeLimitation": "generic_other_floor_covering_has_multiple_unpriced_technologies",
+      "accessNeedsVerification": false,
+      "approvedForPublication": false
+    },
+    {
+      "workKey": "floorRemoveOtherWork",
+      "url": "https://topmaster.md/price/demontazh/",
+      "label": "Демонтаж подложки из ДВП обмазанной битумной мастикой м2",
+      "unit": "m2",
+      "technology": "bitumen_bonded_fiberboard_underlay_only",
+      "scopeLimitation": "underlay_demolition_is_not_a_generic_floor_covering",
+      "accessNeedsVerification": false,
+      "approvedForPublication": false
+    },
+    {
+      "workKey": "vinylWork",
+      "url": "https://tsgate.pereflex.md/en/catalog/floor%20install.html?brand%5B%5D=30&filter=1",
+      "label": "Vinyl installation using floating method",
+      "unit": "m2",
+      "technology": "floating_vinyl_only",
+      "scopeLimitation": "click_lock_vinyl_is_not_glued_vinyl_and_page_may_be_unavailable",
+      "accessNeedsVerification": true,
+      "approvedForPublication": false
+    },
+    {
+      "workKey": "vinylWork",
+      "url": "https://tsgate.pereflex.md/en/catalog/floor%20install.html?brand%5B%5D=30&filter=1",
+      "label": "Vinyl installation with glue",
+      "unit": "m2",
+      "technology": "glued_vinyl_only",
+      "scopeLimitation": "adhesive_installation_needs_separate_technology_and_subfloor_check",
+      "accessNeedsVerification": true,
+      "approvedForPublication": false
+    }
+  ]
+}

@@ -15,8 +15,10 @@ on:
       - 'scripts/check_labor_source_health.py'
       - 'scripts/collect_live_labor_quotes.py'
       - 'scripts/audit_live_labor_drift.py'
+      - 'scripts/build_labor_review_queue.py'
       - 'scripts/collect_prices.py'
       - 'labor_live_match_rules.json'
+      - 'labor_manual_research_leads.json'
       - 'material_consumption_evidence.json'
       - 'tests/test_build_material_tier_review.py'
       - 'tests/test_prepare_verified_catalog_release.py'
@@ -27,6 +29,7 @@ on:
       - 'tests/test_check_labor_source_health.py'
       - 'tests/test_collect_live_labor_quotes.py'
       - 'tests/test_audit_live_labor_drift.py'
+      - 'tests/test_build_labor_review_queue.py'
       - 'labor_market_sources.json'
   schedule:
     - cron: '37 5 2 * *'
@@ -56,6 +59,7 @@ jobs:
           python3 -m py_compile scripts/check_labor_source_health.py
           python3 -m py_compile scripts/collect_live_labor_quotes.py
           python3 -m py_compile scripts/audit_live_labor_drift.py
+          python3 -m py_compile scripts/build_labor_review_queue.py
           python3 -m py_compile scripts/plan_verified_material_updates.py
           python3 -m py_compile scripts/build_material_tier_review.py
           python3 -m py_compile scripts/audit_material_pack_alignment.py
@@ -89,6 +93,9 @@ jobs:
       - name: Screen preliminary labor price drift without updating any tier
         run: python3 scripts/audit_live_labor_drift.py
 
+      - name: Prepare complete human labor research queue without price changes
+        run: python3 scripts/build_labor_review_queue.py
+
       - name: Plan only strongly verified material changes (read-only)
         run: python3 scripts/plan_verified_material_updates.py
 
@@ -115,6 +122,8 @@ jobs:
           live_labor = json.loads(Path('live_labor_quotes.json').read_text(encoding='utf-8'))
           live_rules = json.loads(Path('labor_live_match_rules.json').read_text(encoding='utf-8'))
           labor_drift = json.loads(Path('labor_drift_review.json').read_text(encoding='utf-8'))
+          labor_queue = json.loads(Path('labor_manual_review_queue.json').read_text(encoding='utf-8'))
+          manual_leads = json.loads(Path('labor_manual_research_leads.json').read_text(encoding='utf-8'))
           planned = json.loads(Path('material_update_proposals.json').read_text(encoding='utf-8'))
           tier_review = json.loads(Path('material_tier_review.json').read_text(encoding='utf-8'))
           packs = json.loads(Path('material_pack_alignment_report.json').read_text(encoding='utf-8'))
@@ -174,6 +183,19 @@ jobs:
           assert labor_drift['automaticLaborPublicationEnabled'] is False
           assert all(not q['approvedForPublication'] and not q['priceDateVerified']
                      for q in labor_drift['workReview'])
+          assert labor_queue['status'] == 'manual_research_only'
+          assert manual_leads['researchOnly'] is True
+          assert manual_leads['publicationAllowed'] is False
+          assert labor_queue['summary']['workTypesReviewed'] == 38
+          assert labor_queue['summary']['workTypesWithExactMappings'] == 35
+          assert labor_queue['summary']['workTypesWithoutExactMappings'] == 3
+          assert labor_queue['summary']['manualLeadsForUnmappedWork'] == 5
+          assert labor_queue['summary']['publicationReadyLaborRates'] == 0
+          assert labor_queue['publishedPricesChanged'] is False
+          assert labor_queue['flutterCalculationsChanged'] is False
+          assert labor_queue['automaticLaborPublicationEnabled'] is False
+          assert all(not r['approvedForPublication'] and not r['priceDateVerified']
+                     for r in labor_queue['workReview'])
           assert consumption['status'] == 'technical_research_only'
           assert consumption['publishedPricesChanged'] is False
           assert consumption['flutterCalculationsChanged'] is False
@@ -212,6 +234,9 @@ jobs:
               f"Labor work types with two aligned bounded sources (not approved): {live_labor['summary']['workTypesWithTwoBoundedAlignedSourcesForComparison']}",
               f"Labor standard rates outside provisional 20-percent screening band: {labor_drift['summary']['outsidePreliminaryBandManualReview']}",
               f"Labor rates without two comparable independent sources: {labor_drift['summary']['insufficientIndependentSources'] + labor_drift['summary']['notComparable']}",
+              f"Labor tasks in human research queue: {labor_queue['summary']['workTypesReviewed']}",
+              f"Work types without exact machine-readable mappings: {labor_queue['summary']['workTypesWithoutExactMappings']}",
+              f"Technology-specific leads requiring manual checks: {labor_queue['summary']['manualLeadsForUnmappedWork']}",
               f"Start putty: {labor['startPuttyMarketStatus']}",
               f"Catalog publication status: {status}",
               f"Strict material update proposals (not published): {planned['proposedCount']}",
@@ -365,6 +390,24 @@ jobs:
                          if r['mappedPages'] == 0 and r['workKey'] != 'startPuttyWork']
               summary.write(f"\nБез настроенной точной строки: **{len(missing)}** работ: "
                             + ', '.join(f'`{key}`' for key in missing) + '.\n')
+              summary.write('\n### Очередь проверки 38 расценок — без изменения цен\n\n')
+              qsummary = labor_queue['summary']
+              summary.write(f"Составлено задач: **{qsummary['workTypesReviewed']}**; "
+                            f"точных настроенных соответствий: **{qsummary['workTypesWithExactMappings']}**; "
+                            f"без точного соответствия: **{qsummary['workTypesWithoutExactMappings']}**. "
+                            f"Исследовательских подсказок: **{qsummary['manualLeadsForUnmappedWork']}**. "
+                            'Подтверждённых к публикации тарифов: **0**.\n\n')
+              summary.write('| Приоритет | Работа | Причина | Следующее ручное действие |\n')
+              summary.write('|---:|---|---|---|\n')
+              for task in labor_queue['workReview']:
+                  if task['priority'] <= 3:
+                      summary.write(f"| {task['priority']} | `{task['workKey']}` | "
+                                    f"{task['reviewGroup']} | {task['nextManualAction']} |\n")
+              summary.write('\n**Внимание:** «снятие декоративной краски» не равно удалению '
+                            'всякого декоративного покрытия; демонтаж паркета или подложки '
+                            'не равен любой другой отделке пола; клеевой и замковый винил '
+                            'требуют разных технологических условий. Эти ссылки — подсказки '
+                            'для ручного поиска, а не автоматически проверенные цены.\n')
               summary.write('\n**Это сигнал для проверки, не рекомендация изменения цены.** '
                             'Даже два сайта не подтверждают дату конкретного тарифа, '
                             'совпадение технологии, толщины, числа слоёв и состава работ. '
@@ -425,6 +468,7 @@ jobs:
             labor_source_health.json
             live_labor_quotes.json
             labor_drift_review.json
+            labor_manual_review_queue.json
             material_update_proposals.json
             material_tier_review.json
             material_tier_review_RU.md
