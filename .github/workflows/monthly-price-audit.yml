@@ -32,6 +32,8 @@ on:
       - 'scripts/check_live_sku_listing.py'
       - 'scripts/audit_priority_sources_batch.py'
       - 'scripts/build_complete_material_criteria.py'
+      - 'scripts/build_market_decision_dashboard.py'
+      - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
       - 'tests/test_audit_priority_sources_batch.py'
       - 'tests/test_live_sku_listing.py'
@@ -112,6 +114,7 @@ jobs:
           python3 -m py_compile scripts/check_live_sku_listing.py
           python3 -m py_compile scripts/audit_priority_sources_batch.py
           python3 -m py_compile scripts/build_complete_material_criteria.py
+          python3 -m py_compile scripts/build_market_decision_dashboard.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -270,6 +273,8 @@ jobs:
         run: python3 scripts/audit_priority_sources_batch.py
       - name: Define criteria for all 41 material positions (read-only)
         run: python3 scripts/build_complete_material_criteria.py
+      - name: Build joint material and labor market decision dashboard (read-only)
+        run: python3 scripts/build_market_decision_dashboard.py
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
 
@@ -668,6 +673,9 @@ jobs:
             complete_material_criteria.json
             complete_material_criteria_RU.md
             remaining_material_research_tasks.json
+            market_decision_dashboard.json
+            market_decision_dashboard_RU.md
+            market_decision_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
