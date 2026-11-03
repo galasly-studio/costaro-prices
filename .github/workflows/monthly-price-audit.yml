@@ -31,6 +31,8 @@ on:
       - 'scripts/build_product_provenance_review.py'
       - 'scripts/check_live_sku_listing.py'
       - 'scripts/audit_priority_sources_batch.py'
+      - 'scripts/build_complete_material_criteria.py'
+      - 'tests/test_build_complete_material_criteria.py'
       - 'tests/test_audit_priority_sources_batch.py'
       - 'tests/test_live_sku_listing.py'
       - 'tests/test_product_provenance_review.py'
@@ -109,6 +111,7 @@ jobs:
           python3 -m py_compile scripts/build_product_provenance_review.py
           python3 -m py_compile scripts/check_live_sku_listing.py
           python3 -m py_compile scripts/audit_priority_sources_batch.py
+          python3 -m py_compile scripts/build_complete_material_criteria.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -265,6 +268,8 @@ jobs:
 
       - name: Batch-audit priority manufacturer sources and all material families (read-only)
         run: python3 scripts/audit_priority_sources_batch.py
+      - name: Define criteria for all 41 material positions (read-only)
+        run: python3 scripts/build_complete_material_criteria.py
       - name: Evaluate guarded publication readiness (read-only)
         run: python3 scripts/prepare_verified_catalog_release.py
 
@@ -660,6 +665,9 @@ jobs:
             live_sku_listing_check_RU.md
             priority_source_batch_review.json
             priority_source_batch_review_RU.md
+            complete_material_criteria.json
+            complete_material_criteria_RU.md
+            remaining_material_research_tasks.json
             verified_release_readiness.json
             monthly_price_summary.txt
           if-no-files-found: warn
