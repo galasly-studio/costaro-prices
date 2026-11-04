@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "status": "historical_fallback_staged_for_manual_review",
+  "historicalAuditDate": "2026-08-30",
+  "catalogVersionBefore": "0.1.0",
+  "catalogVersionCandidate": "0.1.1",
+  "materialKeys": 41,
+  "laborKeys": 37,
+  "priceValuesChanged": false,
+  "auditDateChanged": false,
+  "currentMarketPricesVerified": false,
+  "automaticPublicationApproved": false,
+  "publishedCatalogModified": false,
+  "requiresSeparateManualPromotion": true
+}

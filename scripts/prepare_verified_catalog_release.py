@@ -60,7 +60,13 @@ def prepare(catalog, baseline, sources, observations, policy, *, now=None):
         if patch >= 999999:
             raise ValueError("Version patch exhausted; manual migration required")
         candidate["catalogVersion"] = f"{major}.{minor}.{patch + 1}"
-        candidate["sourceAuditDate"] = now.date().isoformat()
+        # sourceAuditDate describes the common audit date of the entire
+        # catalog. A partial monthly price update must not misrepresent every
+        # untouched material (or any labor price) as newly audited.
+        # Keep the historical global date until a separate FULL catalog audit
+        # is explicitly approved. The partial update date belongs in the
+        # readiness report, not in a global app-facing freshness claim.
+        candidate["sourceAuditDate"] = catalog["sourceAuditDate"]
 
         errors = validate(candidate, baseline)
         if errors:
@@ -93,6 +99,8 @@ def prepare(catalog, baseline, sources, observations, policy, *, now=None):
         "approvedMappingCount": len(policy.get("approvedMappings", [])),
         "holdReasons": holds,
         "changes": changes,
+        "lastVerifiedPartialMaterialChangeDate": now.date().isoformat() if candidate else None,
+        "globalCatalogAuditDatePreserved": True,
         "publishedCatalogUnchangedByPreparation": True,
     }
     return readiness, candidate

@@ -1,0 +1,12 @@
+﻿{
+    "status":  "approved_historical_fallback",
+    "decision":  "option_1",
+    "catalogVersion":  "0.1.1",
+    "historicalAuditDate":  "2026-08-30",
+    "currentMarketPricesVerified":  false,
+    "publishedToGitHub":  false,
+    "publishedToGooglePlay":  false,
+    "workingCatalogUnchanged":  true,
+    "sha256":  "E4253125A3EF220AEC5729C45C6A5ECFD7DE2C77336870D969CEE6692791D307",
+    "approvedAt":  "2026-11-04T22:03:43.2186678+02:00"
+}

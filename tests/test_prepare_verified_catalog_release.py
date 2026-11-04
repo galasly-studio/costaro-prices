@@ -113,7 +113,9 @@ class GuardedReleaseTests(unittest.TestCase):
         self.assertEqual(report["status"], "ready_for_guarded_publication")
         self.assertEqual(report["catalogVersionCandidate"], "0.1.1")
         self.assertEqual(report["proposedPriceChanges"], 1)
-        self.assertEqual(candidate["sourceAuditDate"], "2026-11-01")
+        self.assertEqual(candidate["sourceAuditDate"], data[0]["sourceAuditDate"])
+        self.assertEqual(report["lastVerifiedPartialMaterialChangeDate"], "2026-11-01")
+        self.assertTrue(report["globalCatalogAuditDatePreserved"])
         self.assertEqual(candidate["materialPrices"]["gypsumPlaster"]["standard"]["price"], 152)
         self.assertEqual(candidate["laborPrices"], data[0]["laborPrices"])
         self.assertEqual(candidate["laborStagePrices"], data[0]["laborStagePrices"])
@@ -137,6 +139,7 @@ class GuardedReleaseTests(unittest.TestCase):
         report, candidate = prepare(*data, now=NOW)
         self.assertIsNone(candidate)
         self.assertIn("explicit_automatic_publication_approval_missing", report["holdReasons"])
+        self.assertIsNone(report["lastVerifiedPartialMaterialChangeDate"])
 
     def test_draft_catalog_cannot_bootstrap_itself(self):
         data = fixture()

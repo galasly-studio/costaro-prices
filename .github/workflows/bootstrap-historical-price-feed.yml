@@ -1,0 +1,111 @@
+# Explicit one-time deployment of the already approved 2026-08-30 fallback.
+# This does NOT change research prices.json or approve monthly retail updates.
+name: COSTARO One-Time Historical Price Feed
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_historical_date:
+        description: 'Publish fallback with the honest audit date 2026-08-30'
+        required: true
+        type: choice
+        options:
+          - '2026-08-30'
+
+concurrency:
+  group: costaro-historical-price-feed-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  verify-historical-feed:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout pricing research repository
+        uses: actions/checkout@v6
+
+      - name: Use Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned PDF reader needed by research tests
+        run: python3 -m pip install --disable-pip-version-check pypdf==5.9.0
+
+      - name: Require explicit historical fallback confirmation
+        shell: bash
+        run: |
+          test '${{ inputs.confirm_historical_date }}' = '2026-08-30' || {
+            echo 'COSTARO STOP: historical audit date not acknowledged'
+            exit 1
+          }
+
+      - name: Run full source and historical release safety tests
+        shell: bash
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py' -q
+          python3 scripts/validate_app_catalog.py \
+            --catalog prices.json --baseline app_embedded_baseline.json
+          python3 scripts/validate_app_catalog.py \
+            --catalog published_catalog/prices.json --baseline app_embedded_baseline.json
+
+      - name: Verify exact manually approved historical catalog
+        shell: bash
+        run: |
+          python3 scripts/verify_approved_historical_feed.py \
+            --approved published_catalog/prices.json \
+            --manifest published_catalog/approval_manifest.json \
+            --readiness published_catalog/readiness.json \
+            --candidate "$RUNNER_TEMP/costaro_historical_feed/prices.json" \
+            --report "$RUNNER_TEMP/costaro_historical_readiness.json"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          report = json.loads((root / 'costaro_historical_readiness.json')
+                              .read_text(encoding='utf-8'))
+          if (report.get('status') != 'historical_feed_verified_for_manual_deployment'
+                  or report.get('sourceAuditDate') != '2026-08-30'
+                  or report.get('currentMarketPricesVerified') is not False
+                  or report.get('researchCatalogChanged') is not False
+                  or report.get('automaticPricePublicationApproved') is not False):
+              raise SystemExit('COSTARO STOP: historical release validation failed')
+          feed = root / 'costaro_historical_feed'
+          (feed / 'index.html').write_text(
+              '<!doctype html><html lang="ru"><meta charset="utf-8">'
+              '<title>COSTARO Historical Prices</title><body><h1>COSTARO Price Feed</h1>'
+              '<p>Historical reference audited 2026-08-30; not current market verification.</p>'
+              '<p><a href="prices.json">prices.json</a></p></body></html>\n',
+              encoding='utf-8')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
+              stream.write('## COSTARO approved historical fallback\n\n')
+              stream.write('Catalog version: **0.1.1**\n\n')
+              stream.write('Full catalog audit date: **2026-08-30**\n\n')
+              stream.write('November market verification: **not claimed**\n\n')
+              stream.write('Research prices, labor rates, formulas: **unchanged**\n')
+          PY
+          git diff --exit-code -- prices.json material_update_policy.json app_embedded_baseline.json
+
+      - name: Upload approved historical Pages feed
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/costaro_historical_feed
+
+  deploy:
+    needs: verify-historical-feed
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy explicitly approved historical feed
+        id: deployment
+        uses: actions/deploy-pages@v4
