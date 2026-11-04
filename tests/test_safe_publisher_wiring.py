@@ -1,4 +1,4 @@
-"""Safety contract: monthly checks are read-only; publisher remains opt-in."""
+"""Safety contract: research is read-only; publication is strictly gated."""
 
 from pathlib import Path
 import unittest
@@ -22,17 +22,30 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertNotIn("git push", workflow)
         self.assertNotIn("actions/deploy-pages", workflow)
 
-    def test_live_publisher_is_inactive_until_explicit_activation(self):
+    def test_live_publisher_never_skips_approval_gates(self):
         directory = ROOT / ".github/workflows"
         inactive = directory / "approved-price-publisher.yml.disabled"
         self.assertTrue(inactive.is_file())
-        self.assertFalse((directory / "approved-price-publisher.yml").exists())
-        contents = inactive.read_text(encoding="utf-8")
-        self.assertIn("approved-price-publisher.yml", contents)
+        workflow = directory / "approved-price-publisher.yml"
+        self.assertTrue(workflow.is_file())
+        contents = workflow.read_text(encoding="utf-8")
+        self.assertIn("  schedule:\n", contents)
+        self.assertIn("'17 6 3 * *'", contents)
         self.assertIn("scripts/prepare_verified_catalog_release.py", contents)
+        self.assertIn("automaticPublicationApproved", contents)
+        self.assertIn("approvedMappings", contents)
+        self.assertIn("catalog.get('status') == 'published'", contents)
+        self.assertIn("report.get('status') == 'ready_for_guarded_publication'", contents)
+        self.assertIn('if: steps.gate.outputs.publish == \'true\'', contents)
+        self.assertIn('git add -- prices.json', contents)
+        self.assertIn('git push origin HEAD:main', contents)
+        # A bot commit does not trigger branch-based Pages; a separately
+        # permissioned deployment is allowed only after publication.
         self.assertIn("actions/deploy-pages@v4", contents)
         self.assertIn("actions/upload-pages-artifact@v4", contents)
-        self.assertIn("automaticPublicationApproved", contents)
+        self.assertIn("if: needs.verify-and-publish.outputs.deploy == 'true'", contents)
+        # Committed historical reports may never be overwritten by the job.
+        self.assertIn("$RUNNER_TEMP/costaro_price_release_readiness.json", contents)
 
 
 if __name__ == "__main__":

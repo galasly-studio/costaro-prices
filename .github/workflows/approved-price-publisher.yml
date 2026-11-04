@@ -1,0 +1,154 @@
+# A monthly, fail-closed publisher. A scheduled run is NOT approval to change
+# any price. No data is published while the catalog/policy is still a draft.
+name: COSTARO Guarded Monthly Price Publisher
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 3 * *'
+
+concurrency:
+  group: costaro-guarded-price-publisher
+  cancel-in-progress: false
+
+jobs:
+  verify-and-publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    outputs:
+      deploy: ${{ steps.gate.outputs.publish }}
+
+    steps:
+      - name: Checkout COSTARO price repository
+        uses: actions/checkout@v6
+
+      - name: Use Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned PDF text reader for research
+        run: python3 -m pip install --disable-pip-version-check pypdf==5.9.0
+
+      - name: Run full safety regression suite
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+          python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
+
+      - name: Collect fresh material and labor evidence
+        run: |
+          python3 scripts/collect_prices.py
+          python3 scripts/audit_prices.py
+          python3 scripts/audit_material_pack_alignment.py --market-audit price_audit_report.json
+
+      - name: Stage changes only after approval and complete validation
+        run: |
+          python3 scripts/prepare_verified_catalog_release.py \
+            --report "$RUNNER_TEMP/costaro_price_release_readiness.json" \
+            --candidate "$RUNNER_TEMP/costaro_release_candidate/prices.json"
+
+      - name: Check mandatory publication gates
+        id: gate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP'])
+          report = json.loads((root / 'costaro_price_release_readiness.json').read_text(encoding='utf-8'))
+          catalog = json.loads(Path('prices.json').read_text(encoding='utf-8'))
+          policy = json.loads(Path('material_update_policy.json').read_text(encoding='utf-8'))
+          candidate = root / 'costaro_release_candidate/prices.json'
+
+          approved = (
+              catalog.get('status') == 'published'
+              and catalog.get('automaticUpdatesEnabled') is True
+              and policy.get('enabled') is True
+              and policy.get('automaticPublicationApproved') is True
+              and bool(policy.get('approvedMappings'))
+          )
+          ready = report.get('status') == 'ready_for_guarded_publication'
+          if ready != candidate.is_file():
+              raise SystemExit('COSTARO STOP: candidate/report mismatch')
+          if ready and (not approved or report.get('proposedPriceChanges', 0) <= 0):
+              raise SystemExit('COSTARO STOP: readiness without approved changes')
+          publish = ready and approved
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+              stream.write(f"publish={'true' if publish else 'false'}\n")
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
+              stream.write('## COSTARO: monthly verified catalog publication\n\n')
+              stream.write(f"Status: **{report.get('status')}**\n\n")
+              stream.write(f"Approved change candidates: **{report.get('proposedPriceChanges', 0)}**\n\n")
+              stream.write('Holds: ' + (', '.join(report.get('holdReasons', [])) or 'none') + '\n\n')
+              stream.write('Published: **' + str(publish) + '**\n')
+          print('COSTARO PUBLISH:', publish)
+          PY
+
+      - name: Preserve the publication decision as an artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: costaro-guarded-price-decision
+          path: ${{ runner.temp }}/costaro_price_release_readiness.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Promote only the validated approved candidate
+        if: steps.gate.outputs.publish == 'true'
+        shell: bash
+        run: |
+          cp "$RUNNER_TEMP/costaro_release_candidate/prices.json" prices.json
+          python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
+          git diff --check -- prices.json
+          git config user.name 'costaro-price-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- prices.json
+          git diff --cached --exit-code -- prices.json && {
+            echo 'COSTARO STOP: candidate has no catalog changes'
+            exit 1
+          }
+          git commit -m 'Publish verified monthly COSTARO price changes' -- prices.json
+          git push origin HEAD:main
+
+      - name: Prepare the verified price feed
+        if: steps.gate.outputs.publish == 'true'
+        shell: bash
+        run: |
+          mkdir -p public_price_feed
+          cp prices.json public_price_feed/prices.json
+          python3 - <<'PY'
+          from pathlib import Path
+          Path('public_price_feed/index.html').write_text(
+              '<!doctype html><html lang="ru"><meta charset="utf-8">'
+              '<title>COSTARO Prices</title><body><h1>COSTARO Price Feed</h1>'
+              '<p><a href="prices.json">prices.json</a></p></body></html>\n',
+              encoding='utf-8')
+          PY
+
+      - name: Upload the verified Pages artifact
+        if: steps.gate.outputs.publish == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public_price_feed
+
+  deploy:
+    needs: verify-and-publish
+    if: needs.verify-and-publish.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy verified prices to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
