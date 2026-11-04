@@ -1,34 +1,117 @@
+# Read-only monthly monitoring of Moldova labor prices. Observations are
+# research only: no rate, quality tier, app formula or catalog date is changed.
 name: COSTARO Labor Price Audit
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '11 6 2 * *'
 
 permissions:
   contents: read
 
+concurrency:
+  group: costaro-labor-price-audit
+  cancel-in-progress: false
+
 jobs:
   audit-labor:
-    name: Check 37 labor rates without publishing
+    name: Monitor 37 labor rates and optional putty stage
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - name: Download repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Check Python script
-        run: python3 -m py_compile scripts/audit_labor_prices.py
+      - name: Use Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
 
-      - name: Run audit unit tests
-        run: python3 -m unittest discover -s tests -p test_audit_labor_prices.py -v
+      - name: Compile labor analysis scripts
+        run: |
+          python3 -m py_compile \
+            scripts/audit_labor_prices.py \
+            scripts/collect_live_labor_quotes.py \
+            scripts/audit_live_labor_drift.py
 
-      - name: Audit all 37 rates
+      - name: Run labor safety regression tests
+        run: |
+          python3 -m unittest discover -s tests -p 'test_audit_labor_prices.py' -v
+          python3 -m unittest discover -s tests -p 'test_collect_live_labor_quotes.py' -v
+          python3 -m unittest discover -s tests -p 'test_audit_live_labor_drift.py' -v
+          python3 scripts/validate_app_catalog.py \
+            --catalog prices.json --baseline app_embedded_baseline.json
+
+      - name: Audit catalog labor rates
         run: python3 scripts/audit_labor_prices.py
 
-      - name: Upload audit report
+      - name: Collect fresh Moldova labor research quotes
+        run: python3 scripts/collect_live_labor_quotes.py
+
+      - name: Screen labor drift without proposing publication
+        run: python3 scripts/audit_live_labor_drift.py
+
+      - name: Enforce read-only publication safety
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          quotes = json.loads(Path('live_labor_quotes.json').read_text(encoding='utf-8'))
+          drift = json.loads(Path('labor_drift_review.json').read_text(encoding='utf-8'))
+          catalog = json.loads(Path('prices.json').read_text(encoding='utf-8'))
+
+          if quotes.get('status') != 'technical_research_only':
+              raise SystemExit('COSTARO STOP: labor quotes left research mode')
+          if drift.get('status') != 'technical_research_only':
+              raise SystemExit('COSTARO STOP: labor drift left research mode')
+          if drift.get('catalogVersion') != catalog.get('catalogVersion'):
+              raise SystemExit('COSTARO STOP: labor catalog version mismatch')
+          if drift.get('summary', {}).get('catalogLaborRates') != 37:
+              raise SystemExit('COSTARO STOP: expected 37 labor rate keys')
+          if drift.get('summary', {}).get('approvedForPublication') != 0:
+              raise SystemExit('COSTARO STOP: unapproved labor rates')
+          if quotes.get('summary', {}).get('publicationReadyLaborRates') != 0:
+              raise SystemExit('COSTARO STOP: unsafe publication readiness')
+          for name, obj in (('quotes', quotes), ('drift', drift)):
+              for key in ('publishedPricesChanged', 'flutterCalculationsChanged',
+                          'automaticLaborPublicationEnabled'):
+                  if obj.get(key) is not False:
+                      raise SystemExit(f'COSTARO STOP: {name}.{key} not false')
+          if any(row.get('approvedForPublication') is not False
+                 or row.get('priceDateVerified') is not False
+                 for row in quotes.get('observations', [])):
+              raise SystemExit('COSTARO STOP: observation marked verified/approved')
+          if any(row.get('approvedForPublication') is not False
+                 for row in drift.get('workReview', [])):
+              raise SystemExit('COSTARO STOP: labor drift row approved')
+
+          summary = drift['summary']
+          print('COSTARO LABOR RESEARCH SAFE: NO PRICES PUBLISHED')
+          print('Reviewed labor rates:', summary['laborRatesReviewed'])
+          print('Not comparable:', summary['notComparable'])
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
+              stream.write('## COSTARO monthly labor evidence\n\n')
+              stream.write(f"Reviewed rates: **{summary['laborRatesReviewed']}**\n\n")
+              stream.write(f"Not comparable: **{summary['notComparable']}**\n\n")
+              stream.write('Verified rates available for publication: **0**\n\n')
+              stream.write('Catalog, formulas and prices: **unchanged**\n')
+          PY
+          git diff --exit-code -- prices.json material_update_policy.json app_embedded_baseline.json
+
+      - name: Upload complete labor evidence package
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: costaro-labor-audit-report
+          name: costaro-monthly-labor-evidence
           path: |
             labor_audit_report.json
             labor_audit_summary.txt
+            live_labor_quotes.json
+            labor_drift_review.json
           if-no-files-found: warn
+          retention-days: 60
