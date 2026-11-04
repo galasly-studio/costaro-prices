@@ -38,6 +38,8 @@ on:
       - 'tests/test_official_manufacturer_batch.py'
       - 'scripts/build_official_content_evidence.py'
       - 'tests/test_official_content_evidence.py'
+      - 'scripts/build_material_decision_matrix.py'
+      - 'tests/test_material_decision_matrix.py'
       - 'tests/test_bulk_sku_tier_evidence.py'
       - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
@@ -91,6 +93,14 @@ jobs:
       - name: Download repository
         uses: actions/checkout@v6
 
+      - name: Use a managed Python for monthly research
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned, text-only PDF research extractor
+        run: python3 -m pip install --disable-pip-version-check pypdf==5.9.0
+
       - name: Validate Python scripts
         run: |
           python3 -m py_compile scripts/collect_prices.py
@@ -123,6 +133,7 @@ jobs:
           python3 -m py_compile scripts/build_market_decision_dashboard.py
           python3 -m py_compile scripts/build_bulk_sku_tier_evidence.py
           python3 -m py_compile scripts/build_official_content_evidence.py
+          python3 -m py_compile scripts/build_material_decision_matrix.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -642,6 +653,9 @@ jobs:
       - name: Inspect official document content and model markers (read-only)
         run: python3 scripts/build_official_content_evidence.py
 
+      - name: Build evidence and action matrix for all 41 material keys (read-only)
+        run: python3 scripts/build_material_decision_matrix.py
+
       - name: Upload monthly audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -702,6 +716,9 @@ jobs:
             manufacturer_content_evidence.json
             manufacturer_content_evidence_RU.md
             manufacturer_content_review_queue.json
+            material_decision_matrix.json
+            material_decision_matrix_RU.md
+            material_manual_actions.json
             bulk_sku_quality_review_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt

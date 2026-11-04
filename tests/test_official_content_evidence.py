@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock, patch
 
 from scripts import build_official_content_evidence as stage
 
@@ -135,6 +136,41 @@ class Stage44Tests(unittest.TestCase):
             stage.fetch_document("https://example.com/fake")["status"],
             "untrusted_url",
         )
+
+    def test_pdf_fallback_reads_official_text_without_pdftotext(self):
+        fake_reader = Mock()
+        fake_reader.is_encrypted = False
+        fake_reader.pages = [Mock(extract_text=lambda: "VINAROM F15 25 kg. Interior.")]
+        with patch.object(stage.shutil, "which", return_value=None), patch(
+            "pypdf.PdfReader", return_value=fake_reader
+        ):
+            doc, status = stage.source_text_from_pdf(b"%PDF-mock")
+        self.assertEqual(status, "text_extracted_pdf")
+        self.assertIn("VINAROM F15", doc)
+        reviewed = stage.evaluate_document("decorativePlaster", doc, "Vinarom F15 25kg")
+        self.assertTrue(reviewed["modelFamilyMarkersPresent"])
+        self.assertFalse(reviewed["exactRetailSkuIndependentlyVerified"])
+
+    def test_pdf_with_no_extractable_text_requires_manual_review(self):
+        fake_reader = Mock()
+        fake_reader.is_encrypted = False
+        fake_reader.pages = [Mock(extract_text=lambda: "")]
+        with patch.object(stage.shutil, "which", return_value=None), patch(
+            "pypdf.PdfReader", return_value=fake_reader
+        ):
+            doc, status = stage.source_text_from_pdf(b"%PDF-mock")
+        self.assertIsNone(doc)
+        self.assertEqual(status, "pdf_text_extraction_failed")
+
+    def test_encrypted_pdf_never_counts_as_read_document(self):
+        fake_reader = Mock()
+        fake_reader.is_encrypted = True
+        with patch.object(stage.shutil, "which", return_value=None), patch(
+            "pypdf.PdfReader", return_value=fake_reader
+        ):
+            doc, status = stage.source_text_from_pdf(b"%PDF-mock")
+        self.assertIsNone(doc)
+        self.assertEqual(status, "pdf_manual_review_required")
 
 
 if __name__ == "__main__":

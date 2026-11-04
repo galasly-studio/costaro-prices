@@ -6,6 +6,7 @@ An official company's statement is not an independent laboratory test.
 
 import hashlib
 import html
+import io
 import json
 import os
 import re
@@ -109,22 +110,46 @@ def source_text_from_html(raw):
 
 def source_text_from_pdf(raw):
     command = shutil.which("pdftotext")
-    if not command:
+    if command:
+        try:
+            process = subprocess.run(
+                [command, "-", "-"],
+                input=raw,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                timeout=12,
+                check=False,
+            )
+            if process.returncode == 0 and process.stdout.strip():
+                return process.stdout[:250_000].decode("utf-8", errors="replace"), "text_extracted_pdf"
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+
+    # GitHub runners may lack the pdftotext binary. A pinned, pure-Python
+    # extractor makes official PDFs inspectable without shell tools. This
+    # extracts words only; it does not validate the product or approve a tier.
+    try:
+        from pypdf import PdfReader
+    except ImportError:
         return None, "pdf_text_tool_unavailable"
     try:
-        process = subprocess.run(
-            [command, "-", "-"],
-            input=raw,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            timeout=12,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
+        reader = PdfReader(io.BytesIO(raw), strict=False)
+        if reader.is_encrypted or len(reader.pages) > 30:
+            return None, "pdf_manual_review_required"
+        fragments = []
+        total = 0
+        for page in reader.pages:
+            part = page.extract_text() or ""
+            total += len(part)
+            if total > 250_000:
+                return None, "pdf_text_too_large"
+            fragments.append(part)
+        extracted = "\n".join(fragments)
+        if not extracted.strip():
+            return None, "pdf_text_extraction_failed"
+        return extracted, "text_extracted_pdf"
+    except Exception:  # Malformed, unsupported, or image-only PDF: manual review.
         return None, "pdf_text_extraction_failed"
-    if process.returncode != 0 or not process.stdout.strip():
-        return None, "pdf_text_extraction_failed"
-    return process.stdout.decode("utf-8", errors="replace"), "text_extracted_pdf"
 
 
 def fetch_document(url):
