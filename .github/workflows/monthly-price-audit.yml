@@ -42,6 +42,8 @@ on:
       - 'tests/test_material_decision_matrix.py'
       - 'scripts/build_room_use_guard_review.py'
       - 'tests/test_room_use_guard_review.py'
+      - 'scripts/build_manual_sku_pilot_dossiers.py'
+      - 'tests/test_manual_sku_pilot_dossiers.py'
       - 'tests/test_bulk_sku_tier_evidence.py'
       - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
@@ -137,6 +139,7 @@ jobs:
           python3 -m py_compile scripts/build_official_content_evidence.py
           python3 -m py_compile scripts/build_material_decision_matrix.py
           python3 -m py_compile scripts/build_room_use_guard_review.py
+          python3 -m py_compile scripts/build_manual_sku_pilot_dossiers.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -662,6 +665,9 @@ jobs:
       - name: Screen room-use restrictions and composite fastener pricing (read-only)
         run: python3 scripts/build_room_use_guard_review.py
 
+      - name: Prepare five exact-SKU human approval pilots without publication
+        run: python3 scripts/build_manual_sku_pilot_dossiers.py
+
       - name: Upload monthly audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -727,6 +733,8 @@ jobs:
             material_manual_actions.json
             room_and_pack_safety_review.json
             room_and_pack_safety_review_RU.md
+            manual_sku_pilot_dossiers.json
+            manual_sku_pilot_dossiers_RU.md
             bulk_sku_quality_review_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt
