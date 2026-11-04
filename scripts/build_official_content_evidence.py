@@ -62,14 +62,16 @@ FORMAT_SIGNALS = {
     "decorativePlaster": ("25 kg", "25kg"),
     "electricalSocketPerPiece": ("16 a", "16a"),
     "floorWaterproofing": ("5 kg", "5kg"),
-    "finishPutty": ("8 kg", "8kg"),
+    # Russian Moldova storefronts write Cyrillic «кг» (also without a space).
+    # These are research-only format mentions, never exact-SKU verification.
+    "finishPutty": ("8 kg", "8kg", "8 кг", "8кг"),
     "grout": ("2 kg", "2kg"),
     "gypsumBoardCeiling": ("12 5 mm", "12 5mm"),
     "floorScreedMix": ("25 kg", "25kg"),
     "selfLevelingFloorMix": ("25 kg", "25kg"),
     "cementPlaster": ("25 kg", "25kg"),
     "gypsumPlaster": ("30 kg", "30kg"),
-    "interiorPaint": ("7 kg", "7kg"),
+    "interiorPaint": ("7 kg", "7kg", "7 кг", "7кг"),
     "primer": ("3 kg", "3kg"),
     "tileAdhesive": ("25 kg", "25kg"),
 }
@@ -214,6 +216,12 @@ def evaluate_document(key, text, retail_name):
     if key == "floorScreedMix" and re.search(r"25\s*(?:-|–|to)\s*80", text, re.IGNORECASE):
         if re.search(r"10\s*(?:-|–|to)\s*60", retail_name, re.IGNORECASE):
             restrictions.append("regional_thickness_range_disagreement_10_60_vs_25_80")
+    if key == "gypsumBoardCeiling" and re.search(
+        r"(?:normal\s+humidity|humidity\s+up\s+to\s+60|"
+        r"umiditate\s+normala|umiditate\s+de\s+pana\s+la\s+60)",
+        normalized, re.IGNORECASE,
+    ):
+        restrictions.append("technogips_type_a_normal_humidity_room_review")
 
     return {
         "modelFamilyMarkersPresent": bool(normalized) and all(groups_found),

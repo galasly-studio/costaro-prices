@@ -98,6 +98,28 @@ class Stage44Tests(unittest.TestCase):
         self.assertTrue(evidence["modelFamilyMarkersPresent"])
         self.assertFalse(evidence["configuredPackageOrRatingMentioned"])
 
+    def test_russian_cyrillic_kilograms_are_recognized_but_not_approved(self):
+        for key, product, document in (
+            ("finishPutty", "Meșterul Manole 8kg", "Meșterul Manole. Упаковка — 8кг."),
+            ("interiorPaint", "Romanita 7kg", "Краска ROMANITA 7 кг. Для сухих помещений."),
+        ):
+            with self.subTest(key=key):
+                evidence = stage.evaluate_document(key, document, product)
+                self.assertTrue(evidence["modelFamilyMarkersPresent"])
+                self.assertTrue(evidence["configuredPackageOrRatingMentioned"])
+                self.assertFalse(evidence["exactRetailSkuIndependentlyVerified"])
+
+    def test_different_cyrillic_pack_does_not_match(self):
+        evidence = stage.evaluate_document("interiorPaint", "Краска ROMANITA 17кг", "Romanita 7kg")
+        self.assertFalse(evidence["configuredPackageOrRatingMentioned"])
+
+    def test_type_a_normal_humidity_limit_is_flagged(self):
+        doc = "Technogips Pro Type A. Ideal for interior application in areas with normal humidity up to 60%."
+        evidence = stage.evaluate_document("gypsumBoardCeiling", doc, "Technogips 2500x1200x12.5")
+        self.assertTrue(evidence["modelFamilyMarkersPresent"])
+        self.assertIn("technogips_type_a_normal_humidity_room_review", evidence["technicalRestrictionSignals"])
+        self.assertFalse(evidence["manufacturerTechnicalClaimsIndependentlyTested"])
+
     def test_scripts_and_styles_do_not_provide_false_document_matches(self):
         raw = (
             b'<html><script>ROMANITA in dry rooms</script>'

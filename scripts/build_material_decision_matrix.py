@@ -23,6 +23,8 @@ RESTRICTION_LABELS = {
     "company_text_limits_product_to_dry_rooms": "Краска ограничена сухими помещениями",
     "regional_thickness_range_disagreement_10_60_vs_25_80":
         "Региональные данные о толщине слоя расходятся (10–60 / 25–80 мм)",
+    "technogips_type_a_normal_humidity_room_review":
+        "Плита Type A предназначена для нормальной влажности; проверить применимость к выбранному помещению",
 }
 
 
