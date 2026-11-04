@@ -36,6 +36,8 @@ on:
       - 'scripts/build_bulk_sku_tier_evidence.py'
       - 'scripts/build_official_manufacturer_batch.py'
       - 'tests/test_official_manufacturer_batch.py'
+      - 'scripts/build_official_content_evidence.py'
+      - 'tests/test_official_content_evidence.py'
       - 'tests/test_bulk_sku_tier_evidence.py'
       - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
@@ -120,6 +122,7 @@ jobs:
           python3 -m py_compile scripts/build_complete_material_criteria.py
           python3 -m py_compile scripts/build_market_decision_dashboard.py
           python3 -m py_compile scripts/build_bulk_sku_tier_evidence.py
+          python3 -m py_compile scripts/build_official_content_evidence.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -635,6 +638,10 @@ jobs:
 
       - name: Assemble official manufacturer source batch (research only)
         run: python3 scripts/build_official_manufacturer_batch.py
+
+      - name: Inspect official document content and model markers (read-only)
+        run: python3 scripts/build_official_content_evidence.py
+
       - name: Upload monthly audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -692,6 +699,9 @@ jobs:
             official_source_batch_review.json
             official_source_batch_review_RU.md
             official_source_batch_queue.json
+            manufacturer_content_evidence.json
+            manufacturer_content_evidence_RU.md
+            manufacturer_content_review_queue.json
             bulk_sku_quality_review_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt
