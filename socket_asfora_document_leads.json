@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "status": "manual_document_identity_research_only",
+  "capturedOnResearchDate": "2026-11-04",
+  "catalogMaterialKey": "electricalSocketPerPiece",
+  "manufacturerPartNumber": "EPH2900221",
+  "officialManufacturerProductPage": {
+    "url": "https://www.se.com/ro/ro/product/EPH2900221/asfora-priza-simpla-2p%2Be-16a-obturatoare-alb/",
+    "observedPartNumberOnPage": "EPH2900221",
+    "observedGrounded2PPlusE": true,
+    "observedShutters": true,
+    "observedRatedAmperes": 16,
+    "observedCompleteProduct": true,
+    "currentModelManufacturingStatusIndependentlyVerified": false
+  },
+  "manufacturerBrandedDatasheetMirror": {
+    "url": "https://solarshop.baywa-re.lv/en/documents/schneider-electric-socket-outlet-eph2900221-3606480526107-0/188/26.pdf",
+    "hostIsManufacturerControlled": false,
+    "manufacturerDocumentOriginalVerified": false,
+    "historicalDocumentDateShown": "2021-02-11",
+    "observedPartNumberOnDocument": "EPH2900221",
+    "observedGrounded2PPlusE": true,
+    "observedShutters": true,
+    "observedRatedAmperes": 16,
+    "observedRatedVolts": 250,
+    "observedIpClass": "IP20",
+    "observedCompleteProduct": true,
+    "observedStandardMention": "IEC 60884-1",
+    "observedCertificationNamesNotIndependentlyValidated": ["TSE", "VDE", "AENOR"],
+    "dataNotCurrentIndependentLaboratoryProof": true
+  },
+  "officialComplianceDocumentRetrievalLead": {
+    "requestedUrl": "https://download.se.com/files?p_Doc_Ref=EPH2900221_ROHS_DECLARATION&p_File_Name=EPH2900221_ROHS_DECLARATION_ES_ca-ES.pdf&p_enDocType=Declaration+of+Conformity+%28Sustainability%29",
+    "requestedPartNumber": "EPH2900221",
+    "observedReturnedDocumentPartNumber": "A9CR5263",
+    "retrievalObservedDocumentIdentityConflict": true,
+    "observationIsNotProofOfManufacturerSiteFault": true,
+    "acceptedAsThisProductComplianceEvidence": false,
+    "notesRu": "В исследовательском просмотрщике ссылка с EPH2900221 показала PDF для A9CR5263. Возможна ошибка перенаправления, индексации или просмотрщика: требуется ручная сверка конечного PDF. Не засчитывать как подтверждение EPH2900221."
+  },
+  "remainingEvidenceRequirementsRu": [
+    "Получить технический PDF с официального домена производителя и сверить номер EPH2900221 внутри файла и дату версии.",
+    "Получить актуальное подтверждение статуса артикула и комплектации с рамкой для молдавского рынка.",
+    "Проверить точные размеры и совместимость установочной коробки для реальных смет.",
+    "Найти независимые результаты испытаний на надёжность и соответствие, а не только заявления на фирменном PDF.",
+    "Разделить сухие помещения (IP20) и влажные: не использовать этот источник как разрешение на влажную зону.",
+    "Проверить цену и наличие у каждого магазина на конкретную дату; не переносить снимки страниц в прайс-лист.",
+    "Без отдельных сопоставимых моделей и подтверждённых испытаний не присваивать Бюджет/Стандарт/Премиум."
+  ]
+}

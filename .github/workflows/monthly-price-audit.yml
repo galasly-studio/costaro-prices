@@ -47,6 +47,9 @@ on:
       - 'scripts/build_socket_model_comparison.py'
       - 'tests/test_socket_model_comparison.py'
       - 'socket_comparison_research_sources.json'
+      - 'scripts/build_socket_document_identity_review.py'
+      - 'tests/test_socket_document_identity_review.py'
+      - 'socket_asfora_document_leads.json'
       - 'tests/test_bulk_sku_tier_evidence.py'
       - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
@@ -144,6 +147,7 @@ jobs:
           python3 -m py_compile scripts/build_room_use_guard_review.py
           python3 -m py_compile scripts/build_manual_sku_pilot_dossiers.py
           python3 -m py_compile scripts/build_socket_model_comparison.py
+          python3 -m py_compile scripts/build_socket_document_identity_review.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -675,6 +679,9 @@ jobs:
       - name: Compare four indoor grounded socket leads with manufacturer source guards (read-only)
         run: python3 scripts/build_socket_model_comparison.py
 
+      - name: Audit exact Asfora PDF and compliance document identities without publication
+        run: python3 scripts/build_socket_document_identity_review.py
+
       - name: Upload monthly audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -744,6 +751,8 @@ jobs:
             manual_sku_pilot_dossiers_RU.md
             socket_model_comparison.json
             socket_model_comparison_RU.md
+            socket_document_identity_review.json
+            socket_document_identity_review_RU.md
             bulk_sku_quality_review_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt
