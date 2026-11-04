@@ -4,21 +4,29 @@ import unittest
 from pathlib import Path
 
 from scripts import build_socket_model_comparison as stage
+from scripts import build_manual_sku_pilot_dossiers as stage47
+from tests.test_manual_sku_pilot_dossiers import fixtures as stage47_fixtures
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def fixture():
-    paths = {
-        "pilot": "manual_sku_pilot_dossiers.json",
-        "research": "socket_comparison_research_sources.json",
-        "catalog": "prices.json",
-        "policy": "material_update_policy.json",
-        "readiness": "verified_release_readiness.json",
+    # GitHub Actions executes unittest *before* the Stage47 report is generated.
+    # Reuse Stage47's synthetic source fixtures, so tests require no CI artifacts.
+    source_inputs = stage47_fixtures()
+    research = json.loads((ROOT / "socket_comparison_research_sources.json").read_text(encoding="utf-8"))
+    official_asfora = research["models"][0]["officialUrl"]
+    for item in source_inputs["manufacturer"]["records"]:
+        if item["catalogMaterialKey"] == "electricalSocketPerPiece":
+            item["officialSourceLeadUrl"] = official_asfora
+    return {
+        "pilot": stage47.build(**source_inputs),
+        "research": research,
+        "catalog": source_inputs["catalog"],
+        "policy": source_inputs["policy"],
+        "readiness": source_inputs["readiness"],
     }
-    return {key: json.loads((ROOT / path).read_text(encoding="utf-8"))
-            for key, path in paths.items()}
 
 
 class Stage48Tests(unittest.TestCase):
