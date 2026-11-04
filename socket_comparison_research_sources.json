@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "status": "human_review_research_leads_only",
+  "capturedResearchDate": "2026-11-04",
+  "dateMeansCurrentPriceVerified": false,
+  "catalogMaterialKey": "electricalSocketPerPiece",
+  "notes": [
+    "All prices below are unverified page observations, not offers approved for COSTARO.",
+    "Two store domains are not proof of independent ownership or current physical stock.",
+    "IP20 indoor models are not automatically suitable for wet areas.",
+    "A complete socket and a frame-less 2-module mechanism must not be compared as equal installed products.",
+    "Manufacturer-stated ratings and marketing language are not independent durability testing."
+  ],
+  "models": [
+    {
+      "manufacturer": "Schneider Electric",
+      "range": "Asfora",
+      "mpn": "EPH2900221",
+      "officialUrl": "https://www.se.com/ro/ro/product/EPH2900221/asfora-priza-simpla-2p%2Be-16a-obturatoare-alb/",
+      "manufacturerLifecycleSignal": "no_discontinuation_notice_in_reviewed_page",
+      "technicalTraits": {
+        "grounded2PPlusE": true,
+        "shutters": true,
+        "ratedAmperes": 16,
+        "retailerDeclaredVolts": 250,
+        "retailerDeclaredIp": "IP20",
+        "mountingPackage": "complete_single_socket"
+      },
+      "retailLeads": [
+        {
+          "store": "Volta",
+          "url": "https://volta.md/produs/priza-schneider-eph2900221-250-v",
+          "pageKind": "exact_product_page",
+          "codeShown": "EPH2900221",
+          "priceSnapshotMDLNotVerified": 73.0,
+          "promotionSnapshot": false
+        },
+        {
+          "store": "Gebhardt",
+          "url": "https://gebhardt.md/priza-unitara-cu-obturator-schneider-eph2900221-asfora-16-a-250-v-alb.html",
+          "pageKind": "exact_product_page",
+          "codeShown": "EPH2900221",
+          "priceSnapshotMDLNotVerified": 74.0,
+          "promotionSnapshot": false
+        }
+      ],
+      "retailerDescriptionConflict": false,
+      "researchNotesRu": ["Два адреса точных карточек с одинаковым заводским артикулом.", "Нужно отдельно подтвердить наличие, дату цен, сертификаты и установочную комплектацию."]
+    },
+    {
+      "manufacturer": "Schneider Electric",
+      "range": "Easy Styl",
+      "mpn": "LMR5210001",
+      "officialUrl": "https://www.se.com/ro/ro/product/LMR5210001/easy-styl-priza-2p%2Be-obturatoare-2m-alb/",
+      "manufacturerLifecycleSignal": "no_discontinuation_notice_in_reviewed_page",
+      "technicalTraits": {
+        "grounded2PPlusE": true,
+        "shutters": true,
+        "ratedAmperes": 16,
+        "retailerDeclaredVolts": 250,
+        "retailerDeclaredIp": "IP20",
+        "mountingPackage": "modular_2m_frame_scope_unverified"
+      },
+      "retailLeads": [
+        {
+          "store": "Volta",
+          "url": "https://volta.md/produs/priza-unitara-cu-obturator-schneider-lmr5210001-250-v",
+          "pageKind": "exact_product_page",
+          "codeShown": "LMR5210001",
+          "priceSnapshotMDLNotVerified": 43.4,
+          "promotionSnapshot": true
+        },
+        {
+          "store": "Gebhardt",
+          "url": "https://gebhardt.md/prize",
+          "pageKind": "category_card",
+          "codeShown": "LMR5210001",
+          "priceSnapshotMDLNotVerified": 69.0,
+          "promotionSnapshot": false
+        }
+      ],
+      "retailerDescriptionConflict": false,
+      "researchNotesRu": ["Вторая ссылка ведёт на категорию, а не на карточку артикула.", "Цена Volta показана как распродажа; не считать её постоянной.", "Уточнить необходимость рамки и полную стоимость установки."]
+    },
+    {
+      "manufacturer": "Schneider Electric",
+      "range": "Glossa",
+      "mpn": "GSL000145",
+      "officialUrl": "https://www.se.com/kz/ru/product/GSL000145/glossa-%D1%80%D0%BE%D0%B7%D0%B5%D1%82%D0%BA%D0%B0-%D1%81-%D0%B7%D0%B0%D0%B7%D0%B5%D0%BC%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC-%D1%81%D0%BE-%D1%88%D1%82%D0%BE%D1%80%D0%BA%D0%B0%D0%BC%D0%B8-16%D0%B0-%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC-%D0%B1%D0%B5%D0%BB%D1%8B%D0%B9/",
+      "manufacturerLifecycleSignal": "regional_discontinuation_notice_2023_02_02",
+      "technicalTraits": {
+        "grounded2PPlusE": true,
+        "shutters": true,
+        "ratedAmperes": 16,
+        "retailerDeclaredVolts": 250,
+        "retailerDeclaredIp": "IP20",
+        "mountingPackage": "mechanism_frame_sold_separately"
+      },
+      "retailLeads": [
+        {
+          "store": "Volta",
+          "url": "https://volta.md/produs/priza-unitara-cu-obturator-schneider-gsl000145-250-v",
+          "pageKind": "exact_product_page",
+          "codeShown": "GSL000145",
+          "priceSnapshotMDLNotVerified": 94.0,
+          "promotionSnapshot": false
+        },
+        {
+          "store": "Moldcablu",
+          "url": "https://moldcablu.md/ru/rozetki-i-vyklyuchateli/rozetki/rozetki-schneider-electric/priza-schneider-electric-glossa-cu-i-fara-rama-cu-obloane-alba-gsl000145",
+          "pageKind": "exact_product_page",
+          "codeShown": "GSL000145",
+          "priceSnapshotMDLNotVerified": 60.0,
+          "promotionSnapshot": false
+        }
+      ],
+      "retailerDescriptionConflict": true,
+      "researchNotesRu": ["Страница Schneider Electric для Казахстана сообщает о снятии артикула с производства 02.02.2023; актуальность для Молдовы требует уточнения.", "В описании Moldcablu заголовок говорит о заземлении и отсутствии рамки, а текст — об отсутствии заземления и наличии рамки: конфликт.", "Исключить из подбора до выяснения статуса и комплектации."]
+    },
+    {
+      "manufacturer": "Schneider Electric",
+      "range": "New Unica",
+      "mpn": "NU303718",
+      "officialUrl": "https://www.se.com/ro/ro/product/NU303718/noua-unica-priza-2p%2Be-16a-obturatoare-alb/",
+      "manufacturerLifecycleSignal": "no_discontinuation_notice_in_reviewed_page",
+      "technicalTraits": {
+        "grounded2PPlusE": true,
+        "shutters": true,
+        "ratedAmperes": 16,
+        "retailerDeclaredVolts": 250,
+        "retailerDeclaredIp": "IP20",
+        "mountingPackage": "modular_2m_frame_scope_unverified"
+      },
+      "retailLeads": [
+        {
+          "store": "Volta",
+          "url": "https://volta.md/produs/priza-unitara-cu-obturator-schneider-nu303718-unica-studio-16-a-250-v-alb-NU303718",
+          "pageKind": "exact_product_page",
+          "codeShown": "NU303718",
+          "priceSnapshotMDLNotVerified": 85.0,
+          "promotionSnapshot": false
+        }
+      ],
+      "retailerDescriptionConflict": false,
+      "researchNotesRu": ["Пока обнаружена только одна подходящая молдавская карточка; нужна вторая.", "Уточнить рамку и стоимость законченной установки."]
+    }
+  ]
+}

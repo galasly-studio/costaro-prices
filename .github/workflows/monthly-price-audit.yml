@@ -44,6 +44,9 @@ on:
       - 'tests/test_room_use_guard_review.py'
       - 'scripts/build_manual_sku_pilot_dossiers.py'
       - 'tests/test_manual_sku_pilot_dossiers.py'
+      - 'scripts/build_socket_model_comparison.py'
+      - 'tests/test_socket_model_comparison.py'
+      - 'socket_comparison_research_sources.json'
       - 'tests/test_bulk_sku_tier_evidence.py'
       - 'tests/test_market_decision_dashboard.py'
       - 'tests/test_build_complete_material_criteria.py'
@@ -140,6 +143,7 @@ jobs:
           python3 -m py_compile scripts/build_material_decision_matrix.py
           python3 -m py_compile scripts/build_room_use_guard_review.py
           python3 -m py_compile scripts/build_manual_sku_pilot_dossiers.py
+          python3 -m py_compile scripts/build_socket_model_comparison.py
 
       - name: Run labor audit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -668,6 +672,9 @@ jobs:
       - name: Prepare five exact-SKU human approval pilots without publication
         run: python3 scripts/build_manual_sku_pilot_dossiers.py
 
+      - name: Compare four indoor grounded socket leads with manufacturer source guards (read-only)
+        run: python3 scripts/build_socket_model_comparison.py
+
       - name: Upload monthly audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -735,6 +742,8 @@ jobs:
             room_and_pack_safety_review_RU.md
             manual_sku_pilot_dossiers.json
             manual_sku_pilot_dossiers_RU.md
+            socket_model_comparison.json
+            socket_model_comparison_RU.md
             bulk_sku_quality_review_queue.json
             verified_release_readiness.json
             monthly_price_summary.txt
