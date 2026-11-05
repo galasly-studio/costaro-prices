@@ -50,6 +50,8 @@ jobs:
         run: |
           python3 scripts/prepare_verified_catalog_release.py \
             --catalog published_catalog/prices.json \
+            --labor-policy labor_update_policy.json \
+            --labor-evidence verified_labor_quotes.json \
             --report "$RUNNER_TEMP/costaro_price_release_readiness.json" \
             --candidate "$RUNNER_TEMP/costaro_release_candidate/prices.json"
 
@@ -66,20 +68,31 @@ jobs:
           report = json.loads((root / 'costaro_price_release_readiness.json').read_text(encoding='utf-8'))
           catalog = json.loads(Path('published_catalog/prices.json').read_text(encoding='utf-8'))
           policy = json.loads(Path('material_update_policy.json').read_text(encoding='utf-8'))
+          labor_policy = json.loads(Path('labor_update_policy.json').read_text(encoding='utf-8'))
           candidate = root / 'costaro_release_candidate/prices.json'
 
-          approved = (
+          material_approved = (
               catalog.get('status') == 'published'
               and catalog.get('automaticUpdatesEnabled') is True
               and policy.get('enabled') is True
               and policy.get('automaticPublicationApproved') is True
               and bool(policy.get('approvedMappings'))
           )
+          labor_approved = (
+              catalog.get('status') == 'published'
+              and catalog.get('automaticUpdatesEnabled') is True
+              and labor_policy.get('enabled') is True
+              and labor_policy.get('automaticPublicationApproved') is True
+              and bool(labor_policy.get('approvedMappings'))
+          )
+          approved = material_approved or labor_approved
           ready = report.get('status') == 'ready_for_guarded_publication'
           if ready != candidate.is_file():
               raise SystemExit('COSTARO STOP: candidate/report mismatch')
           if ready and (not approved or report.get('proposedPriceChanges', 0) <= 0):
               raise SystemExit('COSTARO STOP: readiness without approved changes')
+          if report.get('laborProposedPriceChanges', 0) > 0 and not labor_approved:
+              raise SystemExit('COSTARO STOP: labor changes without separate labor approval')
           research = json.loads(Path('prices.json').read_text(encoding='utf-8'))
           if research.get('status') != 'draft' or research.get('automaticUpdatesEnabled') is not False:
               raise SystemExit('COSTARO STOP: research baseline is not safely draft')
@@ -91,6 +104,7 @@ jobs:
               stream.write('## COSTARO: monthly verified catalog publication\n\n')
               stream.write(f"Status: **{report.get('status')}**\n\n")
               stream.write(f"Approved change candidates: **{report.get('proposedPriceChanges', 0)}**\n\n")
+              stream.write(f"Labor change candidates: **{report.get('laborProposedPriceChanges', 0)}**\n\n")
               stream.write('Holds: ' + (', '.join(report.get('holdReasons', [])) or 'none') + '\n\n')
               stream.write('Published: **' + str(publish) + '**\n')
           print('COSTARO PUBLISH:', publish)
