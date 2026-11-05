@@ -19,6 +19,12 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertIn("Доступность магазинов", workflow)
         self.assertIn("scripts/collect_prices.py", workflow)
         self.assertIn("verified_release_readiness.json", workflow)
+        # Readiness must evaluate the live, independently approved catalog,
+        # never the draft research baseline, and must refresh any old report.
+        self.assertIn("--catalog published_catalog/prices.json", workflow)
+        self.assertIn('mv verified_release_readiness.json "$RUNNER_TEMP/costaro_previous_readiness.json"', workflow)
+        self.assertIn('--candidate "$RUNNER_TEMP/costaro_monthly_candidate/prices.json"', workflow)
+        self.assertIn('--report verified_release_readiness.json', workflow)
         self.assertNotIn("git push", workflow)
         self.assertNotIn("actions/deploy-pages", workflow)
 

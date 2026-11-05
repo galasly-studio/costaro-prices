@@ -307,7 +307,18 @@ jobs:
       - name: Define criteria for all 41 material positions (read-only)
         run: python3 scripts/build_complete_material_criteria.py
       - name: Evaluate guarded publication readiness (read-only)
-        run: python3 scripts/prepare_verified_catalog_release.py
+        shell: bash
+        run: |
+          # An older report may be tracked in the research repository. Move it
+          # aside only in this disposable CI checkout; never reuse stale holds
+          # and never overwrite the published price feed.
+          if [ -f verified_release_readiness.json ]; then
+            mv verified_release_readiness.json "$RUNNER_TEMP/costaro_previous_readiness.json"
+          fi
+          python3 scripts/prepare_verified_catalog_release.py \
+            --catalog published_catalog/prices.json \
+            --candidate "$RUNNER_TEMP/costaro_monthly_candidate/prices.json" \
+            --report verified_release_readiness.json
 
       - name: Build joint material and labor market decision dashboard (read-only)
         run: python3 scripts/build_market_decision_dashboard.py
