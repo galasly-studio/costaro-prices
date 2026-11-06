@@ -22,9 +22,9 @@ SCOPE = "wall-paint-two-finish-coats-dry-room"
 
 def fixture(*, stage=False):
     catalog = load(ROOT / "published_catalog/prices.json")
-    baseline = load(ROOT / "app_embedded_baseline.json")
+    baseline = load(ROOT / "published_catalog/compatibility_baseline.json")
     key = "startPuttyWork" if stage else "wallPaintWork"
-    amount = 41 if stage else 26
+    amount = 41 if stage else 24
     policy = {
         "schemaVersion": 1, "enabled": True,
         "automaticPublicationApproved": True,
@@ -73,8 +73,8 @@ class LaborApprovalTests(unittest.TestCase):
         self.assertEqual(report["proposedCount"], 1)
         self.assertFalse(report["publishedPricesChanged"])
         self.assertFalse(report["approvedForPublication"])
-        self.assertEqual(candidate["laborPrices"]["wallPaintWork"]["budget"], 26)
-        self.assertEqual(catalog["laborPrices"]["wallPaintWork"]["budget"], 25)
+        self.assertEqual(candidate["laborPrices"]["wallPaintWork"]["budget"], 24)
+        self.assertEqual(catalog["laborPrices"]["wallPaintWork"]["budget"], 22.75)
         self.assertEqual(validate(candidate, baseline), [])
 
     def test_no_policy_consent(self):
@@ -153,11 +153,11 @@ class LaborApprovalTests(unittest.TestCase):
         self.assertEqual(report["status"], "ready_for_guarded_publication")
         self.assertEqual(report["proposedPriceChanges"], 1)
         self.assertEqual(report["laborProposedPriceChanges"], 1)
-        self.assertEqual(report["catalogVersionCandidate"], "0.1.2")
+        self.assertEqual(report["catalogVersionCandidate"], "0.1.3")
         self.assertEqual(report["lastVerifiedPartialLaborChangeDate"], "2026-11-05")
         self.assertEqual(candidate["materialPrices"], frozen["materialPrices"])
-        self.assertEqual(candidate["laborPrices"]["wallPaintWork"]["budget"], 26)
-        self.assertEqual(candidate["sourceAuditDate"], "2026-08-30")
+        self.assertEqual(candidate["laborPrices"]["wallPaintWork"]["budget"], 24)
+        self.assertEqual(candidate["sourceAuditDate"], "2026-11-05")
         self.assertEqual(catalog, frozen)
         self.assertEqual(validate(candidate, baseline), [])
 
@@ -173,7 +173,7 @@ class LaborApprovalTests(unittest.TestCase):
         self.assertEqual(report["proposedPriceChanges"], 2)
         self.assertEqual(report["laborProposedPriceChanges"], 1)
         self.assertEqual(candidate["materialPrices"]["gypsumPlaster"]["standard"]["price"], 152)
-        self.assertEqual(candidate["laborPrices"]["wallPaintWork"]["budget"], 26)
+        self.assertEqual(candidate["laborPrices"]["wallPaintWork"]["budget"], 24)
         self.assertEqual(candidate["sourceAuditDate"], catalog["sourceAuditDate"])
         self.assertEqual(validate(candidate, baseline), [])
 
@@ -192,7 +192,7 @@ class LaborApprovalTests(unittest.TestCase):
 
     def test_default_repository_has_no_approved_labor_rate(self):
         catalog = load(ROOT / "published_catalog/prices.json")
-        baseline = load(ROOT / "app_embedded_baseline.json")
+        baseline = load(ROOT / "published_catalog/compatibility_baseline.json")
         policy = load(ROOT / "labor_update_policy.json")
         evidence = load(ROOT / "verified_labor_quotes.json")
         result, candidate = plan(catalog, baseline, policy, evidence, now=NOW)

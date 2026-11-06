@@ -1,0 +1,756 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "0.1.2",
+  "country": "MD",
+  "currency": "MDL",
+  "status": "draft",
+  "automaticUpdatesEnabled": false,
+  "source": "Manually approved full November 2026 COSTARO embedded market catalog",
+  "sourceAuditDate": "2026-11-05",
+  "laborStagePrices": {
+    "startPuttyWork": {
+      "budget": 40,
+      "standard": 65,
+      "premium": 80
+    }
+  },
+  "laborPrices": {
+    "removeWallpaperWork": {
+      "budget": 21.38,
+      "standard": 32.5,
+      "premium": 34.21
+    },
+    "removePaintWork": {
+      "budget": 35.29,
+      "standard": 75,
+      "premium": 97.06
+    },
+    "removeTileWork": {
+      "budget": 25,
+      "standard": 37.5,
+      "premium": 68.75
+    },
+    "removeDecorativeWork": {
+      "budget": 50,
+      "standard": 74,
+      "premium": 100
+    },
+    "plasterWork": {
+      "budget": 77.5,
+      "standard": 116.25,
+      "premium": 174.38
+    },
+    "puttyWork": {
+      "budget": 37.5,
+      "standard": 50,
+      "premium": 75
+    },
+    "primerWork": {
+      "budget": 7.78,
+      "standard": 10,
+      "premium": 16.67
+    },
+    "wallpaperWork": {
+      "budget": 33.33,
+      "standard": 50,
+      "premium": 88.89
+    },
+    "wallPaintWork": {
+      "budget": 22.75,
+      "standard": 45.5,
+      "premium": 63.7
+    },
+    "wallTileWork": {
+      "budget": 128.33,
+      "standard": 192.5,
+      "premium": 280
+    },
+    "decorativeWork": {
+      "budget": 180,
+      "standard": 280,
+      "premium": 900
+    },
+    "floorRemoveSoftCoverWork": {
+      "budget": 15,
+      "standard": 20,
+      "premium": 25
+    },
+    "floorRemoveTileWork": {
+      "budget": 28.12,
+      "standard": 37.5,
+      "premium": 46.88
+    },
+    "floorRemoveOtherWork": {
+      "budget": 35,
+      "standard": 50,
+      "premium": 80
+    },
+    "floorScreedWork": {
+      "budget": 120,
+      "standard": 180,
+      "premium": 300
+    },
+    "selfLevelingFloorWork": {
+      "budget": 96.15,
+      "standard": 125,
+      "premium": 153.85
+    },
+    "floorPrimerWork": {
+      "budget": 14,
+      "standard": 20,
+      "premium": 30
+    },
+    "floorWaterproofingWork": {
+      "budget": 41.54,
+      "standard": 60,
+      "premium": 83.08
+    },
+    "laminateWork": {
+      "budget": 50,
+      "standard": 100,
+      "premium": 162.5
+    },
+    "vinylWork": {
+      "budget": 100,
+      "standard": 130,
+      "premium": 160
+    },
+    "linoleumWork": {
+      "budget": 46.8,
+      "standard": 78,
+      "premium": 140.4
+    },
+    "floorTileWork": {
+      "budget": 130,
+      "standard": 195,
+      "premium": 390
+    },
+    "skirtingWork": {
+      "budget": 16.61,
+      "standard": 46.5,
+      "premium": 93
+    },
+    "ceilingPaintWork": {
+      "budget": 37.84,
+      "standard": 46.25,
+      "premium": 58.86
+    },
+    "ceilingPuttyWork": {
+      "budget": 36.67,
+      "standard": 55,
+      "premium": 85.56
+    },
+    "ceilingPrimerWork": {
+      "budget": 11.67,
+      "standard": 17.5,
+      "premium": 29.17
+    },
+    "drywallCeilingWork": {
+      "budget": 88.57,
+      "standard": 155,
+      "premium": 221.43
+    },
+    "stretchCeilingTurnkey": {
+      "budget": 118.8,
+      "standard": 165,
+      "premium": 231
+    },
+    "electricalDeviceInstallWork": {
+      "budget": 38.54,
+      "standard": 92.5,
+      "premium": 246.67
+    },
+    "electricalSubboxInstallWork": {
+      "budget": 38.54,
+      "standard": 92.5,
+      "premium": 246.67
+    },
+    "electricalSubboxHoleWork": {
+      "budget": 22.5,
+      "standard": 37.5,
+      "premium": 90
+    },
+    "electricalCableLayWork": {
+      "budget": 14,
+      "standard": 20,
+      "premium": 30
+    },
+    "electricalLightInstallWork": {
+      "budget": 102.5,
+      "standard": 205,
+      "premium": 364.44
+    },
+    "electricalDeviceRemovalWork": {
+      "budget": 33,
+      "standard": 55,
+      "premium": 88
+    },
+    "electricalLightRemovalWork": {
+      "budget": 62.5,
+      "standard": 125,
+      "premium": 250
+    },
+    "plumbingWaterPipeWork": {
+      "budget": 39,
+      "standard": 65,
+      "premium": 97.5
+    },
+    "plumbingSewerPipeWork": {
+      "budget": 100,
+      "standard": 150,
+      "premium": 250
+    }
+  },
+  "materialPrices": {
+    "ceilingDirectHangerPerPiece": {
+      "budget": 2.56,
+      "standard": 3.2,
+      "premium": 4.16
+    },
+    "ceilingCrossConnectorPerPiece": {
+      "budget": 3.12,
+      "standard": 5,
+      "premium": 7.5
+    },
+    "ceilingExtensionConnectorPerPiece": {
+      "budget": 3.2,
+      "standard": 4,
+      "premium": 5.6
+    },
+    "ceilingBaseAnchorPerPiece": {
+      "budget": 2,
+      "standard": 2.31,
+      "premium": 2.31
+    },
+    "ceilingUdFastenerPerPiece": {
+      "budget": 0.49,
+      "standard": 0.7,
+      "premium": 0.8
+    },
+    "tilePerM2": {
+      "budget": 175.02,
+      "standard": 219,
+      "premium": 306.95
+    },
+    "laminatePerM2": {
+      "budget": 84.11,
+      "standard": 169,
+      "premium": 246.94
+    },
+    "vinylPerM2": {
+      "budget": 251.67,
+      "standard": 347.5,
+      "premium": 368.56
+    },
+    "linoleumPerM2": {
+      "budget": 88.74,
+      "standard": 118,
+      "premium": 169.92
+    },
+    "laminateUnderlayPerM2": {
+      "budget": 5,
+      "standard": 18,
+      "premium": 26
+    },
+    "skirtingAccessoryPerPiece": {
+      "budget": 5.6,
+      "standard": 8,
+      "premium": 11.2
+    },
+    "electricalSocketPerPiece": {
+      "budget": 42,
+      "standard": 73.5,
+      "premium": 147
+    },
+    "electricalSwitchPerPiece": {
+      "budget": 16.23,
+      "standard": 25.5,
+      "premium": 51
+    },
+    "electricalSubboxPerPiece": {
+      "budget": 2.5,
+      "standard": 5,
+      "premium": 10
+    },
+    "electricalLightingConnectorPerPoint": {
+      "budget": 22.5,
+      "standard": 23.25,
+      "premium": 24
+    },
+    "electricalSocketCablePerM": {
+      "budget": 29.15,
+      "standard": 36.15,
+      "premium": 46.65
+    },
+    "electricalLightingCablePerM": {
+      "budget": 19.64,
+      "standard": 24.55,
+      "premium": 34.37
+    },
+    "ceilingFrameFastenersPerM2": {
+      "budget": 20,
+      "standard": 30,
+      "premium": 45
+    },
+    "gypsumPlaster": {
+      "budget": {
+        "name": "Гипсовая штукатурка",
+        "amount": 30,
+        "unit": "кг",
+        "price": 109.81
+      },
+      "standard": {
+        "name": "Гипсовая штукатурка",
+        "amount": 25,
+        "unit": "кг",
+        "price": 137.5
+      },
+      "premium": {
+        "name": "Гипсовая штукатурка",
+        "amount": 25,
+        "unit": "кг",
+        "price": 164.24
+      }
+    },
+    "cementPlaster": {
+      "budget": {
+        "name": "Готовая сухая штукатурная смесь на цементной основе",
+        "amount": 25,
+        "unit": "кг",
+        "price": 83.15
+      },
+      "standard": {
+        "name": "Готовая сухая штукатурная смесь на цементной основе",
+        "amount": 25,
+        "unit": "кг",
+        "price": 94
+      },
+      "premium": {
+        "name": "Готовая сухая штукатурная смесь на цементной основе",
+        "amount": 25,
+        "unit": "кг",
+        "price": 94
+      }
+    },
+    "startPutty": {
+      "budget": {
+        "name": "Стартовая шпаклёвка",
+        "amount": 18,
+        "unit": "кг",
+        "price": 177.43
+      },
+      "standard": {
+        "name": "Стартовая шпаклёвка",
+        "amount": 20,
+        "unit": "кг",
+        "price": 272
+      },
+      "premium": {
+        "name": "Стартовая шпаклёвка",
+        "amount": 20,
+        "unit": "кг",
+        "price": 307.1
+      }
+    },
+    "finishPutty": {
+      "budget": {
+        "name": "Финишная шпаклёвка",
+        "amount": 8,
+        "unit": "кг",
+        "price": 167
+      },
+      "standard": {
+        "name": "Финишная шпаклёвка",
+        "amount": 8,
+        "unit": "кг",
+        "price": 191
+      },
+      "premium": {
+        "name": "Финишная шпаклёвка",
+        "amount": 8,
+        "unit": "кг",
+        "price": 234
+      }
+    },
+    "gypsumBoardCeiling": {
+      "budget": {
+        "name": "Гипсокартон для потолка 12,5 мм",
+        "amount": 3,
+        "unit": "м²/лист",
+        "price": 86.46
+      },
+      "standard": {
+        "name": "Гипсокартон для потолка 12,5 мм",
+        "amount": 3,
+        "unit": "м²/лист",
+        "price": 159
+      },
+      "premium": {
+        "name": "Гипсокартон для потолка 12,5 мм",
+        "amount": 3,
+        "unit": "м²/лист",
+        "price": 171.92
+      }
+    },
+    "ceilingCdProfile": {
+      "budget": {
+        "name": "Потолочный профиль CD 60/27",
+        "amount": 3,
+        "unit": "м/шт",
+        "price": 69.42
+      },
+      "standard": {
+        "name": "Потолочный профиль CD 60/27",
+        "amount": 3,
+        "unit": "м/шт",
+        "price": 89
+      },
+      "premium": {
+        "name": "Потолочный профиль CD 60/27",
+        "amount": 3,
+        "unit": "м/шт",
+        "price": 142.4
+      }
+    },
+    "ceilingUdProfile": {
+      "budget": {
+        "name": "Направляющий профиль UD 28/27",
+        "amount": 3,
+        "unit": "м/шт",
+        "price": 59.03
+      },
+      "standard": {
+        "name": "Направляющий профиль UD 28/27",
+        "amount": 3,
+        "unit": "м/шт",
+        "price": 61
+      },
+      "premium": {
+        "name": "Направляющий профиль UD 28/27",
+        "amount": 3,
+        "unit": "м/шт",
+        "price": 78.71
+      }
+    },
+    "ceilingMetalScrews": {
+      "budget": {
+        "name": "Саморезы металл-металл 3,5×9,5 мм",
+        "amount": 100,
+        "unit": "шт/уп",
+        "price": 36.58
+      },
+      "standard": {
+        "name": "Саморезы металл-металл 3,5×9,5 мм",
+        "amount": 100,
+        "unit": "шт/уп",
+        "price": 42
+      },
+      "premium": {
+        "name": "Саморезы металл-металл 3,5×9,5 мм",
+        "amount": 100,
+        "unit": "шт/уп",
+        "price": 54.19
+      }
+    },
+    "ceilingDrywallScrews": {
+      "budget": {
+        "name": "Саморезы ГКЛ-металл 3,5×25 мм",
+        "amount": 200,
+        "unit": "шт/уп",
+        "price": 32.59
+      },
+      "standard": {
+        "name": "Саморезы ГКЛ-металл 3,5×25 мм",
+        "amount": 200,
+        "unit": "шт/уп",
+        "price": 40
+      },
+      "premium": {
+        "name": "Саморезы ГКЛ-металл 3,5×25 мм",
+        "amount": 200,
+        "unit": "шт/уп",
+        "price": 53.33
+      }
+    },
+    "ceilingJointTape": {
+      "budget": {
+        "name": "Лента для швов ГКЛ",
+        "amount": 45,
+        "unit": "м/рул",
+        "price": 42
+      },
+      "standard": {
+        "name": "Лента для швов ГКЛ",
+        "amount": 45,
+        "unit": "м/рул",
+        "price": 49
+      },
+      "premium": {
+        "name": "Лента для швов ГКЛ",
+        "amount": 45,
+        "unit": "м/рул",
+        "price": 66.5
+      }
+    },
+    "primer": {
+      "budget": {
+        "name": "Грунтовка глубокого проникновения",
+        "amount": 3,
+        "unit": "кг",
+        "price": 109.81
+      },
+      "standard": {
+        "name": "Грунтовка глубокого проникновения",
+        "amount": 3,
+        "unit": "кг",
+        "price": 146
+      },
+      "premium": {
+        "name": "Грунтовка глубокого проникновения",
+        "amount": 3,
+        "unit": "кг",
+        "price": 182.19
+      }
+    },
+    "interiorPaint": {
+      "budget": {
+        "name": "Интерьерная краска",
+        "amount": 7,
+        "unit": "кг",
+        "price": 214
+      },
+      "standard": {
+        "name": "Интерьерная краска",
+        "amount": 7,
+        "unit": "кг",
+        "price": 325
+      },
+      "premium": {
+        "name": "Интерьерная краска",
+        "amount": 7,
+        "unit": "кг",
+        "price": 409.5
+      }
+    },
+    "wallpaper": {
+      "budget": {
+        "name": "Обои, рулон 10×0,53 м",
+        "amount": 5.3,
+        "unit": "м²/рулон",
+        "price": 93
+      },
+      "standard": {
+        "name": "Обои, рулон 10×1,06 м",
+        "amount": 10.6,
+        "unit": "м²/рулон",
+        "price": 550
+      },
+      "premium": {
+        "name": "Обои, рулон 10×1,06 м",
+        "amount": 10.6,
+        "unit": "м²/рулон",
+        "price": 615
+      }
+    },
+    "wallpaperGlue": {
+      "budget": {
+        "name": "Клей для обоев",
+        "amount": 1,
+        "unit": "уп.",
+        "price": 35
+      },
+      "standard": {
+        "name": "Клей для обоев",
+        "amount": 1,
+        "unit": "уп.",
+        "price": 52
+      },
+      "premium": {
+        "name": "Клей для обоев",
+        "amount": 1,
+        "unit": "уп.",
+        "price": 74
+      }
+    },
+    "decorativePlaster": {
+      "budget": {
+        "name": "Декоративная штукатурка",
+        "amount": 25,
+        "unit": "кг",
+        "price": 831.82
+      },
+      "standard": {
+        "name": "Декоративная штукатурка",
+        "amount": 25,
+        "unit": "кг",
+        "price": 890
+      },
+      "premium": {
+        "name": "Декоративная штукатурка",
+        "amount": 25,
+        "unit": "кг",
+        "price": 1445.71
+      }
+    },
+    "tileAdhesive": {
+      "budget": {
+        "name": "Клей для плитки",
+        "amount": 25,
+        "unit": "кг",
+        "price": 59.66
+      },
+      "standard": {
+        "name": "Клей для плитки",
+        "amount": 25,
+        "unit": "кг",
+        "price": 110
+      },
+      "premium": {
+        "name": "Клей для плитки",
+        "amount": 25,
+        "unit": "кг",
+        "price": 152.88
+      }
+    },
+    "grout": {
+      "budget": {
+        "name": "Затирка для швов",
+        "amount": 2,
+        "unit": "кг",
+        "price": 95.89
+      },
+      "standard": {
+        "name": "Затирка для швов",
+        "amount": 2,
+        "unit": "кг",
+        "price": 175
+      },
+      "premium": {
+        "name": "Затирка для швов",
+        "amount": 2,
+        "unit": "кг",
+        "price": 250.51
+      }
+    },
+    "floorScreedMix": {
+      "budget": {
+        "name": "Смесь для цементной стяжки",
+        "amount": 25,
+        "unit": "кг",
+        "price": 91.2
+      },
+      "standard": {
+        "name": "Смесь для цементной стяжки",
+        "amount": 25,
+        "unit": "кг",
+        "price": 96
+      },
+      "premium": {
+        "name": "Смесь для цементной стяжки",
+        "amount": 25,
+        "unit": "кг",
+        "price": 120
+      }
+    },
+    "selfLevelingFloorMix": {
+      "budget": {
+        "name": "Самовыравнивающаяся смесь для пола",
+        "amount": 25,
+        "unit": "кг",
+        "price": 166.1
+      },
+      "standard": {
+        "name": "Самовыравнивающаяся смесь для пола",
+        "amount": 25,
+        "unit": "кг",
+        "price": 234.5
+      },
+      "premium": {
+        "name": "Самовыравнивающаяся смесь для пола",
+        "amount": 25,
+        "unit": "кг",
+        "price": 293.12
+      }
+    },
+    "floorWaterproofing": {
+      "budget": {
+        "name": "Гидроизоляция для пола",
+        "amount": 5,
+        "unit": "кг",
+        "price": 665.83
+      },
+      "standard": {
+        "name": "Гидроизоляция для пола",
+        "amount": 5,
+        "unit": "кг",
+        "price": 799
+      },
+      "premium": {
+        "name": "Гидроизоляция для пола",
+        "amount": 5,
+        "unit": "кг",
+        "price": 1041.12
+      }
+    },
+    "pvcSkirtingPiece": {
+      "budget": {
+        "name": "Плинтус ПВХ",
+        "amount": 2.5,
+        "unit": "м/шт",
+        "price": 50.03
+      },
+      "standard": {
+        "name": "Плинтус ПВХ",
+        "amount": 2.5,
+        "unit": "м/шт",
+        "price": 79
+      },
+      "premium": {
+        "name": "Плинтус ПВХ",
+        "amount": 2.5,
+        "unit": "м/шт",
+        "price": 86.9
+      }
+    },
+    "mdfSkirtingPiece": {
+      "budget": {
+        "name": "Плинтус MDF",
+        "amount": 2.4,
+        "unit": "м/шт",
+        "price": 160.78
+      },
+      "standard": {
+        "name": "Плинтус MDF",
+        "amount": 2.4,
+        "unit": "м/шт",
+        "price": 245
+      },
+      "premium": {
+        "name": "Плинтус MDF",
+        "amount": 2.4,
+        "unit": "м/шт",
+        "price": 306.25
+      }
+    },
+    "woodSkirtingPiece": {
+      "budget": {
+        "name": "Деревянный плинтус",
+        "amount": 2.5,
+        "unit": "м/шт",
+        "price": 16.67
+      },
+      "standard": {
+        "name": "Деревянный плинтус",
+        "amount": 2.5,
+        "unit": "м/шт",
+        "price": 35
+      },
+      "premium": {
+        "name": "Деревянный плинтус",
+        "amount": 2.5,
+        "unit": "м/шт",
+        "price": 52.59
+      }
+    }
+  }
+}

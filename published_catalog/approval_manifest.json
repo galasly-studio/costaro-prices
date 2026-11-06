@@ -1,12 +1,26 @@
-﻿{
-    "status":  "approved_historical_fallback",
-    "decision":  "option_1",
-    "catalogVersion":  "0.1.1",
-    "historicalAuditDate":  "2026-08-30",
-    "currentMarketPricesVerified":  false,
-    "publishedToGitHub":  false,
-    "publishedToGooglePlay":  false,
-    "workingCatalogUnchanged":  true,
-    "sha256":  "E4253125A3EF220AEC5729C45C6A5ECFD7DE2C77336870D969CEE6692791D307",
-    "approvedAt":  "2026-11-04T22:03:43.2186678+02:00"
+{
+  "schemaVersion": 1,
+  "status": "manually_approved_complete_november_catalog",
+  "approvedByUser": true,
+  "approvedBy": "Sergey COSTARO owner, explicit approval in chat on 2026-11-05",
+  "approvedAt": "2026-11-05T21:26:51Z",
+  "sourceAuditDate": "2026-11-05",
+  "materialCountApproved": 41,
+  "laborCountApproved": 38,
+  "marketEvidenceVerified": false,
+  "approvalBasis": "user_accepted_indicative_market_estimates",
+  "indicativeMarketEstimatesAcceptedByUser": true,
+  "modelledQualityTiersAcknowledged": true,
+  "unconfirmedQuoteDatesAcknowledged": true,
+  "acceptedProxyKeys": [
+    "electricalLightingConnectorPerPoint",
+    "removeDecorativeWork",
+    "startPuttyWork"
+  ],
+  "inactiveHistoricalKeys": [
+    "ceilingFrameFastenersPerM2",
+    "floorRemoveOtherWork"
+  ],
+  "approvedWorkbookSha256": "7808521b726aab4d7da3ffb5d52f67dfe482fab2dd852c92e749f67c9834ccd0",
+  "catalogSha256": "b361223f06c3d323d51b9b49b0e9565082fbd7a4d73c61b976e56699ae844225"
 }

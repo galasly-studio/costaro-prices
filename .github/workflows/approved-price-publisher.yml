@@ -38,7 +38,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -p 'test_*.py' -v
           python3 scripts/validate_app_catalog.py --catalog prices.json --baseline app_embedded_baseline.json
-          python3 scripts/validate_app_catalog.py --catalog published_catalog/prices.json --baseline app_embedded_baseline.json
+          python3 scripts/validate_app_catalog.py --catalog published_catalog/prices.json --baseline published_catalog/compatibility_baseline.json
 
       - name: Collect fresh material and labor evidence
         run: |
@@ -50,6 +50,7 @@ jobs:
         run: |
           python3 scripts/prepare_verified_catalog_release.py \
             --catalog published_catalog/prices.json \
+            --baseline published_catalog/compatibility_baseline.json \
             --labor-policy labor_update_policy.json \
             --labor-evidence verified_labor_quotes.json \
             --report "$RUNNER_TEMP/costaro_price_release_readiness.json" \
@@ -124,7 +125,7 @@ jobs:
         shell: bash
         run: |
           cp "$RUNNER_TEMP/costaro_release_candidate/prices.json" published_catalog/prices.json
-          python3 scripts/validate_app_catalog.py --catalog published_catalog/prices.json --baseline app_embedded_baseline.json
+          python3 scripts/validate_app_catalog.py --catalog published_catalog/prices.json --baseline published_catalog/compatibility_baseline.json
           git diff --check -- published_catalog/prices.json
           git config user.name 'costaro-price-bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
